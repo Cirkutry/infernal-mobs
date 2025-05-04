@@ -1,4 +1,4 @@
-package io.hotmail.com.jacob_vejvoda.infernal_mobs;
+package jacob_vejvoda.infernal_mobs;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;

@@ -1,3 +1,5 @@
+# Loot configuration for Infernal Mobs
+
 potionEffects:
   '1':
     potion: INCREASE_DAMAGE

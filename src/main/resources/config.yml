@@ -1,0 +1,426 @@
+#  ██╗███╗   ██╗███████╗███████╗██████╗ ███╗   ██╗ █████╗ ██╗     
+#  ██║████╗  ██║██╔════╝██╔════╝██╔══██╗████╗  ██║██╔══██╗██║     
+#  ██║██╔██╗ ██║█████╗  █████╗  ██████╔╝██╔██╗ ██║███████║██║     
+#  ██║██║╚██╗██║██╔══╝  ██╔══╝  ██╔══██╗██║╚██╗██║██╔══██║██║     
+#  ██║██║ ╚████║██║     ███████╗██║  ██║██║ ╚████║██║  ██║███████╗
+#  ╚═╝╚═╝  ╚═══╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
+#                                                               
+#          ███╗   ███╗ ██████╗ ██████╗ ███████╗                   
+#          ████╗ ████║██╔═══██╗██╔══██╗██╔════╝                   
+#          ██╔████╔██║██║   ██║██████╔╝███████╗                   
+#          ██║╚██╔╝██║██║   ██║██╔══██╗╚════██║                   
+#          ██║ ╚═╝ ██║╚██████╔╝██████╔╝███████║                   
+#          ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝                                                                                  
+
+
+# The base spawn weight for Infernal mobs (1/N chance of a mob becoming Infernal)
+# Higher value = lower probability (1/100 chance when set to 100)
+# Min value: 1 (every mob becomes Infernal)
+chance: 100
+
+# Override spawn weights for specific mob types
+mobChances:
+  Ghast: 100
+
+# Used to control how rare specific power levels are. (Uncomment to use)
+# After a mob passes the above initial chance checks and has powers assigned, this is checked
+# Format: '<number of abilities>: <weight>'
+# Number of abilities of the mob are received from minpowers and maxpowers setting
+# If the check fails, the mob will NOT become Infernal at all
+#levelChance:
+#  '3': 1  # Always accept mobs with 3 abilities (1/1 chance)
+#  '4': 2  # 1/2 chance to keep mobs with 4 abilities  
+#  '5': 4  # 1/4 chance to keep mobs with 5 abilities
+#  '6': 8  # 1/8 chance to keep mobs with 6 abilities
+#  '7': 16  # 1/16 chance to keep mobs with 7 abilities
+
+# Default prefix for Infernal mobs.
+namePrefix: '&fInfernal'
+
+# Custom prefixes for different levels of Infernal mobs
+levelPrefixs:
+  '3': '&fMad'     # Prefix for level 3 mobs
+  '4': '&fRabid'   # Prefix for level 4 mobs
+
+# Minimum level for mobs to show name tags (1 = show for all Infernal mobs)
+nameTagsLevel: 1
+
+# Format for the name tag displayed above Infernal mobs
+# <prefix> = prefix configured above, <mobName> = type of mob
+nameTagsName: '&f<prefix> <mobName>'
+
+# Format for boss bar display
+# <mobLevel> = level of the mob, <prefix> = configured prefix, <mobName> = type of mob
+bossBarsName: '&fLevel <mobLevel> &f<prefix> <mobName>'
+
+# Whether to display boss bars for Infernal mobs
+enableBossBar: true
+
+# Configure boss bar appearance
+bossBarSettings:
+  # Default boss bar color (PINK, BLUE, RED, GREEN, YELLOW, PURPLE, WHITE)
+  defaultColor: "PINK"
+  # Default boss bar style (SOLID, SEGMENTED_6, SEGMENTED_10, SEGMENTED_12, SEGMENTED_20)
+  defaultStyle: "SOLID"
+  # Custom boss bar settings for specific mob types
+  perMob:
+    Ghast:
+      color: "RED"
+      style: "SEGMENTED_12"
+
+  # Custom boss bar settings for specific mob levels
+  perLevel:
+    '5':
+      color: "GREEN"
+      style: "SEGMENTED_6"
+
+# Whether to display scoreboard info for Infernal mobs
+enableScoreBoard: false
+
+# Whether to show mob health on the scoreboard
+showHealthOnScoreBoard: true
+
+# Whether Infernal mob effects trigger on all player attacks
+effectAllPlayerAttacks: true
+
+# Whether to show particle effects for Infernal mobs
+enableParticles: true
+
+# Whether to display custom death messages when Infernal mobs are killed
+enableDeathMessages: false
+
+# List of death messages when Infernal mobs are killed (Ignored if enableDeathMessages = false)
+# "player" will be replaced with killer's name, "mob" will be replaced with mob type
+deathMessages:
+- '&cplayer &chas killed an mob&c!'
+- '&cAn mob &cwas slain by player&c!'
+- '&cplayer &cowned an mob&c!'
+- '&cAn mob &cwas beheaded by player&c''s weapon!'
+- '&cplayer&c''s weapon &ckilled an mob&c!'
+- '&cAn mob &cwas killed by player &cusing a weapon&c!'
+
+# Whether to display messages when Infernal mobs spawn near players
+enableSpawnMessages: false
+
+# Radius (in blocks) to send spawn messages to players
+spawnMessageRadius: 64
+
+# List of spawn messages to display (chosen randomly when mobs spawn)
+spawnMessages:
+- '&cAn Infernal mob has spawned near you!'
+- '&cWatch out!'
+- '&cYou hear a faint scream...'
+- '&cSomething is coming...'
+- '&cYou hear a mob nearby...'
+
+# Worlds where Infernal mobs can spawn (<all> = all worlds)
+mobworlds:
+- <all>
+
+# Worlds where Infernal mob effects are active (<all> = all worlds)
+effectworlds:
+- <all>
+
+# List of mob types that can spawn as Infernal mobs
+enabledmobs:
+- WITHER_SKELETON
+- STRAY
+- HUSK
+- ZOMBIE_VILLAGER
+- CREEPER
+- SKELETON
+- SPIDER
+- GIANT
+- ZOMBIE
+- SLIME
+- GHAST
+- PIG_ZOMBIE
+- ENDERMAN
+
+# Inventory slots that can hold Infernal charms (0-8 = hotbar, 36-39 = armor slots, 40 = offhand)
+enabledCharmSlots:
+- 0
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 40
+- 36
+- 37
+- 38
+- 39
+
+# Enable/disable each ability type (true = enabled, false = disabled)
+
+# Applies poison effect to players
+poisonous: true
+
+# Increases mob's armor/protection
+armoured: true
+
+# Blinds players when hit
+blinding: true
+
+# Applies wither effect to players
+withering: true
+
+# Tosses players into the air when hit
+tosser: true
+
+# Steals items from player inventory
+thief: true
+
+# Slows down players (quicksand effect)
+quicksand: true
+
+# Reduces damage taken from attacks
+bullwark: true
+
+# Damages/breaks player's armor
+rust: true
+
+# Drains player's hunger
+sapper: true
+
+# Mob resurrects once after being killed
+1up: true
+
+# Mob becomes invisible periodically
+cloaked: true
+
+# Teleports like an enderman when hit
+ender: true
+
+# Shoots fireballs like a ghast
+ghastly: true
+
+# Heals when damaging players
+lifesteal: true
+
+# Moves faster than normal
+sprint: true
+
+# Creates lightning strikes
+storm: true
+
+# Creates cobwebs around hit players
+webber: true
+
+# Reflects damage back to attacker
+vengeance: true
+
+# Applies weakness effect to players
+weakness: true
+
+# Increases attack damage when health is low
+berserk: true
+
+# Explodes when killed
+explode: true
+
+# Can use various potion effects
+potions: true
+
+# Spawns babies when hit
+mama: true
+
+# Sets players on fire
+molten: true
+
+# Shoots arrows at players
+archer: true
+
+# Spawns other mobs when attacking
+necromancer: true
+
+# Launches fireworks when hit
+firework: true
+
+# Causes levitation effect
+gravity: true
+
+# Can fly/hover in the air
+flying: true
+
+# Mob is riding another mob
+mounted: true
+
+# Can transform into other mob types
+morph: true
+
+# Partially transparent and can pass through blocks
+ghost: true
+
+# Causes confusion effect to players
+confusing: true
+
+# Settings for specific abilities
+
+# Number of mobs spawned by the 'mama' ability
+mamaSpawnAmount: 3
+
+# Amount of damage reflected by 'vengeance' ability
+vengeanceDamage: 6
+
+# Additional damage when 'berserk' ability activates
+berserkDamage: 3
+
+# Duration in seconds for 'molten' burn effect
+moltenBurnLength: 5
+
+# Duration in seconds for 'gravity' levitation effect
+gravityLevitateLength: 6
+
+# Whether mounted horses have saddles
+horseMountsHaveSaddles: true
+
+# Whether armored mounts have armor
+armouredMountsHaveArmour: true
+
+# Color for firework ability (RGB values)
+fireworkColour:
+  red: 255
+  green: 10
+  blue: 10
+
+# Spawn reasons that can create Infernal mobs
+# Commented spawn reasons will not generate Infernal mobs
+enabledSpawnReasons:
+- BREEDING
+#- BUILD_IRONGOLEM
+#- BUILD_SNOWMAN
+- BUILD_WITHER
+- CHUNK_GEN
+#- CURED
+- CUSTOM
+- DEFAULT
+#- DISPENSE_EGG
+#- EGG
+- INFECTION
+- SPAWNER_EGG
+#- JOCKEY
+- LIGHTNING
+#- MOUNT
+- NATURAL
+- NETHER_PORTAL
+- OCELOT_BABY
+- REINFORCEMENTS
+- SILVERFISH_BLOCK
+- SLIME_SPLIT
+#- SPAWNER
+#- SPAWNER_EGG
+#- TRAP
+#- VILLAGE_DEFENSE
+- VILLAGE_INVASION
+
+# Particle effects used by Infernal mobs (format: effect:count:speed)
+mobParticles:
+- lavaSpark:1:10
+
+# What happens to a mount when its rider is killed (nothing, kill, remove)
+mountFate: nothing
+
+# Mob types that can be used as mounts
+enabledMounts:
+- SPIDER
+- SKELETON_HORSE
+- ZOMBIE_HORSE
+- DONKEY
+- MULE
+- SLIME
+- GHAST
+- MAGMA_CUBE
+- ENDER_DRAGON
+- BAT
+- PIG
+- SHEEP
+- COW
+- CHICKEN
+- MUSHROOM_COW
+- HORSE
+- POLAR_BEAR
+- LLAMA
+- PHANTOM
+- HOGLIN
+- ZOGLIN
+- STRIDER
+
+# Mob types that can ride mounts
+enabledRiders:
+- WITHER_SKELETON
+- STRAY
+- HUSK
+- ZOMBIE_VILLAGER
+- EVOKER
+- VINDICATOR
+- SKELETON
+- ZOMBIE
+- PIG_ZOMBIE
+- ENDERMAN
+- WITCH
+- SNOWMAN
+- VILLAGER
+- ILLUSIONER
+- DROWNED
+- ZOMBIFIED_PIGLIN
+- PIGLIN
+
+# Baby versions of these mobs will not become Infernal
+disabledBabyMobs:
+- WOLF
+- MUSHROOM_COW
+- COW
+- SHEEP
+- PIG
+- CHICKEN
+- OCELOT
+- HORSE
+
+# Minimum number of powers for Infernal mobs
+minpowers: 3
+
+# Maximum number of powers for Infernal mobs
+maxpowers: 7
+
+# Health multiplier for Infernal mobs (base health × this value)
+healthMultiplier: 4
+
+# Whether health increases based on number of powers
+healthByPower: false
+
+# Whether health increases based on distance from spawn
+healthByDistance: false
+
+# Whether number of powers increases based on distance from spawn
+powerByDistance: false
+
+# Additional health to add when healthByPower or healthByDistance is true
+healthToAdd: 5
+
+# Additional powers to add when powerByDistance is true
+powerToAdd: 1
+
+# Experience multiplier for Infernal mobs
+xpMultiplier: 8
+
+# Distance from spawn for incremental health/power addition
+addDistance: 200
+
+# Whether Infernal mobs can drop special loot
+enableDrops: true
+
+# Chance (0.0-1.0) for Infernal mobs to drop loot
+dropChance: 1
+
+# Whether passive (farm) animals can drop loot when killed
+enableFarmingDrops: false
+
+# Minimum height requirement for natural spawns to become Infernal (0 = no minimum)
+naturalSpawnHeight: 0
+
+# Config version - Do not touch :)
+configVersion: '7.0'
