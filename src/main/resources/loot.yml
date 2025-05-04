@@ -4,7 +4,7 @@ potionEffects:
   '1':
     potion: INCREASE_DAMAGE
     level: 2
-    particleEffect: CLOUD:0:1
+    particleEffect: cloud:0:1
     requiredItems:
     - 7
   '2':

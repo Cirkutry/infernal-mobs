@@ -720,106 +720,44 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
 
     private String getEffect() {
-        String effect = "mobSpawnerFire";
+        String effect = "FLAME:1:1";
         try {
             List<String> partTypes = configManager.getStringList("mobParticles");
-            effect = partTypes.get(new Random().nextInt(partTypes.size()));
+            if (partTypes != null && !partTypes.isEmpty()) {
+                String selectedEffect = partTypes.get(new Random().nextInt(partTypes.size()));
+                if (selectedEffect.contains(":")) {
+                    String[] parts = selectedEffect.split(":");
+                    if (parts.length >= 3) {
+                        effect = selectedEffect;
+                    } else {
+                        effect = parts[0] + ":1:1";
+                    }
+                } else {
+                    effect = selectedEffect + ":1:1";
+                }
+            }
         } catch (Exception e) {
-            System.out.println("Error: " + e);
+            getLogger().warning("Error getting particle effect: " + e.getMessage());
         }
         return effect;
     }
 
     private void displayEffect(Location l, String effect) {
-        if (effect == null) {
-            try {
-                effect = getEffect();
-            } catch (Exception e) {
-                effect = "mobSpawnerFire";
-            }
+        if ((effect == null) || (effect.equals(""))) {
+            effect = getEffect();
         }
         String[] split = effect.split(":");
         effect = split[0];
         int data1 = Integer.parseInt(split[1]);
         int data2 = Integer.parseInt(split[2]);
         try {
-            String f = "FLAME";
-            switch (effect) {
-                case "potionBrake":
-                    f = "SPELL";
-                    break;
-                case "smoke":
-                    f = "SMOKE_NORMAL";
-                    break;
-                case "blockBrake":
-                    f = "BLOCK_CRACK";
-                    break;
-                case "hugeExplode":
-                    f = "EXPLOSION_HUGE";
-                    break;
-                case "angryVillager":
-                    f = "VILLAGER_ANGRY";
-                    break;
-                case "cloud":
-                    f = "CLOUD";
-                    break;
-                case "criticalHit":
-                    f = "CRIT";
-                    break;
-                case "mobSpell":
-                    f = "SPELL_MOB";
-                    break;
-                case "enchantmentTable":
-                    f = "ENCHANTMENT_TABLE";
-                    break;
-                case "ender":
-                    f = "PORTAL";
-                    break;
-                case "explode":
-                    f = "EXPLOSION_NORMAL";
-                    break;
-                case "greenSparkle":
-                    f = "VILLAGER_HAPPY";
-                    break;
-                case "heart":
-                    f = "HEART";
-                    break;
-                case "largeExplode":
-                    f = "EXPLOSION_LARGE";
-                    break;
-                case "splash":
-                    f = "WATER_SPLASH";
-                    break;
-                case "largeSmoke":
-                    f = "SMOKE_LARGE";
-                    break;
-                case "lavaSpark":
-                    f = "LAVA";
-                    break;
-                case "magicCriticalHit":
-                    f = "CRIT_MAGIC";
-                    break;
-                case "noteBlock":
-                    f = "NOTE";
-                    break;
-                case "tileDust":
-                    f = "BLOCK_DUST";
-                    break;
-                case "colouredDust":
-                    f = "REDSTONE";
-                    break;
-                case "flame":
-                    f = "FLAME";
-                    break;
-                case "witchMagic":
-                    f = "SPELL_WITCH";
-                    break;
-            }
-            if (f != null) {
-                displayParticle(f, l, 1.0, data1, data2);
-            } else
-                l.getWorld().playEffect(l, Effect.MOBSPAWNER_FLAMES, data2);
+            displayParticle(effect, l, 1.0, data1, data2);
         } catch (Exception x) {
+            try {
+                displayParticle("FLAME", l, 1.0, data1, data2);
+            } catch (Exception ignored) {
+                l.getWorld().playEffect(l, Effect.MOBSPAWNER_FLAMES, data2);
+            }
         }
     }
 
@@ -914,7 +852,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                             } else {
                                                 fb = ((LivingEntity) mob).launchProjectile(WitherSkull.class);
                                             }
-                                            moveToward(fb, player.getLocation(), 0.6);
+                                            moveToward(fb, player.getLocation(), 0.6D);
                                         }
                                     }
                                 }
@@ -1194,9 +1132,10 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     case "ghastly":
                     case "necromancer":
                         if ((!vic.isDead()) && ((!(vic instanceof Player)) || ((!((Player) vic).isSneaking()) && (!((Player) vic).getGameMode().equals(GameMode.CREATIVE))))) {
-                            Fireball fb;
+                            Fireball fb = null;
                             if (ability.equals("ghastly")) {
                                 fb = ((LivingEntity) atc).launchProjectile(Fireball.class);
+                                vic.getWorld().playSound(vic.getLocation(), Sound.AMBIENT_CAVE, 5, 1);
                             } else {
                                 fb = ((LivingEntity) atc).launchProjectile(WitherSkull.class);
                             }
@@ -1890,19 +1829,21 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         amount = (amount <= 0) ? 1 : amount;
         Location l = new Location(w, x, y, z);
         try {
+            Particle particle = Particle.valueOf(effect);
             if (radius <= 0) {
-                w.spawnParticle(Particle.valueOf(effect), l, amount, 0, 0, 0, speed);
+                w.spawnParticle(particle, l, amount, 0, 0, 0, speed);
             } else {
                 List<Location> ll = getArea(l, radius, 0.2);
                 if (ll.size() > 0){
                     for (int i = 0; i < amount; i++) {
                         int index = new Random().nextInt(ll.size());
-                        w.spawnParticle(Particle.valueOf(effect), ll.get(index), 1, 0, 0, 0, 0);
+                        w.spawnParticle(particle, ll.get(index), 1, 0, 0, 0, 0);
                         ll.remove(index);
                     }
                 }
             }
         } catch (Exception ex) {
+            getLogger().warning("Error displaying particle: " + ex.getMessage());
         }
     }
 

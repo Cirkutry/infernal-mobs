@@ -369,7 +369,7 @@ public class EventListener implements Listener {
                 }
                 
                 if (aList.contains("explode")) {
-                    TNTPrimed tnt = (TNTPrimed) event.getEntity().getWorld().spawnEntity(event.getEntity().getLocation(), EntityType.valueOf("TNT_PRIMED"));
+                    TNTPrimed tnt = (TNTPrimed) event.getEntity().getWorld().spawnEntity(event.getEntity().getLocation(), EntityType.TNT);
                     tnt.setFuseTicks(1);
                 }
                 boolean isGhost = false;

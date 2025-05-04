@@ -11,7 +11,8 @@
 #          ██║╚██╔╝██║██║   ██║██╔══██╗╚════██║                   
 #          ██║ ╚═╝ ██║╚██████╔╝██████╔╝███████║                   
 #          ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝                                                                                  
-
+ 
+# Source: https://github.com/Cirkutry/infernal-mobs
 
 # The base spawn weight for Infernal mobs (1/N chance of a mob becoming Infernal)
 # Higher value = lower probability (1/100 chance when set to 100)
@@ -121,7 +122,8 @@ mobWorlds:
 effectWorlds:
 - <all>
 
-# List of mob types that can spawn as Infernal mobs
+# Mob types that can turn into Infernal mobs
+# List of mob types: https://minecraft.wiki/w/Mob#List_of_mobs
 enabledMobs:
 - WITHER_SKELETON
 - STRAY
@@ -137,7 +139,8 @@ enabledMobs:
 - PIG_ZOMBIE
 - ENDERMAN
 
-# Inventory slots that can hold Infernal charms (0-8 = hotbar, 36-39 = armor slots, 40 = offhand)
+# Inventory slots that can hold Infernal charms
+# (0-8 = hotbar, 36-39 = armor slots, 40 = offhand)
 enabledCharmSlots:
 - 0
 - 1
@@ -288,38 +291,27 @@ fireworkColour:
   blue: 10
 
 # Spawn reasons that can create Infernal mobs
-# Commented spawn reasons will not generate Infernal mobs
+# List of possible spawn reasons: https://jd.papermc.io/paper/1.21.5/org/bukkit/event/entity/CreatureSpawnEvent.SpawnReason.html
 enabledSpawnReasons:
 - BREEDING
-#- BUILD_IRONGOLEM
-#- BUILD_SNOWMAN
 - BUILD_WITHER
 - CHUNK_GEN
-#- CURED
 - CUSTOM
 - DEFAULT
-#- DISPENSE_EGG
-#- EGG
 - INFECTION
 - SPAWNER_EGG
-#- JOCKEY
 - LIGHTNING
-#- MOUNT
 - NATURAL
 - NETHER_PORTAL
 - OCELOT_BABY
 - REINFORCEMENTS
 - SILVERFISH_BLOCK
 - SLIME_SPLIT
-#- SPAWNER
-#- SPAWNER_EGG
-#- TRAP
-#- VILLAGE_DEFENSE
 - VILLAGE_INVASION
 
-# Particle effects used by Infernal mobs (format: effect:count:speed)
+# Particle effects used by Infernal mobs (Format: effect:count:speed)
 mobParticles:
-- lavaSpark:1:10
+- LAVA:1:10
 
 # What happens to a mount when its rider is killed (nothing, kill, remove)
 mountFate: nothing
