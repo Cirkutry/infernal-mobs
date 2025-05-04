@@ -2216,7 +2216,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                         reloadConfig();
                         refreshLoot();
                         reloadMobSave();
-                        sender.sendMessage("§eConfig reloaded!");
+                        sender.sendMessage("§eConfig files reloaded successfully!");
                     } else if (args[0].equals("mobList")) {
                         sender.sendMessage("§6Mob List:");
                         for (EntityType et : EntityType.values())
@@ -2519,7 +2519,13 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     
     public void refreshLoot() {
         try {
-            this.lootFile.reload();
+            this.lootFile = YamlDocument.create(
+                lootYML,
+                GeneralSettings.DEFAULT,
+                LoaderSettings.DEFAULT,
+                DumperSettings.DEFAULT,
+                UpdaterSettings.DEFAULT
+            );
             this.getLogger().info("Loot configuration reloaded successfully.");
         } catch (IOException e) {
             this.getLogger().log(Level.SEVERE, "Failed to reload loot configuration!", e);
@@ -2529,7 +2535,6 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     public void reloadMobSave() {
         try {
             this.mobSaveFile.reload();
-            this.getLogger().info("Mob save configuration reloaded successfully.");
         } catch (IOException e) {
             this.getLogger().log(Level.SEVERE, "Failed to reload mob save configuration!", e);
         }
