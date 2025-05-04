@@ -586,11 +586,13 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             if (lootFile.getString("loot." + loot + ".name") != null && lootFile.isString("loot." + loot + ".name")) {
                 name = lootFile.getString("loot." + loot + ".name");
                 name = prosessLootName(name, stack);
+                name = ChatColor.translateAlternateColorCodes('&', name);
             } else if (lootFile.isList("loot." + loot + ".name")) {
                 List<String> names = lootFile.getStringList("loot." + loot + ".name");
                 if (!names.isEmpty()) {
                     name = names.get(rand(1, names.size()) - 1);
                     name = prosessLootName(name, stack);
+                    name = ChatColor.translateAlternateColorCodes('&', name);
                 }
             }
             
@@ -2583,17 +2585,15 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             return null;
         }
         
-
         if (!lootName.startsWith("[")) {
             return lootName;
         }
         
-
         try {
-
             List<String> names = lootFile.getStringList(lootName);
             if (names != null && !names.isEmpty()) {
-                return names.get(new Random().nextInt(names.size()));
+                String name = names.get(new Random().nextInt(names.size()));
+                return name;
             }
         } catch (Exception e) {
 
