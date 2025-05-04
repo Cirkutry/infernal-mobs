@@ -975,7 +975,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                 for (Map.Entry<Integer, ItemStack> hm : itemMap.entrySet()) {
                                     ItemStack check = hm.getValue();
                                     try {
-                                        if ((neededItem.getItemMeta() == null) || (check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
+                                        if ((neededItem.getItemMeta() == null) || (check.getItemMeta() != null && check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
                                             if (check.getType().equals(neededItem.getType())) {
                                                     if (!isArmor(neededItem) || hm.getKey() >= 100)
                                                         itemsPlayerHas.add(neededItem);
@@ -1128,8 +1128,8 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                             ItemStack neededItem = getItem(neededItemIndex);
                             for (ItemStack check : items) {
                                 try {
-                                    if ((neededItem.getItemMeta() == null) || (itemUsed.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
-                                        if (itemUsed.getType().equals(neededItem.getType())) {
+                                    if ((neededItem.getItemMeta() == null) || (check.getItemMeta() != null && check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
+                                        if (check.getType().equals(neededItem.getType())) {
                                                 if (!itemsPlayerHas.contains(neededItem)) {
                                                     itemsPlayerHas.add(neededItem);
                                                 }
