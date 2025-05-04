@@ -306,7 +306,7 @@ public class EventListener implements Listener {
                 Block spawner = plugin.blockNear(event.getEntity().getLocation(), Material.SPAWNER, 10);
                 if (spawner != null) {
                     String name = plugin.getLocationName(spawner.getLocation());
-                    if (plugin.mobSaveFile.getString("infernalSpanwers." + name) != null) {
+                    if (plugin.mobSaveFile.getString("infernalSpawners." + name) != null) {
                         if (this.spawnerMap.get(name) == null) {
                             plugin.makeInfernal(event.getEntity(), true);
                             this.spawnerMap.put(name, plugin.serverTime);
@@ -314,7 +314,7 @@ public class EventListener implements Listener {
                             long startTime = this.spawnerMap.get(name);
                             long endTime = plugin.serverTime;
                             long timePassed = endTime - startTime;
-                            int delay = plugin.mobSaveFile.getInt("infernalSpanwers." + name);
+                            int delay = plugin.mobSaveFile.getInt("infernalSpawners." + name);
                             if (timePassed >= delay) {
                                 plugin.makeInfernal(event.getEntity(), true);
                                 this.spawnerMap.put(name, plugin.serverTime);
@@ -343,8 +343,8 @@ public class EventListener implements Listener {
             throws IOException {
         if (e.getBlock().getType().equals(Material.SPAWNER)) {
             String name = plugin.getLocationName(e.getBlock().getLocation());
-            if (plugin.mobSaveFile.getString("infernalSpanwers." + name) != null) {
-                plugin.mobSaveFile.set("infernalSpanwers." + name, null);
+            if (plugin.mobSaveFile.getString("infernalSpawners." + name) != null) {
+                plugin.mobSaveFile.set("infernalSpawners." + name, null);
                 plugin.mobSaveFile.save(plugin.saveYML);
                 if (e.getPlayer().isOp()) {
                     e.getPlayer().sendMessage("§cYou broke an infernal mob spawner!");

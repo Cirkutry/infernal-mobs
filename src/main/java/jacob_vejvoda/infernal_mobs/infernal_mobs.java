@@ -2571,7 +2571,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
 
                                 String name = getLocationName(player.getTargetBlock(null, 25).getLocation());
 
-                                this.mobSaveFile.set("infernalSpanwers." + name, delay);
+                                this.mobSaveFile.set("infernalSpawners." + name, delay);
                                 this.mobSaveFile.save(this.saveYML);
                                 sender.sendMessage("§cSpawner set to infernal with a " + delay + " second delay!");
                             } else {
