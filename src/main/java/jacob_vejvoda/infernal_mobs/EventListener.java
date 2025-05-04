@@ -95,7 +95,7 @@ public class EventListener implements Listener {
 	    	    			for (int j = 1 ; j <= 10 ; j++) {
 	    		    			for (int i = 1 ; i <= 10 ; i++) {
 	    							Location loc = new Location(p.getWorld(), px + (i * x), py + (i * z), pz + (i * y));
-	    							beamParticals(loc);
+	    							beamParticles(loc);
 	    		    			}
 	    	    			}
 	    	        	}
@@ -105,7 +105,7 @@ public class EventListener implements Listener {
     	}catch(Exception x) {}
     }
     
-    private void beamParticals(Location loc){
+    private void beamParticles(Location loc){
     	int speed = -1;
     	int amount = 1;
         double r = 0;
@@ -329,8 +329,8 @@ public class EventListener implements Listener {
                 return;
             }
             String entName = event.getEntity().getType().name();
-            if (((plugin.getConfig().getStringList("mobworlds").contains(world.getName())) || (plugin.getConfig().getStringList("mobworlds").contains("<all>"))) &&
-                    (plugin.getConfig().getStringList("enabledmobs").contains(entName)) &&
+            if (((plugin.getConfig().getStringList("mobWorlds").contains(world.getName())) || (plugin.getConfig().getStringList("mobWorlds").contains("<all>"))) &&
+                    (plugin.getConfig().getStringList("enabledMobs").contains(entName)) &&
                     (plugin.getConfig().getInt("naturalSpawnHeight") < event.getEntity().getLocation().getY()) &&
                     (plugin.getConfig().getStringList("enabledSpawnReasons").contains(event.getSpawnReason().toString()))) {
                 plugin.makeInfernal(event.getEntity(), false);
@@ -433,8 +433,8 @@ public class EventListener implements Listener {
                         int max = plugin.getConfig().getInt("dropChance");
                         int randomNum = new Random().nextInt(max - min + 1) + min;
                         if ((dropSpot != null) && (randomNum == 1)) {
-                            Item dropedItem = event.getEntity().getWorld().dropItemNaturally(dropSpot, drop);
-                            plugin.keepAlive(dropedItem);
+                            Item droppedItem = event.getEntity().getWorld().dropItemNaturally(dropSpot, drop);
+                            plugin.keepAlive(droppedItem);
                         }
                         int xpm = plugin.getConfig().getInt("xpMultiplier");
                         int xp = event.getDroppedExp() * xpm;

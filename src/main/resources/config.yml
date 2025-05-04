@@ -25,7 +25,7 @@ mobChances:
 # Used to control how rare specific power levels are. (Uncomment to use)
 # After a mob passes the above initial chance checks and has powers assigned, this is checked
 # Format: '<number of abilities>: <weight>'
-# Number of abilities of the mob are received from minpowers and maxpowers setting
+# Number of abilities of the mob are received from minPowers and maxPowers setting
 # If the check fails, the mob will NOT become Infernal at all
 #levelChance:
 #  '3': 1  # Always accept mobs with 3 abilities (1/1 chance)
@@ -38,7 +38,7 @@ mobChances:
 namePrefix: '&fInfernal'
 
 # Custom prefixes for different levels of Infernal mobs
-levelPrefixs:
+levelPrefixes:
   '3': '&fMad'     # Prefix for level 3 mobs
   '4': '&fRabid'   # Prefix for level 4 mobs
 
@@ -114,15 +114,15 @@ spawnMessages:
 - '&cYou hear a mob nearby...'
 
 # Worlds where Infernal mobs can spawn (<all> = all worlds)
-mobworlds:
+mobWorlds:
 - <all>
 
 # Worlds where Infernal mob effects are active (<all> = all worlds)
-effectworlds:
+effectWorlds:
 - <all>
 
 # List of mob types that can spawn as Infernal mobs
-enabledmobs:
+enabledMobs:
 - WITHER_SKELETON
 - STRAY
 - HUSK
@@ -381,10 +381,10 @@ disabledBabyMobs:
 - HORSE
 
 # Minimum number of powers for Infernal mobs
-minpowers: 3
+minPowers: 3
 
 # Maximum number of powers for Infernal mobs
-maxpowers: 7
+maxPowers: 7
 
 # Health multiplier for Infernal mobs (base health × this value)
 healthMultiplier: 4

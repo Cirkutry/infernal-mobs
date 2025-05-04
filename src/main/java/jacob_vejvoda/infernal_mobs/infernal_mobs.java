@@ -104,7 +104,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     long serverTime = 0L;
     private int loops;
     ArrayList<InfernalMob> infernalList = new ArrayList();
-    private ArrayList<UUID> dropedLootList = new ArrayList();
+    private ArrayList<UUID> droppedLootList = new ArrayList();
     private File lootYML = new File(getDataFolder(), "loot.yml");
     File saveYML = new File(getDataFolder(), "save.yml");
     public YamlDocument config;
@@ -255,7 +255,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
                 String entName1 = e.getType().name();
                 if ((!e.isDead()) && (e.isValid()) && (
-                        ((getConfig().getStringList("enabledmobs").contains(entName1))) || ((fixed) &&
+                        ((getConfig().getStringList("enabledMobs").contains(entName1))) || ((fixed) &&
                                 (idSearch(id) == -1)))) {
                     int min = 1;
                     int max = chance;
@@ -476,10 +476,10 @@ public class infernal_mobs extends JavaPlugin implements Listener {
 
     void keepAlive(Item item) {
         final UUID id = item.getUniqueId();
-        this.dropedLootList.add(id);
+        this.droppedLootList.add(id);
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
             public void run() {
-                infernal_mobs.this.dropedLootList.remove(id);
+                infernal_mobs.this.droppedLootList.remove(id);
             }
         }, 300L);
     }
@@ -1121,7 +1121,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     public void applyEffect() {
         for (Player p : this.getServer().getOnlinePlayers()) {
             World world = p.getWorld();
-            if (getConfig().getStringList("effectworlds").contains(world.getName()) || (getConfig().getStringList("effectworlds").contains("<all>"))) {
+            if (getConfig().getStringList("effectWorlds").contains(world.getName()) || (getConfig().getStringList("effectWorlds").contains("<all>"))) {
                 HashMap<Integer, ItemStack> itemMap = new HashMap<>();
                 for (int i : (ArrayList<Integer>) getConfig().getList("enabledCharmSlots", new ArrayList<>())) {
                     ItemStack in;
@@ -1244,8 +1244,8 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         }, 20 * time);
     }
 
-    void doEffect(Player player, final Entity mob, boolean playerIsVictom) {
-        if (!playerIsVictom) {
+    void doEffect(Player player, final Entity mob, boolean playerIsVictim) {
+        if (!playerIsVictim) {
             ItemStack itemUsed = player.getInventory().getItemInMainHand();
             ArrayList<ItemStack> items = new ArrayList<>();
             for (int i = 0; i < 9; i++) {
@@ -1314,13 +1314,13 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                 List<String> abilityList = findMobAbilities(id);
                 if ((!player.isDead()) && (!mob.isDead())) {
                     for (String ability : abilityList)
-                        doMagic(player, mob, playerIsVictom, ability, id);
+                        doMagic(player, mob, playerIsVictim, ability, id);
                 }
             }
         } catch (Exception e) {/**System.out.println("Do Effect Error: " + e);**/}
     }
 
-    private void doMagic(Entity vic, Entity atc, boolean playerIsVictom, String ability, UUID id) {
+    private void doMagic(Entity vic, Entity atc, boolean playerIsVictim, String ability, UUID id) {
         int min = 1;
         int max = 10;
         int randomNum = new Random().nextInt(max - min) + min;
@@ -1365,9 +1365,9 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             }
             if (ability.equals("ender")) {
                 atc.teleport(vic.getLocation());
-            } else if ((ability.equals("poisonous")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("poisonous")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) vic).addPotionEffect(new PotionEffect(PotionEffectType.POISON, 200, 1));
-            } else if ((ability.equals("morph")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("morph")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 try {
                     Entity newEnt;
                     int mc = new Random().nextInt(25) + 1;
@@ -1384,7 +1384,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     atc.teleport(new Location(atc.getWorld(), l.getX(), 0.0D, l.getZ()));
                     atc.remove();
                     this.getLogger().log(Level.INFO, "Entity remove due to Morph");
-                    List<String> mList = getConfig().getStringList("enabledmobs");
+                    List<String> mList = getConfig().getStringList("enabledMobs");
                     int index = new Random().nextInt(mList.size());
                     String mobName = mList.get(index);
 
@@ -1428,7 +1428,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     ex.printStackTrace();
                 }
             }
-            if ((ability.equals("molten")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            if ((ability.equals("molten")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 int amount;
                 if (getConfig().getString("moltenBurnLength") != null) {
                     amount = getConfig().getInt("moltenBurnLength");
@@ -1436,13 +1436,13 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     amount = 5;
                 }
                 vic.setFireTicks(amount * 20);
-            } else if ((ability.equals("blinding")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("blinding")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) vic).addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 60, 1));
-            } else if ((ability.equals("confusing")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("confusing")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) vic).addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 80, 2));
-            } else if ((ability.equals("withering")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("withering")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) vic).addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 180, 1));
-            } else if ((ability.equals("thief")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("thief")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 if ((vic instanceof Player)) {
                     if ((!((Player) vic).getInventory().getItemInMainHand().getType().equals(Material.AIR)) && ((randomNum <= 1) || (randomNum == 1))) {
                         vic.getWorld().dropItemNaturally(atc.getLocation(), ((Player) vic).getInventory().getItemInMainHand());
@@ -1454,21 +1454,21 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     vic.getWorld().dropItemNaturally(atc.getLocation(), eq.getItemInMainHand());
                     eq.setItemInMainHand(null);
                 }
-            } else if ((ability.equals("quicksand")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("quicksand")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) vic).addPotionEffect(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 180, 1));
-            } else if ((ability.equals("bullwark")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("bullwark")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) atc).addPotionEffect(new PotionEffect(org.bukkit.potion.PotionEffectType.RESISTANCE, 500, 2));
-            } else if ((ability.equals("rust")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("rust")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ItemStack damItem = ((Player) vic).getInventory().getItemInMainHand();
                 if (((randomNum <= 3) || (randomNum == 1)) && (damItem.getMaxStackSize() == 1)) {
                     int cDur = ((Damageable)damItem.getItemMeta()).getDamage();
                     ((Damageable)damItem.getItemMeta()).setDamage(cDur + 20);
                 }
-            } else if ((ability.equals("sapper")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((ability.equals("sapper")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                 ((LivingEntity) vic).addPotionEffect(new PotionEffect(org.bukkit.potion.PotionEffectType.HUNGER, 500, 1), true);
-            } else if ((!ability.equals("1up")) || (!isLegitVictim(atc, playerIsVictom, ability))) {
+            } else if ((!ability.equals("1up")) || (!isLegitVictim(atc, playerIsVictim, ability))) {
                 Location needAir2;
-                if ((ability.equals("ender")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                if ((ability.equals("ender")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                     Location targetLocation = vic.getLocation();
                     if (randomNum >= 8) {
                         Random rand2 = new Random();
@@ -1493,15 +1493,15 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                             atc.teleport(targetLocation);
                         }
                     }
-                } else if ((ability.equals("lifesteal")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                } else if ((ability.equals("lifesteal")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                     ((LivingEntity) atc).addPotionEffect(new PotionEffect(org.bukkit.potion.PotionEffectType.REGENERATION, 20, 1));
-                } else if ((!ability.equals("cloaked")) || (!isLegitVictim(atc, playerIsVictom, ability))) {
-                    if ((ability.equals("storm")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                } else if ((!ability.equals("cloaked")) || (!isLegitVictim(atc, playerIsVictim, ability))) {
+                    if ((ability.equals("storm")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                         if (((randomNum <= 2) || (randomNum == 1)) && (!atc.isDead())) {
                             vic.getWorld().strikeLightning(vic.getLocation());
                         }
-                    } else if ((!ability.equals("sprint")) || (!isLegitVictim(atc, playerIsVictom, ability))) {
-                        if ((ability.equals("webber")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                    } else if ((!ability.equals("sprint")) || (!isLegitVictim(atc, playerIsVictim, ability))) {
+                        if ((ability.equals("webber")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             if ((randomNum >= 8) || (randomNum == 1)) {
                                 Location feet = vic.getLocation();
                                 feet.getBlock().setType(Material.COBWEB);
@@ -1521,7 +1521,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                     }
                                 }
                             }
-                        } else if ((ability.equals("vengeance")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("vengeance")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             if ((randomNum >= 5) || (randomNum == 1)) {
                                 int amount;
                                 if (getConfig().getString("vengeanceDamage") != null) {
@@ -1533,10 +1533,10 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                     ((LivingEntity) vic).damage((int) Math.round(2.0D * amount));
                                 }
                             }
-                        } else if ((ability.equals("weakness")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("weakness")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             ((LivingEntity) vic).addPotionEffect(new PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, 500, 1));
                             ((LivingEntity) vic).addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 500, 1));
-                        } else if ((ability.equals("berserk")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("berserk")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             if ((randomNum >= 5) && (!atc.isDead())) {
                                 double health = ((org.bukkit.entity.Damageable) atc).getHealth();
                                 ((org.bukkit.entity.Damageable) atc).setHealth(health - 1.0D);
@@ -1550,7 +1550,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                     ((LivingEntity) vic).damage((int) Math.round(2.0D * amount));
                                 }
                             }
-                        } else if ((ability.equals("potions")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("potions")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             ItemStack iStack = new ItemStack(Material.POTION);
                             PotionMeta potion = (PotionMeta) iStack.getItemMeta();
                             switch (randomNum) {
@@ -1579,7 +1579,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                             dist /= 15.0D;
                             direction.multiply(dist);
                             thrownPotion.setVelocity(direction);
-                        } else if ((ability.equals("mama")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("mama")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             if (randomNum == 1) {
                                 int amount;
                                 if (getConfig().getString("mamaSpawnAmount") != null) {
@@ -1648,7 +1648,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                     }
                                 }
                             }
-                        } else if ((ability.equals("archer")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("archer")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             if ((randomNum > 7) || (randomNum == 1)) {
                                 ArrayList<Arrow> arrowList = new ArrayList();
                                 Location loc1 = vic.getLocation();
@@ -1689,7 +1689,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                     }
                                 }
                             }
-                        } else if ((ability.equals("firework")) && (isLegitVictim(atc, playerIsVictom, ability))) {
+                        } else if ((ability.equals("firework")) && (isLegitVictim(atc, playerIsVictim, ability))) {
                             int red = getConfig().getInt("fireworkColour.red");
                             int green = getConfig().getInt("fireworkColour.green");
                             int blue = getConfig().getInt("fireworkColour.blue");
@@ -1771,7 +1771,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         }, 2L);
     }
 
-    private boolean isLegitVictim(Entity e, boolean playerIsVictom, String ability) {
+    private boolean isLegitVictim(Entity e, boolean playerIsVictim, String ability) {
         if ((e instanceof Player)) {
             return true;
         }
@@ -1792,7 +1792,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         attackAbilityList.add("potions");
         attackAbilityList.add("archer");
         attackAbilityList.add("confusing");
-        if ((playerIsVictom) && (attackAbilityList.contains(ability))) {
+        if ((playerIsVictim) && (attackAbilityList.contains(ability))) {
             return true;
         }
         ArrayList<String> defendAbilityList = new ArrayList();
@@ -1810,7 +1810,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         defendAbilityList.add("mama");
         defendAbilityList.add("firework");
         defendAbilityList.add("morph");
-        return (!playerIsVictom) && (defendAbilityList.contains(ability));
+        return (!playerIsVictim) && (defendAbilityList.contains(ability));
     }
 
     private void setAir(final Location block, int time) {
@@ -1832,8 +1832,8 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             int add = getConfig().getInt("powerToAdd");
             power = m * add;
         } else {
-            int min = getConfig().getInt("minpowers");
-            int max = getConfig().getInt("maxpowers");
+            int min = getConfig().getInt("minPowers");
+            int max = getConfig().getInt("maxPowers");
             power = rand(min, max);
         }
         return getAbilities(power);
@@ -2077,7 +2077,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
 
     private String getRandomMob() {
-        List<String> mobList = getConfig().getStringList("enabledmobs");
+        List<String> mobList = getConfig().getStringList("enabledMobs");
         if (mobList.isEmpty()) {
             return "Zombie";
         }
@@ -2389,7 +2389,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                         sender.sendMessage("§eLoops: " + this.loops);
                         sender.sendMessage("§eInfernals: " + this.infernalList.size());
                     } else if ((args.length == 1) && (args[0].equalsIgnoreCase("worldInfo"))) {
-                        List<String> enWorldList = getConfig().getStringList("mobworlds");
+                        List<String> enWorldList = getConfig().getStringList("mobWorlds");
                         World world = player.getWorld();
                         String enabled = "is not";
                         if (enWorldList.contains(world.getName()) || enWorldList.contains("<all>")) {
@@ -2400,8 +2400,8 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     } else if ((args.length == 1) && (args[0].equalsIgnoreCase("help"))) {
                         throwError(sender);
                     } else if ((args.length == 1) && (args[0].equalsIgnoreCase("getloot"))) {
-                        int min = getConfig().getInt("minpowers");
-                        int max = getConfig().getInt("maxpowers");
+                        int min = getConfig().getInt("minPowers");
+                        int max = getConfig().getInt("maxPowers");
                         int powers = rand(min, max);
                         ItemStack gottenLoot = getRandomLoot(player, getRandomMob(), powers);
                         if (gottenLoot != null) {
@@ -2445,7 +2445,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                             Entity ent;
                             if ((args[0].equalsIgnoreCase("cspawn")) && (args[2] != null) && (args[3] != null) && (args[4] != null) && (args[5] != null)) {
                                 if (Bukkit.getServer().getWorld(args[2]) == null) {
-                                    sender.sendMessage(args[2] + " dose not exist!");
+                                    sender.sendMessage(args[2] + " does not exist!");
                                     return true;
                                 }
                                 world = Bukkit.getServer().getWorld(args[2]);
@@ -2490,10 +2490,10 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                 Location farSpawnLoc = player.getTargetBlock(null, 200).getLocation();
                                 farSpawnLoc.setY(farSpawnLoc.getY() + 1.0D);
                                 Entity ent = player.getWorld().spawnEntity(farSpawnLoc, EntityType.valueOf(args[1].toUpperCase()));
-                                ArrayList<String> spesificAbList = new ArrayList();
+                                ArrayList<String> specificAbList = new ArrayList();
                                 for (int i = 0; i <= args.length - 3; i++) {
                                     if (getConfig().getString(args[(i + 2)]) != null) {
-                                        spesificAbList.add(args[(i + 2)]);
+                                        specificAbList.add(args[(i + 2)]);
                                     } else {
                                         sender.sendMessage(args[(i + 2)] + " is not a valid ability!");
                                         return true;
@@ -2501,28 +2501,28 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                 }
                                 InfernalMob newMob;
                                 UUID id = ent.getUniqueId();
-                                if (spesificAbList.contains("1up")) {
-                                    newMob = new InfernalMob(ent, id, true, spesificAbList, 2, getEffect());
+                                if (specificAbList.contains("1up")) {
+                                    newMob = new InfernalMob(ent, id, true, specificAbList, 2, getEffect());
                                 } else {
-                                    newMob = new InfernalMob(ent, id, true, spesificAbList, 1, getEffect());
+                                    newMob = new InfernalMob(ent, id, true, specificAbList, 1, getEffect());
                                 }
-                                if (spesificAbList.contains("flying")) {
+                                if (specificAbList.contains("flying")) {
                                     makeFly(ent);
                                 }
                                 this.infernalList.add(newMob);
                                 this.gui.setName(ent);
                                 giveMobGear(ent, false);
 
-                                addHealth(ent, spesificAbList);
+                                addHealth(ent, specificAbList);
 
                                 sender.sendMessage("Spawned a " + args[1] + " with the abilities:");
-                                sender.sendMessage(spesificAbList.toString());
+                                sender.sendMessage(specificAbList.toString());
                             } else {
                                 sender.sendMessage("Can't spawn a " + args[1] + "!");
                             }
                         } else if (args[0].equalsIgnoreCase("cspawn")) {
                             if (Bukkit.getServer().getWorld(args[2]) == null) {
-                                sender.sendMessage(args[2] + " dose not exist!");
+                                sender.sendMessage(args[2] + " does not exist!");
                                 return true;
                             }
                             World world = Bukkit.getServer().getWorld(args[2]);
@@ -2575,7 +2575,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                 this.mobSaveFile.save(this.saveYML);
                                 sender.sendMessage("§cSpawner set to infernal with a " + delay + " second delay!");
                             } else {
-                                sender.sendMessage("§cYou must be looking a spawner to make it infernal!");
+                                sender.sendMessage("§cYou must be looking at a spawner to make it infernal!");
                             }
                         } else if ((args[0].equalsIgnoreCase("kill")) && (args.length == 2)) {
                             int size = Integer.parseInt(args[1]);

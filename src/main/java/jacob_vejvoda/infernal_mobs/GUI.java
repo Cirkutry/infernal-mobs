@@ -85,8 +85,8 @@ public class GUI implements Listener {
             mobName = "WitherSkeleton";
         }
         String prefix = plugin.getConfig().getString("namePrefix", "&fInfernal");
-        if (plugin.getConfig().getString("levelPrefixs." + oldMobAbilityList.size()) != null) {
-            prefix = plugin.getConfig().getString("levelPrefixs." + oldMobAbilityList.size());
+        if (plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size()) != null) {
+            prefix = plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size());
         }
         tittle = tittle.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
         tittle = tittle.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
@@ -229,8 +229,8 @@ public class GUI implements Listener {
             } while ((tittle.length() + abilities.length() + mobName.length()) > 64);
             tittle = tittle.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
             String prefix = plugin.getConfig().getString("namePrefix");
-            if (plugin.getConfig().getString("levelPrefixs." + oldMobAbilityList.size()) != null)
-                prefix = plugin.getConfig().getString("levelPrefixs." + oldMobAbilityList.size());
+            if (plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size()) != null)
+                prefix = plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size());
             tittle = tittle.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
             tittle = ChatColor.translateAlternateColorCodes('&', tittle);
         } catch (Exception x) {
