@@ -39,9 +39,11 @@ import jacob_vejvoda.infernal_mobs.BoostedYamlAdapter;
 public class EventListener implements Listener {
     private static infernal_mobs plugin;
     private HashMap<String, Long> spawnerMap = new HashMap<>();
+    public ConfigManager configManager;
 
     EventListener(infernal_mobs instance) {
         plugin = instance;
+        this.configManager = instance.getConfigManager();
     }
     
     @EventHandler(priority = EventPriority.HIGH)
@@ -329,10 +331,10 @@ public class EventListener implements Listener {
                 return;
             }
             String entName = event.getEntity().getType().name();
-            if (((plugin.getConfig().getStringList("mobWorlds").contains(world.getName())) || (plugin.getConfig().getStringList("mobWorlds").contains("<all>"))) &&
-                    (plugin.getConfig().getStringList("enabledMobs").contains(entName)) &&
-                    (plugin.getConfig().getInt("naturalSpawnHeight") < event.getEntity().getLocation().getY()) &&
-                    (plugin.getConfig().getStringList("enabledSpawnReasons").contains(event.getSpawnReason().toString()))) {
+            if (((configManager.getStringList("mobWorlds").contains(world.getName())) || (configManager.getStringList("mobWorlds").contains("<all>"))) &&
+                    (configManager.getStringList("enabledMobs").contains(entName)) &&
+                    (configManager.getInt("naturalSpawnHeight") < event.getEntity().getLocation().getY()) &&
+                    (configManager.getStringList("enabledSpawnReasons").contains(event.getSpawnReason().toString()))) {
                 plugin.makeInfernal(event.getEntity(), false);
             }
         }
@@ -388,10 +390,10 @@ public class EventListener implements Listener {
                 } else {
                     dropSpot = event.getEntity().getLocation();
                 }
-                if ((plugin.getConfig().getBoolean("enableDeathMessages")) && ((event.getEntity().getKiller() instanceof Player)) && (!isGhost)) {
+                if ((configManager.getBoolean("enableDeathMessages")) && ((event.getEntity().getKiller() instanceof Player)) && (!isGhost)) {
                     Player player = event.getEntity().getKiller();
-                    if (plugin.getConfig().getList("deathMessages") != null) {
-                        ArrayList<String> deathMessagesList = (ArrayList<String>) plugin.getConfig().getList("deathMessages");
+                    if (configManager.getList("deathMessages") != null) {
+                        ArrayList<String> deathMessagesList = (ArrayList<String>) configManager.getList("deathMessages");
                         Random randomGenerator = new Random();
                         int index = randomGenerator.nextInt(deathMessagesList.size());
                         String deathMessage = deathMessagesList.get(index);
@@ -417,26 +419,26 @@ public class EventListener implements Listener {
                         System.out.println("No valid death messages found!");
                     }
                 }
-                if ((plugin.getConfig().getBoolean("enableDrops")) &&
-                        ((plugin.getConfig().getBoolean("enableFarmingDrops")) || (event.getEntity().getKiller() != null)) &&
-                        ((plugin.getConfig().getBoolean("enableFarmingDrops")) || ((event.getEntity().getKiller() instanceof Player)))) {
+                if ((configManager.getBoolean("enableDrops")) &&
+                        ((configManager.getBoolean("enableFarmingDrops")) || (event.getEntity().getKiller() != null)) &&
+                        ((configManager.getBoolean("enableFarmingDrops")) || ((event.getEntity().getKiller() instanceof Player)))) {
                     Player player = null;
                     if ((event.getEntity().getKiller() instanceof Player)) {
                         player = event.getEntity().getKiller();
                     }
-                    if ((player != null) && (player.getGameMode().equals(GameMode.CREATIVE)) && (plugin.getConfig().getBoolean("noCreativeDrops"))) {
+                    if ((player != null) && (player.getGameMode().equals(GameMode.CREATIVE)) && (configManager.getBoolean("noCreativeDrops"))) {
                         return;
                     }
                     ItemStack drop = plugin.getRandomLoot(player, event.getEntity().getType().getName(), aList.size());
                     if (drop != null) {
                         int min = 1;
-                        int max = plugin.getConfig().getInt("dropChance");
+                        int max = configManager.getInt("dropChance");
                         int randomNum = new Random().nextInt(max - min + 1) + min;
                         if ((dropSpot != null) && (randomNum == 1)) {
                             Item droppedItem = event.getEntity().getWorld().dropItemNaturally(dropSpot, drop);
                             plugin.keepAlive(droppedItem);
                         }
-                        int xpm = plugin.getConfig().getInt("xpMultiplier");
+                        int xpm = configManager.getInt("xpMultiplier");
                         int xp = event.getDroppedExp() * xpm;
                         event.setDroppedExp(xp);
                     }

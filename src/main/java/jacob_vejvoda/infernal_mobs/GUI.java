@@ -23,9 +23,11 @@ public class GUI implements Listener {
     private static infernal_mobs plugin;
     private static HashMap<String, Scoreboard> playerScoreBoard = new HashMap<String, Scoreboard>();
     private static HashMap<Entity, Object> bossBars = new HashMap<Entity, Object>();
+    public static ConfigManager configManager;
 
     GUI(infernal_mobs instance) {
         plugin = instance;
+        configManager = instance.getConfigManager();
     }
     
     public static Entity getNearbyBoss(Player p) {
@@ -46,7 +48,7 @@ public class GUI implements Listener {
         Entity b = getNearbyBoss(p);
         if (b != null) {
             if (b.isDead() || ((Damageable) b).getHealth() <= 0) {
-                if (plugin.getConfig().getBoolean("enableBossBar")) {
+                if (configManager.getBoolean("enableBossBar")) {
                     try {
                         for (Player p2 : ((BossBar) bossBars.get(b)).getPlayers())
                             ((BossBar) bossBars.get(b)).removePlayer(p2);
@@ -62,10 +64,10 @@ public class GUI implements Listener {
                 }
                 clearInfo(p);
             } else {
-                if (plugin.getConfig().getBoolean("enableBossBar")) {
+                if (configManager.getBoolean("enableBossBar")) {
                     showBossBar(p, b);
                 }
-                if (plugin.getConfig().getBoolean("enableScoreBoard")) {
+                if (configManager.getBoolean("enableScoreBoard")) {
                     fixScoreboard(p, b, plugin.findMobAbilities(b.getUniqueId()));
                 }
             }
@@ -76,7 +78,7 @@ public class GUI implements Listener {
 
     private static void showBossBar(Player p, Entity e) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(e.getUniqueId());
-        String tittle = plugin.getConfig().getString("bossBarsName", "&fLevel <powers> &fInfernal <mobName>");
+        String tittle = configManager.getString("bossBarsName", "&fLevel <powers> &fInfernal <mobName>");
         String mobName = e.getType().getName().replace("_", " ");
         if (e.getType().equals(EntityType.SKELETON)) {
             Skeleton sk = (Skeleton) e;
@@ -84,9 +86,9 @@ public class GUI implements Listener {
         if (e.getType().equals(EntityType.WITHER_SKELETON)) {
             mobName = "WitherSkeleton";
         }
-        String prefix = plugin.getConfig().getString("namePrefix", "&fInfernal");
-        if (plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size()) != null) {
-            prefix = plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size());
+        String prefix = configManager.getString("namePrefix", "&fInfernal");
+        if (configManager.contains("levelPrefixes." + oldMobAbilityList.size())) {
+            prefix = configManager.getString("levelPrefixes." + oldMobAbilityList.size());
         }
         tittle = tittle.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
         tittle = tittle.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
@@ -109,20 +111,20 @@ public class GUI implements Listener {
         tittle = ChatColor.translateAlternateColorCodes('&', tittle);
 
         if (!bossBars.containsKey(e)) {
-            BarColor bc = BarColor.valueOf(plugin.getConfig().getString("bossBarSettings.defaultColor"));
-            BarStyle bs = BarStyle.valueOf(plugin.getConfig().getString("bossBarSettings.defaultStyle"));
+            BarColor bc = BarColor.valueOf(configManager.getString("bossBarSettings.defaultColor"));
+            BarStyle bs = BarStyle.valueOf(configManager.getString("bossBarSettings.defaultStyle"));
 
-            String lc = plugin.getConfig().getString("bossBarSettings.perLevel." + oldMobAbilityList.size() + ".color");
+            String lc = configManager.getString("bossBarSettings.perLevel." + oldMobAbilityList.size() + ".color");
             if (lc != null)
                 bc = BarColor.valueOf(lc);
-            String ls = plugin.getConfig().getString("bossBarSettings.perLevel." + oldMobAbilityList.size() + ".style");
+            String ls = configManager.getString("bossBarSettings.perLevel." + oldMobAbilityList.size() + ".style");
             if (ls != null)
                 bs = BarStyle.valueOf(ls);
 
-            String mc = plugin.getConfig().getString("bossBarSettings.perMob." + e.getType().getName() + ".color");
+            String mc = configManager.getString("bossBarSettings.perMob." + e.getType().getName() + ".color");
             if (mc != null)
                 bc = BarColor.valueOf(mc);
-            String ms = plugin.getConfig().getString("bossBarSettings.perMob." + e.getType().getName() + ".style");
+            String ms = configManager.getString("bossBarSettings.perMob." + e.getType().getName() + ".style");
             if (ms != null)
                 bs = BarStyle.valueOf(ms);
             BossBar bar = Bukkit.createBossBar(tittle, bc, bs, BarFlag.CREATE_FOG);
@@ -139,12 +141,12 @@ public class GUI implements Listener {
 
 
     private static void clearInfo(Player player) {
-        if (plugin.getConfig().getBoolean("enableBossBar")) {
+        if (configManager.getBoolean("enableBossBar")) {
             for (Entry<Entity, Object> hm : bossBars.entrySet())
                 if (((BossBar) hm.getValue()).getPlayers().contains(player))
                     ((BossBar) hm.getValue()).removePlayer(player);
         }
-        if (plugin.getConfig().getBoolean("enableScoreBoard")) {
+        if (configManager.getBoolean("enableScoreBoard")) {
             try {
                 player.getScoreboard().resetScores(player);
                 player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).unregister();
@@ -155,7 +157,7 @@ public class GUI implements Listener {
 
 
     private static void fixScoreboard(Player player, Entity e, List<String> abilityList) {
-        if (plugin.getConfig().getBoolean("enableScoreBoard") && (e instanceof Damageable)) {
+        if (configManager.getBoolean("enableScoreBoard") && (e instanceof Damageable)) {
             if (playerScoreBoard.get(player.getName()) == null) {
                 ScoreboardManager manager = Bukkit.getScoreboardManager();
                 Scoreboard board = manager.getNewScoreboard();
@@ -178,7 +180,7 @@ public class GUI implements Listener {
                 score = score + 1;
             }
             o.getScore("§e§lAbilities:").setScore(score);
-            if (plugin.getConfig().getBoolean("showHealthOnScoreBoard") == true) {
+            if (configManager.getBoolean("showHealthOnScoreBoard")) {
                 score = score + 1;
                 float health = (float) ((Damageable) e).getHealth();
                 float maxHealth = (float) ((Damageable) e).getMaxHealth();
@@ -198,10 +200,10 @@ public class GUI implements Listener {
 
     public void setName(Entity ent) {
         try {
-            if (plugin.getConfig().getInt("nameTagsLevel") != 0) {
+            if (configManager.getInt("nameTagsLevel") != 0) {
                 String tittle = getMobNameTag(ent);
                 ent.setCustomName(tittle);
-                if (plugin.getConfig().getInt("nameTagsLevel") == 2) {
+                if (configManager.getInt("nameTagsLevel") == 2) {
                     ent.setCustomNameVisible(true);
                 }
             }
@@ -216,7 +218,7 @@ public class GUI implements Listener {
         List<String> oldMobAbilityList = plugin.findMobAbilities(entity.getUniqueId());
         String tittle = null;
         try {
-            tittle = plugin.getConfig().getString("nameTagsName", "&fInfernal <mobName>");
+            tittle = configManager.getString("nameTagsName", "&fInfernal <mobName>");
             String mobName = entity.getType().getName().replace("_", " ");
 
             tittle = tittle.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
@@ -228,9 +230,9 @@ public class GUI implements Listener {
                 count--;
             } while ((tittle.length() + abilities.length() + mobName.length()) > 64);
             tittle = tittle.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
-            String prefix = plugin.getConfig().getString("namePrefix");
-            if (plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size()) != null)
-                prefix = plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size());
+            String prefix = configManager.getString("namePrefix");
+            if (configManager.contains("levelPrefixes." + oldMobAbilityList.size()))
+                prefix = configManager.getString("levelPrefixes." + oldMobAbilityList.size());
             tittle = tittle.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
             tittle = ChatColor.translateAlternateColorCodes('&', tittle);
         } catch (Exception x) {

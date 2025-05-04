@@ -8,7 +8,7 @@ potionEffects:
     requiredItems:
     - 7
   '2':
-    potion: FAST_DIGGING
+    potion: HASTE
     level: 2
     requiredItems:
     - 8
@@ -31,7 +31,7 @@ potionEffects:
     requiredItems:
     - 14
   '6':
-    potion: FAST_DIGGING
+    potion: HASTE
     level: 1
     requiredItems:
     - 13
@@ -146,7 +146,7 @@ potionEffects:
     requiredItems:
     - 93
   '26':
-    potion: FAST_DIGGING
+    potion: HASTE
     level: 3
     requiredItems:
     - 94
@@ -181,7 +181,7 @@ potionEffects:
     requiredItems:
     - 100
   '33':
-    potion: FAST_DIGGING
+    potion: SLOW_DIGGING
     level: 2
     requiredItems:
     - 101
@@ -206,7 +206,7 @@ potionEffects:
     requiredItems:
     - 107
   '38':
-    potion: FAST_DIGGING
+    potion: SLOW_DIGGING
     level: 3
     requiredItems:
     - 108
@@ -295,7 +295,7 @@ consumeEffects:
     requiredItem: 120
     message: '&7&lThe earth trembles under your feet...'
     potionEffects: 
-      - FAST_DIGGING:10:300
+      - HASTE:10:300
 loot:
   '1':
     item: IRON_AXE
@@ -1650,7 +1650,6 @@ loot:
       '8':
         enchantment: mending
         level: 1
-        chance: 15
   '113':
     item: NETHERITE_CHESTPLATE
     amount: 1
