@@ -558,7 +558,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
 
     private Material getMaterial(String s) {
-        return Material.valueOf(s);
+        return Material.valueOf(s.toUpperCase());
     }
 
     public ItemStack getItem(int loot) {
