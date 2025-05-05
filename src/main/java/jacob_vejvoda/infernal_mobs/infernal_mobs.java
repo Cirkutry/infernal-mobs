@@ -656,7 +656,49 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                     }
                                     
                                     if (chance >= 100 || (new Random().nextInt(100) < chance)) {
-                                        stack.addUnsafeEnchantment(enchant, level);
+                                        try {
+                                            int maxAllowedLevel = getMaxAllowedEnchantmentLevel(enchant);
+                                            
+                                            if (level > maxAllowedLevel) {
+                                                level = maxAllowedLevel;
+                                            }
+                                            
+                                            if (meta != null) {
+                                                meta.addEnchant(enchant, 1, true);
+                                                
+                                                List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+                                                if (lore == null) {
+                                                    lore = new ArrayList<>();
+                                                }
+                                                
+                                                String enchantmentDisplayName = enchant.getKey().getKey();
+                                                enchantmentDisplayName = enchantmentDisplayName.substring(0, 1).toUpperCase() + 
+                                                                           enchantmentDisplayName.substring(1).replace('_', ' ');
+                                                
+                                                String formattedEnchant = ChatColor.GRAY + enchantmentDisplayName + " " + toRomanNumeral(level);
+                                                
+                                                lore.add(formattedEnchant);
+                                                meta.setLore(lore);
+                                                
+                                                stack.setItemMeta(meta);
+                                                
+                                                if (level > enchant.getMaxLevel()) {
+                                                    try {
+                                                        meta = stack.getItemMeta();
+                                                        meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+                                                        stack.setItemMeta(meta);
+                                                    } catch (Exception ex) {
+                                                    }
+                                                }
+                                                
+                                                stack.addUnsafeEnchantment(enchant, level);
+                                            } else {
+                                                stack.addUnsafeEnchantment(enchant, level);
+                                            }
+                                        } catch (Exception e) {
+                                            stack.addUnsafeEnchantment(enchant, level);
+                                            getLogger().warning("Couldn't apply custom enchantment format: " + e.getMessage());
+                                        }
                                     }
                                 } else {
                                     getLogger().warning("Unknown enchantment: " + enchantmentName);
@@ -1919,6 +1961,49 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         return namesString.toString();
     }
 
+    private void checkEnchantmentLimits() {
+        if (lootFile == null) return;
+        
+        ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
+        if (lootSection == null) return;
+        
+        int issuesFound = 0;
+        
+        for (String lootId : lootSection.getKeys(false)) {
+            String itemType = lootFile.getString("loot." + lootId + ".item");
+            ConfigurationSection enchantmentsSection = lootFile.getConfigurationSection("loot." + lootId + ".enchantments");
+            if (enchantmentsSection == null) continue;
+            
+            for (String key : enchantmentsSection.getKeys(false)) {
+                String enchantmentName = lootFile.getString("loot." + lootId + ".enchantments." + key + ".enchantment");
+                if (enchantmentName == null) continue;
+                
+                String levelStr = lootFile.getString("loot." + lootId + ".enchantments." + key + ".level");
+                if (levelStr == null) continue;
+                
+                try {
+                    Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
+                    if (enchant == null) {
+                        getLogger().warning("Unknown enchantment: " + enchantmentName + " on item " + lootId);
+                        continue;
+                    }
+                    
+                    int level = getIntFromString(levelStr);
+                    int maxAllowedLevel = getMaxAllowedEnchantmentLevel(enchant);
+                    
+                    if (level > maxAllowedLevel) {
+                        issuesFound++;
+                        getLogger().warning("Item at index " + lootId + " (" + itemType + ") has " + 
+                                           enchant.getKey().getKey() + " enchant level " + 
+                                           level + " but max is " + maxAllowedLevel);
+                    }
+                } catch (Exception e) {
+                    getLogger().warning("Error checking enchantment " + enchantmentName + ": " + e.getMessage());
+                }
+            }
+        }
+    }
+
     private void reloadLoot() {
         try {
             if (this.lootYML == null) {
@@ -1931,9 +2016,24 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             } else {
                 this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
             }
+            
+            checkEnchantmentLimits();
+            
         } catch (Exception e) {
             this.getLogger().log(Level.SEVERE, "Error reloading loot configuration", e);
         }
+    }
+    
+    private int getMaxAllowedEnchantmentLevel(Enchantment enchant) {
+        String enchantKey = enchant.getKey().getKey().toLowerCase();
+        if (enchantKey.equals("mending") || 
+            enchantKey.equals("silk_touch") ||
+            enchantKey.equals("infinity") ||
+            enchantKey.equals("channeling") ||
+            enchantKey.equals("aqua_affinity")) {
+            return 1;
+        }
+        return 255;
     }
     
     public Set<String> getConfigurationSectionKeys(String path) {
@@ -2496,6 +2596,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             } else {
                 this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
             }
+            checkEnchantmentLimits();
             this.getLogger().info("Loot configuration reloaded successfully.");
         } catch (Exception e) {
             this.getLogger().log(Level.SEVERE, "Failed to reload loot configuration!", e);
@@ -2641,5 +2742,17 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             this.lootFile.save(this.lootYML);
         } catch (IOException ignored) {
         }
+    }
+
+    private String toRomanNumeral(int num) {
+        if (num <= 0) {
+            return String.valueOf(num);
+        }
+        
+        String[] hundreds = {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+        String[] tens = {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+        String[] ones = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+        
+        return hundreds[num / 100] + tens[(num % 100) / 10] + ones[num % 10];
     }
 }
