@@ -634,6 +634,40 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             if (meta != null) {
                 stack.setItemMeta(meta);
             }
+
+            if (lootFile.isConfigurationSection("loot." + loot + ".enchantments")) {
+                ConfigurationSection enchantmentsSection = lootFile.getConfigurationSection("loot." + loot + ".enchantments");
+                if (enchantmentsSection != null) {
+                    for (String key : enchantmentsSection.getKeys(false)) {
+                        String enchantmentName = lootFile.getString("loot." + loot + ".enchantments." + key + ".enchantment");
+                        if (enchantmentName != null) {
+                            try {
+                                Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
+                                if (enchant != null) {
+                                    int level = 1;
+                                    String levelStr = lootFile.getString("loot." + loot + ".enchantments." + key + ".level");
+                                    if (levelStr != null) {
+                                        level = getIntFromString(levelStr);
+                                    }
+                                    
+                                    int chance = 100;
+                                    if (lootFile.contains("loot." + loot + ".enchantments." + key + ".chance")) {
+                                        chance = lootFile.getInt("loot." + loot + ".enchantments." + key + ".chance");
+                                    }
+                                    
+                                    if (chance >= 100 || (new Random().nextInt(100) < chance)) {
+                                        stack.addUnsafeEnchantment(enchant, level);
+                                    }
+                                } else {
+                                    getLogger().warning("Unknown enchantment: " + enchantmentName);
+                                }
+                            } catch (Exception e) {
+                                getLogger().warning("Error applying enchantment " + enchantmentName + ": " + e.getMessage());
+                            }
+                        }
+                    }
+                }
+            }
             
             if (this.lootFile.getString("loot." + loot + ".colour") != null && stack.getType().toString().toLowerCase().contains("leather")) {
                 String c = this.lootFile.getString("loot." + loot + ".colour");
