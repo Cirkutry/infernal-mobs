@@ -109,7 +109,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     private File lootYML = new File(getDataFolder(), "loot.yml");
     File saveYML = new File(getDataFolder(), "save.yml");
     public YamlDocument config;
-    public YamlDocument lootFile;
+    public FileConfiguration lootFile;
     public YamlDocument mobSaveFile;
     private HashMap<Entity, Entity> mountList = new HashMap();
     ArrayList<Player> errorList = new ArrayList();
@@ -135,14 +135,10 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                 UpdaterSettings.builder().setVersioning(new BasicVersioning("configVersion")).build()
             );
             
-            lootFile = YamlDocument.create(
-                lootYML, 
-                getResource("loot.yml"),
-                GeneralSettings.DEFAULT,
-                LoaderSettings.builder().setAutoUpdate(true).build(),
-                DumperSettings.DEFAULT,
-                UpdaterSettings.DEFAULT
-            );
+            if (!lootYML.exists()) {
+                saveResource("loot.yml", false);
+            }
+            lootFile = YamlConfiguration.loadConfiguration(lootYML);
             
             if (!saveYML.exists()) {
                 saveYML.createNewFile();
@@ -516,14 +512,17 @@ public class infernal_mobs extends JavaPlugin implements Listener {
 
     ItemStack getRandomLoot(Player player, String mob, int powers) {
         ArrayList<Integer> lootList = new ArrayList();
-        for (String i : BoostedYamlAdapter.getKeys(lootFile, "loot")) {
-            if ((lootFile.getString("loot." + i) != null) &&
-                    ((lootFile.getList("loot." + i + ".mobs") == null) ||
-                            (this.lootFile.getList("loot." + i + ".mobs", new ArrayList<>()).contains(mob))) &&
-                    (lootFile.getString("loot." + i + ".chancePercentage") == null ||
-                            rand(1, 100) <= lootFile.getInt("loot." + i + ".chancePercentage"))) {
-                if (mobPowerLevelFine(Integer.parseInt(i), powers)) {
-                    lootList.add(Integer.valueOf(i));
+        ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
+        if (lootSection != null) {
+            for (String i : lootSection.getKeys(false)) {
+                if ((lootFile.getString("loot." + i) != null) &&
+                        ((lootFile.getList("loot." + i + ".mobs") == null) ||
+                                (lootFile.getList("loot." + i + ".mobs", new ArrayList<>()).contains(mob))) &&
+                        (lootFile.getString("loot." + i + ".chancePercentage") == null ||
+                                rand(1, 100) <= lootFile.getInt("loot." + i + ".chancePercentage"))) {
+                    if (mobPowerLevelFine(Integer.parseInt(i), powers)) {
+                        lootList.add(Integer.valueOf(i));
+                    }
                 }
             }
         }
@@ -655,8 +654,9 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     title = ChatColor.translateAlternateColorCodes('&', title);
                     bMeta.setTitle(title);
                 }
-                if (this.lootFile.getString("loot." + loot + ".pages") != null) {
-                    for (String i : BoostedYamlAdapter.getKeys(lootFile, "loot." + loot + ".pages")) {
+                if (this.lootFile.getConfigurationSection("loot." + loot + ".pages") != null) {
+                    ConfigurationSection pagesSection = lootFile.getConfigurationSection("loot." + loot + ".pages");
+                    for (String i : pagesSection.getKeys(false)) {
                         String page = this.lootFile.getString("loot." + loot + ".pages." + i);
                         page = ChatColor.translateAlternateColorCodes('&', page);
                         bMeta.addPage(page);
@@ -904,8 +904,8 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                         itemMap.put(ai, ar);
                         ai = ai + 1;
                     }
-                if (lootFile.getString("potionEffects") != null)
-                    for (String id : BoostedYamlAdapter.getKeys(lootFile, "potionEffects"))
+                if (lootFile.getConfigurationSection("potionEffects") != null)
+                    for (String id : lootFile.getConfigurationSection("potionEffects").getKeys(false))
                         if ((lootFile.getString("potionEffects." + id) != null) && (lootFile.getString("potionEffects." + id + ".attackEffect") == null) && (lootFile.getString("potionEffects." + id + ".attackHelpEffect") == null)) {
                             ArrayList<ItemStack> itemsPlayerHas = new ArrayList<ItemStack>();
                             for (int neededItemIndex : getIntegerList("potionEffects." + id + ".requiredItems")) {
@@ -1891,21 +1891,11 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                 this.lootYML = new File(getDataFolder(), "loot.yml");
             }
             
-            if (this.lootFile == null) {
-                try {
-                    this.lootFile = YamlDocument.create(
-                        lootYML, 
-                        getResource("loot.yml"),
-                        GeneralSettings.DEFAULT,
-                        LoaderSettings.builder().setAutoUpdate(true).build(),
-                        DumperSettings.DEFAULT,
-                        UpdaterSettings.DEFAULT
-                    );
-                } catch (IOException e) {
-                    this.getLogger().log(Level.SEVERE, "Failed to load loot.yml with BoostedYAML", e);
-                }
+            if (!lootYML.exists()) {
+                saveResource("loot.yml", false);
+                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
             } else {
-                this.lootFile.reload();
+                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
             }
         } catch (Exception e) {
             this.getLogger().log(Level.SEVERE, "Error reloading loot configuration", e);
@@ -1913,11 +1903,12 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
     
     public Set<String> getConfigurationSectionKeys(String path) {
-        return BoostedYamlAdapter.getKeys(lootFile, path);
+        ConfigurationSection section = lootFile.getConfigurationSection(path);
+        return section != null ? section.getKeys(false) : new HashSet<>();
     }
     
     public List<Integer> getIntegerList(String path) {
-        return BoostedYamlAdapter.getIntegerList(lootFile, path);
+        return lootFile.getIntegerList(path);
     }
 
     String getLocationName(Location l) {
@@ -2137,21 +2128,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     	for(int i : (ArrayList<Integer>)getConfig().getList("enabledCharmSlots"))
                     		player.getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
                     }else if ((args.length == 1) && (args[0].equalsIgnoreCase("fixloot"))) {
-                        ArrayList<String> list = new ArrayList<>(getConfig().getConfigurationSection("items").getKeys(false));
-                        for (String i : BoostedYamlAdapter.getKeys(lootFile, "loot")) {
-                            String oid = lootFile.getInt("loot." + i + ".item") + "";
-                            System.out.println(i);
-                            System.out.println("loot." + i + ".item");
-                            System.out.println(oid + ": " + list.contains(oid));
-                            if (list.contains(oid)) {
-                                lootFile.set("loot." + i + ".item", getConfig().getString("items." + oid));
-                            } else
-                                System.out.println("ERROR: " + oid);
-                        }
-                        try {
-                            this.lootFile.save(this.lootYML);
-                        } catch (IOException ignored) {
-                        }
+                        fixloot();
                         sender.sendMessage("§eLoot Fixed!");
                     } else if ((args.length == 1) && (args[0].equalsIgnoreCase("reload"))) {
                         reloadConfig();
@@ -2401,8 +2378,27 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                 if (e != null)
                                     sender.sendMessage(e.toString());
                         } else if (args[0].equalsIgnoreCase("setloot")) {
-                            setItem(player.getInventory().getItemInMainHand(), "loot." + args[1], lootFile);
-                            sender.sendMessage("§eSet loot at index " + args[1] + " §eto item in hand.");
+                            try {
+                                ItemStack item = player.getInventory().getItemInMainHand();
+                                String lootPath = "loot." + args[1];
+                                lootFile.set(lootPath + ".item", item.getType().toString());
+                                lootFile.set(lootPath + ".amount", item.getAmount());
+                                if (item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
+                                    lootFile.set(lootPath + ".name", item.getItemMeta().getDisplayName());
+                                }
+                                if (item.getItemMeta() != null && item.getItemMeta().hasLore()) {
+                                    lootFile.set(lootPath + ".lore", item.getItemMeta().getLore());
+                                }
+                                if (item.getItemMeta() instanceof Damageable) {
+                                    lootFile.set(lootPath + ".durability", ((Damageable)item.getItemMeta()).getDamage());
+                                }
+                                
+                                lootFile.save(lootYML);
+                                sender.sendMessage("§eSet loot at index " + args[1] + " §eto item in hand and saved to file.");
+                            } catch (IOException e) {
+                                sender.sendMessage("§cFailed to save loot file: " + e.getMessage());
+                                e.printStackTrace();
+                            }
                         } else {
                             throwError(sender);
                         }
@@ -2460,15 +2456,14 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     
     public void refreshLoot() {
         try {
-            this.lootFile = YamlDocument.create(
-                lootYML,
-                GeneralSettings.DEFAULT,
-                LoaderSettings.DEFAULT,
-                DumperSettings.DEFAULT,
-                UpdaterSettings.DEFAULT
-            );
+            if (!lootYML.exists()) {
+                saveResource("loot.yml", false);
+                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
+            } else {
+                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
+            }
             this.getLogger().info("Loot configuration reloaded successfully.");
-        } catch (IOException e) {
+        } catch (Exception e) {
             this.getLogger().log(Level.SEVERE, "Failed to reload loot configuration!", e);
         }
     }
@@ -2482,15 +2477,15 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
 
     public ConfigurationSection getConfigurationSection(String path) {
-        return BoostedYamlAdapter.getConfigurationSection(lootFile, path);
+        return lootFile.getConfigurationSection(path);
     }
 
     public List<Integer> getConfigurationSectionIntegerList(String path) {
-        return lootFile.getIntList(path);
+        return lootFile.getIntegerList(path);
     }
 
     public List<Integer> getLootIntegerList(String path) {
-        return lootFile.getIntList(path);
+        return lootFile.getIntegerList(path);
     }
 
     private YamlDocument getYamlConfig() {
@@ -2548,20 +2543,16 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         return lootName;
     }
     
-    private void setItem(ItemStack stack, String loot, YamlDocument lootFile) {
+    private void setItem(ItemStack stack, String loot, FileConfiguration lootFile) {
         if (stack == null || loot == null || lootFile == null) {
             return;
         }
         
-
-        if (lootFile.getString("loot." + loot + ".amount") != null) {
-            String amountStr = lootFile.getString("loot." + loot + ".amount");
+        if (lootFile.getString(loot + ".amount") != null) {
+            String amountStr = lootFile.getString(loot + ".amount");
             int amount = getIntFromString(amountStr);
             stack.setAmount(amount);
         }
-        
-
-
     }
 
     private List<Pattern> convertToPatterns(List<?> rawPatterns) {
@@ -2595,5 +2586,26 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         }
         
         return patternList;
+    }
+
+    private void fixloot() {
+        ArrayList<String> list = new ArrayList<>(getConfig().getConfigurationSection("items").getKeys(false));
+        ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
+        if (lootSection != null) {
+            for (String i : lootSection.getKeys(false)) {
+                String oid = lootFile.getInt("loot." + i + ".item") + "";
+                System.out.println(i);
+                System.out.println("loot." + i + ".item");
+                System.out.println(oid + ": " + list.contains(oid));
+                if (list.contains(oid)) {
+                    lootFile.set("loot." + i + ".item", getConfig().getString("items." + oid));
+                } else
+                    System.out.println("ERROR: " + oid);
+            }
+        }
+        try {
+            this.lootFile.save(this.lootYML);
+        } catch (IOException ignored) {
+        }
     }
 }

@@ -3,6 +3,7 @@ package jacob_vejvoda.infernal_mobs;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -33,8 +34,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.Set;
-
-import jacob_vejvoda.infernal_mobs.BoostedYamlAdapter;
 
 public class EventListener implements Listener {
     private static infernal_mobs plugin;
@@ -147,13 +146,15 @@ public class EventListener implements Listener {
     	ItemStack check = e.getItem();
     	
         if (plugin.lootFile.contains("consumeEffects")) {
-            Set<String> keys = BoostedYamlAdapter.getKeys(plugin.lootFile, "consumeEffects");
-            for (String id : keys) {
-                if (plugin.lootFile.contains("consumeEffects." + id + ".requiredItem")) {
-                	ItemStack neededItem = plugin.getItem(plugin.lootFile.getInt("consumeEffects." + id + ".requiredItem"));
-                    if ((neededItem.getItemMeta() != null) && (check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) 
-                    	if (check.getType().equals(neededItem.getType()))
-                    		plugin.applyEatEffects(p, Integer.parseInt(id));
+            ConfigurationSection section = plugin.lootFile.getConfigurationSection("consumeEffects");
+            if (section != null) {
+                for (String id : section.getKeys(false)) {
+                    if (plugin.lootFile.contains("consumeEffects." + id + ".requiredItem")) {
+                    	ItemStack neededItem = plugin.getItem(plugin.lootFile.getInt("consumeEffects." + id + ".requiredItem"));
+                        if ((neededItem.getItemMeta() != null) && (check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) 
+                        	if (check.getType().equals(neededItem.getType()))
+                        		plugin.applyEatEffects(p, Integer.parseInt(id));
+                    }
                 }
             }
         }
