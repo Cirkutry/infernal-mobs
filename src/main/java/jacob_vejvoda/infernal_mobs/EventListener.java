@@ -398,7 +398,7 @@ public class EventListener implements Listener {
                         Random randomGenerator = new Random();
                         int index = randomGenerator.nextInt(deathMessagesList.size());
                         String deathMessage = deathMessagesList.get(index);
-                        String tittle = plugin.gui.getMobNameTag(event.getEntity());
+                        String title = plugin.gui.getMobNameTag(event.getEntity());
                         deathMessage = ChatColor.translateAlternateColorCodes('&', deathMessage);
                         deathMessage = deathMessage.replace("player", player.getName());
                         if ((player.getInventory().getItemInMainHand() != null) && (!player.getInventory().getItemInMainHand().getType().equals(Material.AIR))) {
@@ -413,7 +413,7 @@ public class EventListener implements Listener {
                         if (event.getEntity().getCustomName() != null) {
                             deathMessage = deathMessage.replace("mob", event.getEntity().getCustomName());
                         } else {
-                            deathMessage = deathMessage.replace("mob", tittle);
+                            deathMessage = deathMessage.replace("mob", title);
                         }
                         Bukkit.broadcastMessage(deathMessage);
                     } else {

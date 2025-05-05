@@ -78,7 +78,7 @@ public class GUI implements Listener {
 
     private static void showBossBar(Player p, Entity e) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(e.getUniqueId());
-        String tittle = configManager.getString("bossBarsName", "&fLevel <powers> &fInfernal <mobName>");
+        String title = configManager.getString("bossBarsName", "&fLevel <powers> &fInfernal <mobName>");
         String mobName = e.getType().getName().replace("_", " ");
         if (e.getType().equals(EntityType.SKELETON)) {
             Skeleton sk = (Skeleton) e;
@@ -90,9 +90,9 @@ public class GUI implements Listener {
         if (configManager.contains("levelPrefixes." + oldMobAbilityList.size())) {
             prefix = configManager.getString("levelPrefixes." + oldMobAbilityList.size());
         }
-        tittle = tittle.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
-        tittle = tittle.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
-        tittle = tittle.replace("<mobLevel>", oldMobAbilityList.size() + "");
+        title = title.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
+        title = title.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
+        title = title.replace("<mobLevel>", oldMobAbilityList.size() + "");
         String abilities = plugin.generateString(5, oldMobAbilityList);
         int count = 4;
         try {
@@ -102,13 +102,13 @@ public class GUI implements Listener {
                 if (count <= 0) {
                     break;
                 }
-            } while (tittle.length() + abilities.length() + mobName.length() > 64);
+            } while (title.length() + abilities.length() + mobName.length() > 64);
         } catch (Exception x) {
             System.out.println("showBossBar error: ");
             x.printStackTrace();
         }
-        tittle = tittle.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
-        tittle = ChatColor.translateAlternateColorCodes('&', tittle);
+        title = title.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
+        title = ChatColor.translateAlternateColorCodes('&', title);
 
         if (!bossBars.containsKey(e)) {
             BarColor bc = BarColor.valueOf(configManager.getString("bossBarSettings.defaultColor"));
@@ -127,7 +127,7 @@ public class GUI implements Listener {
             String ms = configManager.getString("bossBarSettings.perMob." + e.getType().getName() + ".style");
             if (ms != null)
                 bs = BarStyle.valueOf(ms);
-            BossBar bar = Bukkit.createBossBar(tittle, bc, bs, BarFlag.CREATE_FOG);
+            BossBar bar = Bukkit.createBossBar(title, bc, bs, BarFlag.CREATE_FOG);
             bar.setVisible(true);
             bossBars.put(e, bar);
         }
@@ -201,8 +201,8 @@ public class GUI implements Listener {
     public void setName(Entity ent) {
         try {
             if (configManager.getInt("nameTagsLevel") != 0) {
-                String tittle = getMobNameTag(ent);
-                ent.setCustomName(tittle);
+                String title = getMobNameTag(ent);
+                ent.setCustomName(title);
                 if (configManager.getInt("nameTagsLevel") == 2) {
                     ent.setCustomNameVisible(true);
                 }
@@ -216,29 +216,29 @@ public class GUI implements Listener {
 
     public String getMobNameTag(Entity entity) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(entity.getUniqueId());
-        String tittle = null;
+        String title = null;
         try {
-            tittle = configManager.getString("nameTagsName", "&fInfernal <mobName>");
+            title = configManager.getString("nameTagsName", "&fInfernal <mobName>");
             String mobName = entity.getType().getName().replace("_", " ");
 
-            tittle = tittle.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
-            tittle = tittle.replace("<mobLevel>", "" + oldMobAbilityList.size());
+            title = title.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
+            title = title.replace("<mobLevel>", "" + oldMobAbilityList.size());
             String abilities;
             int count = 4;
             do {
                 abilities = plugin.generateString(count, oldMobAbilityList);
                 count--;
-            } while ((tittle.length() + abilities.length() + mobName.length()) > 64);
-            tittle = tittle.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
+            } while ((title.length() + abilities.length() + mobName.length()) > 64);
+            title = title.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
             String prefix = configManager.getString("namePrefix");
             if (configManager.contains("levelPrefixes." + oldMobAbilityList.size()))
                 prefix = configManager.getString("levelPrefixes." + oldMobAbilityList.size());
-            tittle = tittle.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
-            tittle = ChatColor.translateAlternateColorCodes('&', tittle);
+            title = title.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
+            title = ChatColor.translateAlternateColorCodes('&', title);
         } catch (Exception x) {
             plugin.getLogger().log(Level.SEVERE, x.getMessage());
             x.printStackTrace();
         }
-        return tittle;
+        return title;
     }
 }
