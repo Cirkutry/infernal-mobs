@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>jacob_vejvoda</groupId>
-    <artifactId>Infernal-Mobs</artifactId>
-    <version>7.0</version>
+    <artifactId>InfernalMobsReloaded</artifactId>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
-    <name>InfernalMobs</name>
-    <description>Plugin that adds Infernal Mobs with special abilities to your server!</description>
+    <name>InfernalMobsReloaded</name>
+    <description>Add Infernal Mobs with special abilities to your server!</description>
 
     <properties>
         <java.version>21</java.version>

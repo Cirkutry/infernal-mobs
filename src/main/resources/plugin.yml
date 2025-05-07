@@ -1,6 +1,6 @@
-name: InfernalMobs
+name: InfernalMobsReloaded
 main: jacob_vejvoda.infernal_mobs.infernal_mobs
-version: 7.0
+version: 1.0
 softdepend: [Vault]
 api-version: 1.21
 authors: [Eliminator]
