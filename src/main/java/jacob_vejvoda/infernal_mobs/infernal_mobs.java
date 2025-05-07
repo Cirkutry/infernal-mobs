@@ -117,6 +117,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     public ArrayList<Player> fertileList = new ArrayList();
     private ConfigManager configManager;
     private PotionEffectHandler potionEffectHandler;
+    private ConsumeEffectHandler consumeEffectHandler;
 
 	public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -155,6 +156,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                 return;
             }
             this.potionEffectHandler = new PotionEffectHandler(this);
+            this.consumeEffectHandler = new ConsumeEffectHandler(this);
             
             this.getLogger().log(Level.INFO, "Configuration files loaded successfully!");
         } catch (IOException e) {
@@ -587,13 +589,13 @@ public class infernal_mobs extends JavaPlugin implements Listener {
             if (lootFile.getString("loot." + loot + ".name") != null && lootFile.isString("loot." + loot + ".name")) {
                 name = lootFile.getString("loot." + loot + ".name");
                 name = prosessLootName(name, stack);
-                name = ChatColor.translateAlternateColorCodes('&', name);
+                name = ConsumeEffectHandler.hex(name);
             } else if (lootFile.isList("loot." + loot + ".name")) {
                 List<String> names = lootFile.getStringList("loot." + loot + ".name");
                 if (!names.isEmpty()) {
                     name = names.get(rand(1, names.size()) - 1);
                     name = prosessLootName(name, stack);
-                    name = ChatColor.translateAlternateColorCodes('&', name);
+                    name = ConsumeEffectHandler.hex(name);
                 }
             }
             
@@ -987,30 +989,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
 
     public void applyEatEffects(LivingEntity e, int effectID) {
-    	for(String s : (ArrayList<String>)this.lootFile.getList("consumeEffects." + effectID + ".potionEffects")) {
-    		String[] split = s.split(":");
-    		String name = split[0];
-    		int level = Integer.parseInt(split[1]);
-	        int time = Integer.parseInt(split[2]);
-	        if((name.equalsIgnoreCase("fertility")) && (e instanceof Player)) {
-	        	fertileList.add(((Player)e));
-	        	final Player p = (Player) e;
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-					public void run() {
-						fertileList.remove(p);
-					}
-				}, (time*20));
-	        } else {
-                PotionEffectType effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(name.toLowerCase()));
-                if (effectType != null) {
-                    e.addPotionEffect(new PotionEffect(effectType, time*20, level - 1));
-                } else {
-                    this.getLogger().warning("Could not find potion effect type: " + name);
-                }
-            }
-    	}
-        if(e instanceof Player)
-        	((Player)e).sendMessage(this.lootFile.getString("consumeEffects." + effectID + ".message").replace("&", "§"));
+        this.consumeEffectHandler.applyConsumeEffects(e, effectID);
     }
 
     private void showEffectParticles(final Entity p, final String e, int time) {
@@ -2628,5 +2607,9 @@ public class infernal_mobs extends JavaPlugin implements Listener {
 
     public PotionEffectHandler getPotionEffectHandler() {
         return this.potionEffectHandler;
+    }
+
+    public ConsumeEffectHandler getConsumeEffectHandler() {
+        return this.consumeEffectHandler;
     }
 }

@@ -21,9 +21,28 @@ potionEffects:
     particle: [FLAME:1500, CLOUD:1000]
     items: [1]
 
-consumeEffects: []
+consumeEffects:
+  '1':
+    potion:
+      - type: LEVITATION
+        duration: 5
+        amplifier: 2
+        ambient: false
+        particles: true
+        icon: false
+      - type: SLOWNESS
+        duration: 100
+        amplifier: 1
+        ambient: true
+        particles: true
+        icon: false
+    message: "&#CAD35D&lY&#C4D362&lo&#BED467&lu &#B3D571&lf&#ADD576&le&#A7D67B&le&#A2D680&ll &#96D78A&la &#8BD895&lb&#85D89A&li&#7FD99F&lt &#73DAA9&ll&#6EDAAE&li&#68DBB3&lg&#62DBB8&lh&#5CDCBD&lt&#57DCC2&le&#51DDC7&lr&#4BDDCC&l!"
+    items: [1, 2]
 
 loot:
   '1':
     name: "&6&lWither Blade"
     item: DIAMOND_SWORD
+  '2':
+    name: "&#CAD35D&lG&#D0C45D&lo&#D7B55D&ll&#DDA65D&ld &#E9895C&lD&#F07A5C&lr&#F66B5C&lo&#FC5C5C&lp"
+    item: APPLE

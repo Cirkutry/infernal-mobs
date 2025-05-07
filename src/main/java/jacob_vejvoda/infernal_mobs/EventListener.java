@@ -40,6 +40,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.Set;
+import java.util.List;
 
 public class EventListener implements Listener {
     private static infernal_mobs plugin;
@@ -155,11 +156,16 @@ public class EventListener implements Listener {
             ConfigurationSection section = plugin.lootFile.getConfigurationSection("consumeEffects");
             if (section != null) {
                 for (String id : section.getKeys(false)) {
-                    if (plugin.lootFile.contains("consumeEffects." + id + ".requiredItem")) {
-                    	ItemStack neededItem = plugin.getItem(plugin.lootFile.getInt("consumeEffects." + id + ".requiredItem"));
-                        if ((neededItem.getItemMeta() != null) && (check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) 
-                        	if (check.getType().equals(neededItem.getType()))
-                        		plugin.applyEatEffects(p, Integer.parseInt(id));
+                    List<Integer> items = section.getIntegerList(id + ".items");
+                    for (int itemID : items) {
+                        ItemStack neededItem = plugin.getItem(itemID);
+                        if (neededItem != null && neededItem.getItemMeta() != null && 
+                            check.getItemMeta() != null && 
+                            check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()) && 
+                            check.getType().equals(neededItem.getType())) {
+                            plugin.applyEatEffects(p, Integer.parseInt(id));
+                            break;
+                        }
                     }
                 }
             }
