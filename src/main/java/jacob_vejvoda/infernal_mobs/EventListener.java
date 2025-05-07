@@ -26,6 +26,12 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -454,5 +460,49 @@ public class EventListener implements Listener {
         } catch (Exception e) {
             System.out.println("EntityDeathEvent: " + e);
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerDropItem(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onEntityPickupItem(EntityPickupItemEvent event) {
+        if (event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+            });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+            if (event.getInventory().getType() == InventoryType.PLAYER || 
+                event.getInventory().getType() == InventoryType.CRAFTING) {
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+                });
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+        });
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerSwapHandItems(PlayerSwapHandItemsEvent event) {
+        plugin.getPotionEffectHandler().handleItemSwap(event);
     }
 }

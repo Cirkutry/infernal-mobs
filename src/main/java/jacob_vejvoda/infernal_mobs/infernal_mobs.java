@@ -116,6 +116,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     ArrayList<Player> levitateList = new ArrayList();
     public ArrayList<Player> fertileList = new ArrayList();
     private ConfigManager configManager;
+    private PotionEffectHandler potionEffectHandler;
 
 	public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -153,6 +154,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                 getServer().getPluginManager().disablePlugin(this);
                 return;
             }
+            this.potionEffectHandler = new PotionEffectHandler(this);
             
             this.getLogger().log(Level.INFO, "Configuration files loaded successfully!");
         } catch (IOException e) {
@@ -818,7 +820,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         return effect;
     }
 
-    private void displayEffect(Location l, String effect) {
+    public void displayEffect(Location l, String effect) {
         if ((effect == null) || (effect.equals(""))) {
             effect = getEffect();
         }
@@ -968,41 +970,12 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         for (Player p : this.getServer().getOnlinePlayers()) {
             World world = p.getWorld();
             if (getConfig().getStringList("effectWorlds").contains(world.getName()) || (getConfig().getStringList("effectWorlds").contains("<all>"))) {
-                HashMap<Integer, ItemStack> itemMap = new HashMap<>();
-                for (int i : (ArrayList<Integer>) getConfig().getList("enabledCharmSlots", new ArrayList<>())) {
-                    ItemStack in;
-                    in = p.getInventory().getItem(i);
-                    itemMap.put(i, in);
-                }
-                int ai = 100;
-                for (ItemStack ar : p.getInventory().getArmorContents())
-                    if (ar != null) {
-                        itemMap.put(ai, ar);
-                        ai = ai + 1;
+                for (PotionEffect effect : p.getActivePotionEffects()) {
+                    if (effect.isInfinite()) {
+                        p.removePotionEffect(effect.getType());
                     }
-                if (lootFile.getConfigurationSection("potionEffects") != null)
-                    for (String id : lootFile.getConfigurationSection("potionEffects").getKeys(false))
-                        if ((lootFile.getString("potionEffects." + id) != null) && (lootFile.getString("potionEffects." + id + ".attackEffect") == null) && (lootFile.getString("potionEffects." + id + ".attackHelpEffect") == null)) {
-                            ArrayList<ItemStack> itemsPlayerHas = new ArrayList<ItemStack>();
-                            for (int neededItemIndex : getIntegerList("potionEffects." + id + ".requiredItems")) {
-                                ItemStack neededItem = getItem(neededItemIndex);
-                                for (Map.Entry<Integer, ItemStack> hm : itemMap.entrySet()) {
-                                    ItemStack check = hm.getValue();
-                                    try {
-                                        if ((neededItem.getItemMeta() == null) || (check.getItemMeta() != null && check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
-                                            if (check.getType().equals(neededItem.getType())) {
-                                                    if (!isArmor(neededItem) || hm.getKey() >= 100)
-                                                        itemsPlayerHas.add(neededItem);
-                                            }
-                                        }
-                                    } catch (Exception e) {/**System.out.println("Error: " + e);**/}
-                                }
-                            }
-
-                            if (itemsPlayerHas.size() >= getIntegerList("potionEffects." + id + ".requiredItems").size()) {
-                                applyEffects(p, Integer.parseInt(id));
-                            }
-                        }
+                }
+                this.potionEffectHandler.checkPlayerPotionEffects(p);
             }
         }
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this, this::applyEffect, (10 * 20));
@@ -1013,35 +986,6 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         return t.contains("helm") || t.contains("plate") || t.contains("leg") || t.contains("boot");
     }
 
-    public void applyEffects(LivingEntity e, int effectID) {
-        int level = this.lootFile.getInt("potionEffects." + effectID + ".level");
-        String name = this.lootFile.getString("potionEffects." + effectID + ".potion");
-        
-        PotionEffectType effectType = null;
-        if (name.equalsIgnoreCase("FAST_DIGGING")) {
-            effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft("haste"));
-        } else {
-            effectType = PotionEffectType.getByName(name);
-            if (effectType == null) {
-                effectType = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(name.toLowerCase()));
-            }
-        }
-        
-        if (effectType != null) {
-            if ((effectType == PotionEffectType.INSTANT_DAMAGE) || (effectType == PotionEffectType.INSTANT_HEALTH)) {
-                e.addPotionEffect(new PotionEffect(effectType, 1, level - 1));
-            } else {
-                e.addPotionEffect(new PotionEffect(effectType, 400, level - 1));
-            }
-        } else {
-            this.getLogger().warning("Could not find potion effect type: " + name);
-        }
-        if (this.lootFile.getString("potionEffects." + effectID + ".particleEffect") != null) {
-            String effect = this.lootFile.getString("potionEffects." + effectID + ".particleEffect");
-            showEffectParticles(e, effect, 15);
-        }
-    }
-    
     public void applyEatEffects(LivingEntity e, int effectID) {
     	for(String s : (ArrayList<String>)this.lootFile.getList("consumeEffects." + effectID + ".potionEffects")) {
     		String[] split = s.split(":");
@@ -1101,69 +1045,11 @@ public class infernal_mobs extends JavaPlugin implements Listener {
     }
 
     void doEffect(Player player, final Entity mob, boolean playerIsVictim) {
-        if (!playerIsVictim) {
+        if (!playerIsVictim && mob instanceof LivingEntity) {
             ItemStack itemUsed = player.getInventory().getItemInMainHand();
-            ArrayList<ItemStack> items = new ArrayList<>();
-            for (int i = 0; i < 9; i++) {
-                ItemStack in = player.getInventory().getItem(i);
-                if (in != null)
-                    items.add(in);
-            }
-            for (ItemStack ar : player.getInventory().getArmorContents())
-                if (ar != null)
-                    items.add(ar);
-            for (int i = 0; i < 256; i++) {
-                if (lootFile.getString("potionEffects." + i) != null) {
-                    if (lootFile.getString("potionEffects." + i + ".attackEffect") != null) {
-                        boolean effectsPlayer = true;
-                        if (lootFile.getString("potionEffects." + i + ".attackEffect", "target").equals("target"))
-                            effectsPlayer = false;
-                        for (int neededItemIndex : getIntegerList("potionEffects." + i + ".requiredItems")) {
-                            ItemStack neededItem = getItem(neededItemIndex);
-                            try {
-                                if ((neededItem.getItemMeta() == null) || (itemUsed.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
-                                    if (itemUsed.getType().equals(neededItem.getType())) {
-                                            if (effectsPlayer) {
-                                                applyEffects(player, i);
-                                            } else {
-                                                if (mob instanceof LivingEntity)
-                                                    applyEffects((LivingEntity) mob, i);
-                                            }
-                                    }
-                                }
-                            } catch (Exception e) {/**System.out.println("Error: " + e);**/}
-                        }
-                    } else if (lootFile.getString("potionEffects." + i + ".attackHelpEffect") != null) {
-                        boolean effectsPlayer = true;
-                        if (lootFile.getString("potionEffects." + i + ".attackHelpEffect", "target").equals("target"))
-                            effectsPlayer = false;
-                        ArrayList<ItemStack> itemsPlayerHas = new ArrayList<>();
-                        for (int neededItemIndex : getIntegerList("potionEffects." + i + ".requiredItems")) {
-                            ItemStack neededItem = getItem(neededItemIndex);
-                            for (ItemStack check : items) {
-                                try {
-                                    if ((neededItem.getItemMeta() == null) || (check.getItemMeta() != null && check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()))) {
-                                        if (check.getType().equals(neededItem.getType())) {
-                                                if (!itemsPlayerHas.contains(neededItem)) {
-                                                    itemsPlayerHas.add(neededItem);
-                                                }
-                                        }
-                                    }
-                                } catch (Exception e) {/**System.out.println("Error: " + e);**/}
-                            }
-                        }
-                        if (itemsPlayerHas.size() >= getIntegerList("potionEffects." + i + ".requiredItems").size()) {
-                            if (effectsPlayer) {
-                                applyEffects(player, i);
-                            } else {
-                                if (mob instanceof LivingEntity)
-                                    applyEffects((LivingEntity) mob, i);
-                            }
-                        }
-                    }
-                }
-            }
+            this.potionEffectHandler.applyAttackPotionEffects(player, (LivingEntity)mob, itemUsed);
         }
+        
         try {
             UUID id = mob.getUniqueId();
             if (idSearch(id) != -1) {
@@ -2261,14 +2147,12 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                     if(args[0].equalsIgnoreCase("slotTest")) {
                     	for(int i : (ArrayList<Integer>)getConfig().getList("enabledCharmSlots"))
                     		player.getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
-                    }else if ((args.length == 1) && (args[0].equalsIgnoreCase("fixloot"))) {
-                        fixloot();
-                        sender.sendMessage("§eLoot Fixed!");
                     } else if ((args.length == 1) && (args[0].equalsIgnoreCase("reload"))) {
                         reloadConfig();
                         refreshLoot();
                         reloadMobSave();
                         sender.sendMessage("§eConfig files reloaded successfully!");
+                        return true;
                     } else if (args[0].equals("mobList")) {
                         sender.sendMessage("§6Mob List:");
                         for (EntityType et : EntityType.values())
@@ -2597,6 +2481,9 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                 this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
             }
             checkEnchantmentLimits();
+            if (this.potionEffectHandler != null) {
+                this.potionEffectHandler = new PotionEffectHandler(this);
+            }
             this.getLogger().info("Loot configuration reloaded successfully.");
         } catch (Exception e) {
             this.getLogger().log(Level.SEVERE, "Failed to reload loot configuration!", e);
@@ -2723,27 +2610,6 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         return patternList;
     }
 
-    private void fixloot() {
-        ArrayList<String> list = new ArrayList<>(getConfig().getConfigurationSection("items").getKeys(false));
-        ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
-        if (lootSection != null) {
-            for (String i : lootSection.getKeys(false)) {
-                String oid = lootFile.getInt("loot." + i + ".item") + "";
-                System.out.println(i);
-                System.out.println("loot." + i + ".item");
-                System.out.println(oid + ": " + list.contains(oid));
-                if (list.contains(oid)) {
-                    lootFile.set("loot." + i + ".item", getConfig().getString("items." + oid));
-                } else
-                    System.out.println("ERROR: " + oid);
-            }
-        }
-        try {
-            this.lootFile.save(this.lootYML);
-        } catch (IOException ignored) {
-        }
-    }
-
     private String toRomanNumeral(int num) {
         if (num <= 0) {
             return String.valueOf(num);
@@ -2754,5 +2620,13 @@ public class infernal_mobs extends JavaPlugin implements Listener {
         String[] ones = {"", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
         
         return hundreds[num / 100] + tens[(num % 100) / 10] + ones[num % 10];
+    }
+
+    public FileConfiguration getLootFile() {
+        return this.lootFile;
+    }
+
+    public PotionEffectHandler getPotionEffectHandler() {
+        return this.potionEffectHandler;
     }
 }
