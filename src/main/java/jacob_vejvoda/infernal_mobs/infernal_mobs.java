@@ -2123,10 +2123,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                         throwError(sender);
                         return true;
                     }
-                    if(args[0].equalsIgnoreCase("slotTest")) {
-                    	for(int i : (ArrayList<Integer>)getConfig().getList("enabledCharmSlots"))
-                    		player.getInventory().setItem(i, new ItemStack(Material.RED_STAINED_GLASS_PANE));
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("reload"))) {
+                    if ((args.length == 1) && (args[0].equalsIgnoreCase("reload"))) {
                         reloadConfig();
                         refreshLoot();
                         reloadMobSave();

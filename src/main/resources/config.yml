@@ -139,24 +139,6 @@ enabledMobs:
 - PIG_ZOMBIE
 - ENDERMAN
 
-# Inventory slots that can hold Infernal charms
-# (0-8 = hotbar, 36-39 = armor slots, 40 = offhand)
-enabledCharmSlots:
-- 0
-- 1
-- 2
-- 3
-- 4
-- 5
-- 6
-- 7
-- 8
-- 40
-- 36
-- 37
-- 38
-- 39
-
 # Enable/disable each ability type (true = enabled, false = disabled)
 
 # Applies poison effect to players
