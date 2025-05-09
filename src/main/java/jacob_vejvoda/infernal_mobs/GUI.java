@@ -1,5 +1,6 @@
 package jacob_vejvoda.infernal_mobs;
 
+import jacob_vejvoda.infernal_mobs.ConsumeEffectHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
@@ -90,6 +91,7 @@ public class GUI implements Listener {
         if (configManager.contains("levelPrefixes." + oldMobAbilityList.size())) {
             prefix = configManager.getString("levelPrefixes." + oldMobAbilityList.size());
         }
+        prefix = ConsumeEffectHandler.hex(prefix);
         title = title.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
         title = title.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
         title = title.replace("<mobLevel>", oldMobAbilityList.size() + "");
@@ -108,7 +110,7 @@ public class GUI implements Listener {
             x.printStackTrace();
         }
         title = title.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
-        title = ChatColor.translateAlternateColorCodes('&', title);
+        title = ConsumeEffectHandler.hex(title);
 
         if (!bossBars.containsKey(e)) {
             BarColor bc = BarColor.valueOf(configManager.getString("bossBarSettings.defaultColor"));
@@ -233,8 +235,9 @@ public class GUI implements Listener {
             String prefix = configManager.getString("namePrefix");
             if (configManager.contains("levelPrefixes." + oldMobAbilityList.size()))
                 prefix = configManager.getString("levelPrefixes." + oldMobAbilityList.size());
+            prefix = ConsumeEffectHandler.hex(prefix);
             title = title.replace("<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
-            title = ChatColor.translateAlternateColorCodes('&', title);
+            title = ConsumeEffectHandler.hex(title);
         } catch (Exception x) {
             plugin.getLogger().log(Level.SEVERE, x.getMessage());
             x.printStackTrace();

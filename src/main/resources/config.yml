@@ -46,12 +46,19 @@ levelPrefixes:
 # Minimum level for mobs to show name tags (1 = show for all Infernal mobs)
 nameTagsLevel: 1
 
+# <mobName> - Gets replaced with the capitalized entity type name (e.g., "Zombie", "Spider")
+# <mobLevel> - Gets replaced with the number of abilities the infernal mob has
+# <abilities> - Gets replaced with a list of the mob's abilities (limited to fit within character limits)
+# <prefix> - Gets replaced with the configured prefix from either "namePrefix" config or the level-specific "levelPrefixes"
+# <player> - Name of the player who killed the mob
+# <weapon> - Weapon used by the player (item name or "fist")
+
 # Format for the name tag displayed above Infernal mobs
-# <prefix> = prefix configured above, <mobName> = type of mob
+# Allowed placeholders: <weapon>, <mobName>, <mobLevel>, <abilities>, <prefix>
 nameTagsName: '&f<prefix> <mobName>'
 
 # Format for boss bar display
-# <mobLevel> = level of the mob, <prefix> = configured prefix, <mobName> = type of mob
+# Allowed placeholders: <weapon>, <mobName>, <mobLevel>, <abilities>, <prefix>
 bossBarsName: '&fLevel <mobLevel> &f<prefix> <mobName>'
 
 # Whether to display boss bars for Infernal mobs
@@ -90,15 +97,16 @@ enableParticles: true
 # Whether to display custom death messages when Infernal mobs are killed
 enableDeathMessages: false
 
-# List of death messages when Infernal mobs are killed (Ignored if enableDeathMessages = false)
-# "player" will be replaced with killer's name, "mob" will be replaced with mob type
+# List of death messages to display when mob is killed
+# Ignored if enableDeathMessages = false. One is chosen randomly
+# Available placeholders: <player>, <weapon>, <mobName>, <mobLevel>, <abilities>, <prefix>
 deathMessages:
-- '&cplayer &chas killed an mob&c!'
-- '&cAn mob &cwas slain by player&c!'
-- '&cplayer &cowned an mob&c!'
-- '&cAn mob &cwas beheaded by player&c''s weapon!'
-- '&cplayer&c''s weapon &ckilled an mob&c!'
-- '&cAn mob &cwas killed by player &cusing a weapon&c!'
+- '&c<player> &chas killed a level <mobLevel> <prefix> <mobName>&c!'
+- '&cA <prefix> <mobName> &cwas slain by <player>&c!'
+- '&c<player> &cowned a <mobName> with <abilities>&cabilities!'
+- '&cA <prefix> <mobName> &cwas beheaded by <player>&c''s <weapon>!'
+- '&c<player>&c''s <weapon> &ckilled a <mobName> with <abilities>&c!'
+- '&cA level <mobLevel> <mobName> &cwas killed by <player> &cusing a <weapon>&c!'
 
 # Whether to display messages when Infernal mobs spawn near players
 enableSpawnMessages: false
@@ -106,7 +114,8 @@ enableSpawnMessages: false
 # Radius (in blocks) to send spawn messages to players
 spawnMessageRadius: 64
 
-# List of spawn messages to display (chosen randomly when mobs spawn)
+# List of spawn messages to display when mob spawns
+# Ignored if enableSpawnMessages = false. One is chosen randomly
 spawnMessages:
 - '&cAn Infernal mob has spawned near you!'
 - '&cWatch out!'

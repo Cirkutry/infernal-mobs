@@ -100,6 +100,8 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import org.bukkit.Registry;
 
+import jacob_vejvoda.infernal_mobs.ConsumeEffectHandler;
+
 public class infernal_mobs extends JavaPlugin implements Listener {
     GUI gui;
     long serverTime = 0L;
@@ -318,7 +320,7 @@ public class infernal_mobs extends JavaPlugin implements Listener {
                                 int index = randomGenerator.nextInt(spawnMessageList.size());
                                 String spawnMessage = spawnMessageList.get(index);
 
-                                spawnMessage = ChatColor.translateAlternateColorCodes('&', spawnMessage);
+                                spawnMessage = ConsumeEffectHandler.hex(spawnMessage);
                                 if (e.getCustomName() != null) {
                                     spawnMessage = spawnMessage.replace("mob", e.getCustomName());
                                 } else {

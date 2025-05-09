@@ -100,7 +100,6 @@ public class ConsumeEffectHandler {
         return effectType;
     }
 
-    // Compact hex color support for &#RRGGBB and #RRGGBB
     public static String hex(String msg) {
         Matcher matcher = Pattern.compile("&?#([A-Fa-f0-9]{6})").matcher(msg);
         StringBuffer sb = new StringBuffer();

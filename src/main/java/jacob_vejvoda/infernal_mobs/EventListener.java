@@ -42,6 +42,8 @@ import java.util.logging.Level;
 import java.util.Set;
 import java.util.List;
 
+import jacob_vejvoda.infernal_mobs.ConsumeEffectHandler;
+
 public class EventListener implements Listener {
     private static infernal_mobs plugin;
     private HashMap<String, Long> spawnerMap = new HashMap<>();
@@ -410,23 +412,34 @@ public class EventListener implements Listener {
                         Random randomGenerator = new Random();
                         int index = randomGenerator.nextInt(deathMessagesList.size());
                         String deathMessage = deathMessagesList.get(index);
-                        String title = plugin.gui.getMobNameTag(event.getEntity());
-                        deathMessage = ChatColor.translateAlternateColorCodes('&', deathMessage);
-                        deathMessage = deathMessage.replace("player", player.getName());
+                        deathMessage = ConsumeEffectHandler.hex(deathMessage);
+
+                        String mobName = event.getEntity().getType().getName().replace("_", " ");
+                        mobName = mobName.substring(0, 1).toUpperCase() + mobName.substring(1);
+                        int mobLevel = aList.size();
+                        String abilities = plugin.generateString(4, aList);
+                        String prefix = configManager.getString("namePrefix");
+                        if (configManager.contains("levelPrefixes." + mobLevel)) {
+                            prefix = configManager.getString("levelPrefixes." + mobLevel);
+                        }
+                        prefix = ConsumeEffectHandler.hex(prefix);
+
+                        String weaponName = "fist";
                         if ((player.getInventory().getItemInMainHand() != null) && (!player.getInventory().getItemInMainHand().getType().equals(Material.AIR))) {
                             if (player.getInventory().getItemInMainHand().getItemMeta().getDisplayName() != null) {
-                                deathMessage = deathMessage.replace("weapon", player.getInventory().getItemInMainHand().getItemMeta().getDisplayName());
+                                weaponName = player.getInventory().getItemInMainHand().getItemMeta().getDisplayName();
                             } else {
-                                deathMessage = deathMessage.replace("weapon", player.getInventory().getItemInMainHand().getType().name().replace("_", " ").toLowerCase());
+                                weaponName = player.getInventory().getItemInMainHand().getType().name().replace("_", " ").toLowerCase();
                             }
-                        } else {
-                            deathMessage = deathMessage.replace("weapon", "fist");
                         }
-                        if (event.getEntity().getCustomName() != null) {
-                            deathMessage = deathMessage.replace("mob", event.getEntity().getCustomName());
-                        } else {
-                            deathMessage = deathMessage.replace("mob", title);
-                        }
+
+                        deathMessage = deathMessage.replace("<player>", player.getName());
+                        deathMessage = deathMessage.replace("<weapon>", weaponName);
+                        deathMessage = deathMessage.replace("<mobName>", mobName);
+                        deathMessage = deathMessage.replace("<mobLevel>", "" + mobLevel);
+                        deathMessage = deathMessage.replace("<abilities>", abilities);
+                        deathMessage = deathMessage.replace("<prefix>", prefix);
+                        
                         Bukkit.broadcastMessage(deathMessage);
                     } else {
                         System.out.println("No valid death messages found!");
