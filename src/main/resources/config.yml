@@ -13,6 +13,19 @@
 #          ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝                                                                                  
  
 # Source: https://github.com/Cirkutry/infernal-mobs
+# Text inputs allow color constants using &7 , &l etc. They all support hex using &#ffffff format unless specified otherwise.
+# Available placeholders. Individual options show the list of placeholders that work,
+# if not mentioned they won't work for that option!
+#
+# <mobName> - Gets replaced with the capitalized entity type name (e.g., "Zombie", "Spider")
+# <mobLevel> - Gets replaced with the number of abilities the infernal mob has
+# <abilities> - Gets replaced with a list of the mob's abilities (limited to fit within character limits)
+# <prefix> - Gets replaced with the configured prefix from either "namePrefix" config or the level-specific "levelPrefixes"
+# <player> - Name of the player who killed the mob
+# <weapon> - Weapon used by the player (item name or "fist")
+# <health> - Current health of the mob (rounded to 2 decimal places)
+# <maxHealth> - Maximum health of the mob
+
 
 # The base spawn weight for Infernal mobs (1/N chance of a mob becoming Infernal)
 # Higher value = lower probability (1/100 chance when set to 100)
@@ -46,19 +59,12 @@ levelPrefixes:
 # Minimum level for mobs to show name tags (1 = show for all Infernal mobs)
 nameTagsLevel: 1
 
-# <mobName> - Gets replaced with the capitalized entity type name (e.g., "Zombie", "Spider")
-# <mobLevel> - Gets replaced with the number of abilities the infernal mob has
-# <abilities> - Gets replaced with a list of the mob's abilities (limited to fit within character limits)
-# <prefix> - Gets replaced with the configured prefix from either "namePrefix" config or the level-specific "levelPrefixes"
-# <player> - Name of the player who killed the mob
-# <weapon> - Weapon used by the player (item name or "fist")
-
 # Format for the name tag displayed above Infernal mobs
-# Allowed placeholders: <weapon>, <mobName>, <mobLevel>, <abilities>, <prefix>
+# Allowed placeholders: <mobName>, <mobLevel>, <abilities>, <prefix>
 nameTagsName: '&f<prefix> <mobName>'
 
 # Format for boss bar display
-# Allowed placeholders: <weapon>, <mobName>, <mobLevel>, <abilities>, <prefix>
+# Allowed placeholders: <mobName>, <mobLevel>, <abilities>, <prefix>
 bossBarsName: '&fLevel <mobLevel> &f<prefix> <mobName>'
 
 # Whether to display boss bars for Infernal mobs
@@ -84,6 +90,18 @@ bossBarSettings:
 
 # Whether to display scoreboard info for Infernal mobs
 enableScoreBoard: false
+
+# Title for the scoreboard sidebar
+# Allowed placeholders: <health>, <maxHealth>, <mobName>, <mobLevel>, <abilities>, <prefix>
+scoreboardTitle: '&e&l<prefix> <mobName>'
+
+# Scoreboard lines
+# Each entry will be displayed as a separate line
+# Allowed placeholders: <health>, <maxHealth>, <mobName>, <mobLevel>, <abilities>, <prefix>
+# DOESN'T SUPPORT HEX COLORS!
+scoreboard:
+- '&f<prefix> <mobName>'
+- '&fLevel <mobLevel>'
 
 # Whether to show mob health on the scoreboard
 showHealthOnScoreBoard: true

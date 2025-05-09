@@ -173,31 +173,71 @@ public class GUI implements Listener {
             } else {
                 o = board.getObjective(DisplaySlot.SIDEBAR);
             }
-            o.setDisplayName(e.getType().getName());
+            
+            String title = configManager.getString("scoreboardTitle", e.getType().getName());
+            title = processMobPlaceholders(title, e, abilityList);
+            o.setDisplayName(title);
+            
             for (String s : board.getEntries())
                 board.resetScores(s);
+            
             int score = 1;
-            for (String ability : abilityList) {
-                o.getScore("§r" + ability).setScore(score);
-                score = score + 1;
-            }
-            o.getScore("§e§lAbilities:").setScore(score);
-            if (configManager.getBoolean("showHealthOnScoreBoard")) {
-                score = score + 1;
-                float health = (float) ((Damageable) e).getHealth();
-                float maxHealth = (float) ((Damageable) e).getMaxHealth();
-                double roundOff = Math.round(health * 100.0) / 100.0;
+            
+            List<String> scoreboardLines = configManager.getStringList("scoreboard");
+            if (scoreboardLines != null && !scoreboardLines.isEmpty()) {
+                for (String line : scoreboardLines) {
+                    String processedLine = processMobPlaceholders(line, e, abilityList);
+                    o.getScore(processedLine).setScore(score);
+                    score++;
+                }
+            } else {
+                for (String ability : abilityList) {
+                    o.getScore("§r" + ability).setScore(score);
+                    score = score + 1;
+                }
+                o.getScore("§e§lAbilities:").setScore(score);
+                if (configManager.getBoolean("showHealthOnScoreBoard")) {
+                    score = score + 1;
+                    float health = (float) ((Damageable) e).getHealth();
+                    float maxHealth = (float) ((Damageable) e).getMaxHealth();
+                    double roundOff = Math.round(health * 100.0) / 100.0;
 
-                o.getScore(roundOff + "/" + maxHealth).setScore(score);
-                score = score + 1;
+                    o.getScore(roundOff + "/" + maxHealth).setScore(score);
+                    score = score + 1;
 
-                o.getScore("§e§lHealth:").setScore(score);
+                    o.getScore("§e§lHealth:").setScore(score);
+                }
             }
 
             if ((player.getScoreboard() == null) || (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR) == null) || (player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getName() == null) || (!player.getScoreboard().getObjective(DisplaySlot.SIDEBAR).getName().equals(board.getObjective(DisplaySlot.SIDEBAR).getName()))) {
                 player.setScoreboard(board);
             }
         }
+    }
+    
+    private static String processMobPlaceholders(String text, Entity entity, List<String> abilityList) {
+        if (text == null) return "";
+        
+        String mobName = entity.getType().getName().replace("_", " ");
+        String abilities = plugin.generateString(5, abilityList);
+        
+        String prefix = configManager.getString("namePrefix", "&fInfernal");
+        if (configManager.contains("levelPrefixes." + abilityList.size())) {
+            prefix = configManager.getString("levelPrefixes." + abilityList.size());
+        }
+        
+        float health = (float) ((Damageable) entity).getHealth();
+        float maxHealth = (float) ((Damageable) entity).getMaxHealth();
+        double roundHealth = Math.round(health * 100.0) / 100.0;
+        
+        text = text.replace("<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
+        text = text.replace("<mobLevel>", String.valueOf(abilityList.size()));
+        text = text.replace("<abilities>", abilities);
+        text = text.replace("<prefix>", prefix);
+        text = text.replace("<health>", String.valueOf(roundHealth));
+        text = text.replace("<maxHealth>", String.valueOf(maxHealth));
+        
+        return ConsumeEffectHandler.hex(text);
     }
 
     public void setName(Entity ent) {
