@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://i.ibb.co/ns8s1rHt/infernal-mobs.png" width="700"/>
+<img src="https://i.ibb.co/ns8s1rHt/infernal-mobs.png/#" width="700"/>
 
 <h3>Infernal Mobs Reloaded</h3><br>
 
