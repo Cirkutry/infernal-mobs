@@ -1,4 +1,4 @@
-package jacob_vejvoda.infernal_mobs;
+package jacob_vejvoda.InfernalMobs.loot;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -11,6 +11,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Registry;
 
+import jacob_vejvoda.InfernalMobs.InfernalMobs;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +21,10 @@ import java.util.regex.Pattern;
 
 public class ConsumeEffectHandler {
     
-    private final infernal_mobs plugin;
+    private final InfernalMobs plugin;
     private final FileConfiguration lootFile;
     
-    public ConsumeEffectHandler(infernal_mobs plugin) {
+    public ConsumeEffectHandler(InfernalMobs plugin) {
         this.plugin = plugin;
         this.lootFile = plugin.getLootFile();
     }

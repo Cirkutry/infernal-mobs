@@ -1,4 +1,4 @@
-package jacob_vejvoda.infernal_mobs;
+package jacob_vejvoda.InfernalMobs;
 
 import org.bukkit.entity.Entity;
 

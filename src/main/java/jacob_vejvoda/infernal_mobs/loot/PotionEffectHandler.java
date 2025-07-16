@@ -1,4 +1,4 @@
-package jacob_vejvoda.infernal_mobs;
+package jacob_vejvoda.InfernalMobs.loot;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -12,6 +12,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.Registry;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
+import jacob_vejvoda.InfernalMobs.InfernalMobs;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,12 +21,14 @@ import java.util.Map;
 
 public class PotionEffectHandler {
     
-    private final infernal_mobs plugin;
+    private final InfernalMobs plugin;
     private final FileConfiguration lootFile;
+    private final LootManager lootManager;
     
-    public PotionEffectHandler(infernal_mobs plugin) {
+    public PotionEffectHandler(InfernalMobs plugin) {
         this.plugin = plugin;
         this.lootFile = plugin.getLootFile();
+        this.lootManager = plugin.getLootManager();
     }
 
     public void applyPotionEffects(LivingEntity entity, String effectID) {
@@ -122,7 +126,7 @@ public class PotionEffectHandler {
                 
                 boolean hasRequiredItem = false;
                 for (int itemID : requiredItems) {
-                    ItemStack requiredItem = plugin.getItem(itemID);
+                    ItemStack requiredItem = lootManager.getItem(itemID);
                     if (requiredItem == null) continue;
                     
                     for (String slotStr : slotStrings) {
@@ -161,7 +165,7 @@ public class PotionEffectHandler {
                 boolean hasRequiredItem = false;
                 
                 for (int itemID : requiredItems) {
-                    ItemStack requiredItem = plugin.getItem(itemID);
+                    ItemStack requiredItem = lootManager.getItem(itemID);
                     if (requiredItem == null) continue;
                     
                     ItemStack mainHandItem = player.getInventory().getItemInMainHand();
@@ -269,7 +273,7 @@ public class PotionEffectHandler {
             boolean hasRequiredItem = false;
             
             for (int itemID : items) {
-                ItemStack requiredItem = plugin.getItem(itemID);
+                ItemStack requiredItem = lootManager.getItem(itemID);
                 if (requiredItem == null) continue;
                 
                 if (isCharm) {

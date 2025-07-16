@@ -1,17 +1,17 @@
-package jacob_vejvoda.infernal_mobs;
+package jacob_vejvoda.InfernalMobs;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class InfernalSpawnEvent extends Event implements Cancellable {
+public class SpawnEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private Entity ent;
     private InfernalMob infernal;
     private boolean cancelled;
 
-    public InfernalSpawnEvent(Entity ent, InfernalMob infernal){
+    public SpawnEvent(Entity ent, InfernalMob infernal){
         this.ent = ent;
         this.infernal = infernal;
     }
