@@ -310,7 +310,6 @@ public class EventListener implements Listener {
         }
     }
 
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onMobSpawn(CreatureSpawnEvent event) {
         World world = event.getEntity().getWorld();

@@ -1,25 +1,18 @@
 # Loot configuration for Infernal Mobs
 
 potionEffects:
-  '1':
-    potion:
-      - type: LEVITATION
-        duration: 5
-        amplifier: 2
-        ambient: false
-        particles: true
-        icon: true
-      - type: SLOWNESS
-        duration: 100
-        amplifier: 1
-        ambient: true
-        particles: true
-        icon: true
-    type: self
-    charm: true
-    slot: [40]
-    particle: [FLAME:1500, CLOUD:1000]
-    items: [1]
+  '1':  # Unique identifier for this potion effect group
+    potion: # List of potion effects to apply
+      - type: LEVITATION # Bukkit PotionEffectType name (case-insensitive)
+        duration: 5 # Duration in seconds (will be multiplied by 20 internally); 0 = infinite
+        amplifier: 2 # Intensity level (0 = level I, 1 = level II, etc.)
+        ambient: false # If true, has subtle visuals and less noise
+        particles: true # If false, disables visible particles
+        icon: true # If false, disables HUD icon (in top-right corner)
+    type: self # "self" = effect on player; "target" = effect on attacked mob
+    charm: true # true = passive aura when item is held/equipped; false = only on attack/use
+    slot: [40] # Optional: slot(s) required for item match; use numbers (e.g., 40 = offhand)
+    items: [1] # IDs (from loot section) of items that trigger this effect
 
 consumeEffects:
   '1':
@@ -36,13 +29,30 @@ consumeEffects:
         ambient: true
         particles: true
         icon: false
+    # Message sent to player when item is consumed
     message: "&#CAD35D&lY&#C4D362&lo&#BED467&lu &#B3D571&lf&#ADD576&le&#A7D67B&le&#A2D680&ll &#96D78A&la &#8BD895&lb&#85D89A&li&#7FD99F&lt &#73DAA9&ll&#6EDAAE&li&#68DBB3&lg&#62DBB8&lh&#5CDCBD&lt&#57DCC2&le&#51DDC7&lr&#4BDDCC&l!"
-    items: [1, 2]
+    items: [2]
+
+# Possible variables in commands
+# {player}: Player's name
+# {worldName}: Name of the player's current world
+# {playerX}: Player's X coordinate (rounded)
+# {playerY}: Player's Y coordinate (rounded)
+# {playerZ}: Player's Z coordinate (rounded)
 
 loot:
   '1':
-    name: "&6&lWither Blade"
-    item: DIAMOND_SWORD
+    name: "&6&lWither Blade" #Item display name
+    item: DIAMOND_SWORD # Item ID
+    mobs: ["ZOMBIE", "SKELETON"]  # Only drops from these mob types
+    chancePercentage: 25  # 25% chance to drop
+    powersMin: 2  # Minimum mob power level
+    powersMax: 5  # Maximum mob power level
   '2':
     name: "&#CAD35D&lG&#D0C45D&lo&#D7B55D&ll&#DDA65D&ld &#E9895C&lD&#F07A5C&lr&#F66B5C&lo&#FC5C5C&lp"
     item: APPLE
+    commands: # Executes commands as console when item is given to player
+      - "minecraft:give {player} emerald 5"
+  '3':
+    commands: # Executes commands as console as reward
+      - "kill {player}"

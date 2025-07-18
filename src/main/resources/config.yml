@@ -26,6 +26,8 @@
 # <health> - Current health of the mob (rounded to 2 decimal places)
 # <maxHealth> - Maximum health of the mob
 
+# Language/Locale settings
+locale: en_US
 
 # The base spawn weight for Infernal mobs (1/N chance of a mob becoming Infernal)
 # Higher value = lower probability (1/100 chance when set to 100)

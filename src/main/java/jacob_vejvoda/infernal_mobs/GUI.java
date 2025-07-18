@@ -74,7 +74,6 @@ public class GUI implements Listener {
             clearInfo(p);
     }
 
-
     private static void showBossBar(Player p, Entity e) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(e.getUniqueId());
         String title = plugin.getConfig().getString("bossBarsName", "&fLevel <powers> &fInfernal <mobName>");
@@ -139,7 +138,6 @@ public class GUI implements Listener {
         ((BossBar) bossBars.get(e)).setProgress(setHealth / 100.0f);
     }
 
-
     private static void clearInfo(Player player) {
         if (plugin.getConfig().getBoolean("enableBossBar")) {
             for (Entry<Entity, Object> hm : bossBars.entrySet())
@@ -154,7 +152,6 @@ public class GUI implements Listener {
             }
         }
     }
-
 
     private static void fixScoreboard(Player player, Entity e, List<String> abilityList) {
         if (plugin.getConfig().getBoolean("enableScoreBoard") && (e instanceof Damageable)) {
@@ -252,7 +249,6 @@ public class GUI implements Listener {
             x.printStackTrace();
         }
     }
-
 
     public String getMobNameTag(Entity entity) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(entity.getUniqueId());

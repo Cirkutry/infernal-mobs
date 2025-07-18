@@ -39,6 +39,7 @@ import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -97,6 +98,7 @@ import jacob_vejvoda.InfernalMobs.loot.ConsumeEffectHandler;
 import jacob_vejvoda.InfernalMobs.loot.PotionEffectHandler;
 import jacob_vejvoda.InfernalMobs.loot.LootManager;
 import jacob_vejvoda.InfernalMobs.loot.LootUtils;
+import jacob_vejvoda.InfernalMobs.cmd.CommandManager;
 
 public class InfernalMobs extends JavaPlugin implements Listener {
     GUI gui;
@@ -136,7 +138,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                 saveYML.createNewFile();
             }
             saveFile = YamlConfiguration.loadConfiguration(saveYML);
-            
 
             this.potionEffectHandler = new PotionEffectHandler(this);
             this.consumeEffectHandler = new ConsumeEffectHandler(this);
@@ -149,7 +150,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        
 
         this.gui = new GUI(this);
         getServer().getPluginManager().registerEvents(this.gui, this);
@@ -163,6 +163,13 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         reloadPowers();
         showEffect();
         addRecipes();
+        
+        // Initialize command manager
+        CommandManager commandManager = new CommandManager(this);
+        this.getCommand("infernalmobs").setExecutor(commandManager);
+        this.getCommand("infernalmobs").setTabCompleter(commandManager);
+        this.getCommand("im").setExecutor(commandManager);
+        this.getCommand("im").setTabCompleter(commandManager);
     }
 
     private void reloadPowers() {
@@ -333,7 +340,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }
     }
 
-    private void addHealth(Entity ent, List<String> powerList) {
+    public void addHealth(Entity ent, List<String> powerList) {
     	double maxHealth = ((LivingEntity) ent).getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getBaseValue();
         float setHealth;
         if (getConfig().getBoolean("healthByPower")) {
@@ -388,7 +395,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return list.toString();
     }
 
-    void removeMob(int mobIndex) throws IOException {
+    public void removeMob(int mobIndex) throws IOException {
         String id = this.infernalList.get(mobIndex).id.toString();
         this.infernalList.remove(mobIndex);
         this.saveFile.set(id, null);
@@ -484,14 +491,14 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         lootManager.keepAlive(item);
     }
 
-    ItemStack getRandomLoot(Player player, String mob, int powers) {
+    public ItemStack getRandomLoot(Player player, String mob, int powers) {
         return lootManager.getRandomLoot(player, mob, powers);
     }
     
     /**
      * Gets specific loot item by ID for command usage
      */
-    private ItemStack getLoot(Player player, int loot) {
+    public ItemStack getLoot(Player player, int loot) {
         return lootManager.getLoot(player, loot);
     }
     
@@ -509,7 +516,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return false;
     }
 
-    private String getEffect() {
+    public String getEffect() {
         String effect = "FLAME:1:1";
         try {
             List<String> partTypes = getConfig().getStringList("mobParticles");
@@ -1253,7 +1260,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }, time * 20);
     }
 
-    private List<String> getAbilitiesAmount(Entity e) {
+    public List<String> getAbilitiesAmount(Entity e) {
         int power;
         if (getConfig().getBoolean("powerByDistance")) {
             Location l = e.getWorld().getSpawnLocation();
@@ -1315,7 +1322,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return null;
     }
 
-    private Entity getTarget(final Player player) {
+    public Entity getTarget(final Player player) {
 
         BlockIterator iterator = new BlockIterator(player.getWorld(), player
                 .getLocation().toVector(), player.getEyeLocation()
@@ -1336,14 +1343,14 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return null;
     }
 
-    private void makeFly(Entity ent) {
+    public void makeFly(Entity ent) {
         Entity bat = ent.getWorld().spawnEntity(ent.getLocation(), EntityType.BAT);
         bat.setVelocity(new Vector(0, 1, 0));
         bat.addPassenger(ent);
         ((LivingEntity) bat).addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 1));
     }
 
-    private void giveMobGear(Entity mob, boolean naturalSpawn) {
+    public void giveMobGear(Entity mob, boolean naturalSpawn) {
         UUID mobId = mob.getUniqueId();
         List<String> mobAbilityList = null;
         boolean armoured = false;
@@ -1510,7 +1517,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return ll;
     }
 
-    private String getRandomMob() {
+    public String getRandomMob() {
         List<String> mobList = getConfig().getStringList("enabledMobs");
         if (mobList.isEmpty()) {
             return "Zombie";
@@ -1620,7 +1627,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return lootFile.getIntegerList(path);
     }
 
-    String getLocationName(Location l) {
+    public String getLocationName(Location l) {
         return (l.getX() + "." + l.getY() + "." + l.getZ() + l.getWorld().getName()).replace(".", "");
     }
 
@@ -1645,7 +1652,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return null;
     }
 
-    private boolean cSpawn(CommandSender sender, String mob, Location l, ArrayList<String> abList) {
+    public boolean cSpawn(CommandSender sender, String mob, Location l, ArrayList<String> abList) {
         if ((EntityType.valueOf(mob.toUpperCase()) != null)) {
             Entity ent = l.getWorld().spawnEntity(l, EntityType.valueOf(mob.toUpperCase()));
             InfernalMob newMob;
@@ -1672,120 +1679,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public int rand(int min, int max) {
         return min + (int) (Math.random() * (1 + max - min));
-    }
-
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args){
-        List<String> allAbilitiesList = new ArrayList<>(Arrays.asList("confusing", "ghost", "morph", "mounted", "flying", "gravity", "firework", "necromancer", "archer", "molten", "mama", "potions", "explode", "berserk", "weakness", "vengeance", "webber", "storm", "sprint", "lifesteal", "ghastly", "ender", "cloaked", "1up", "sapper", "rust", "bullwark", "quicksand", "thief", "tosser", "withering", "blinding", "armoured", "poisonous"));
-        Set<String> commands = new HashSet<>(Arrays.asList("reload", "worldInfo", "error", "getloot", "setloot", "giveloot", "abilities", "showAbilities", "setInfernal", "spawn", "cspawn", "pspawn", "kill", "killall"));
-        if (sender.hasPermission("InfernalMobs.commands")) {
-
-            List<String> newTab = new ArrayList<>();
-            if (args.length == 1){
-                if (args[0].isEmpty())
-                    return new ArrayList<>(commands);
-                commands.forEach(tab->{
-                    if (tab.toLowerCase().startsWith(args[0].toLowerCase()))
-                    newTab.add(tab);
-                });
-            }
-            if (args[0].equalsIgnoreCase("getloot") || args[0].equalsIgnoreCase("setloot")){
-                if (args.length == 2){
-                    newTab.add("1");
-                }
-            }
-            if (args[0].equalsIgnoreCase("giveloot")){
-                if (args.length == 2){
-                    newTab.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
-                }
-                if (args.length == 3){
-                    newTab.add("1");
-                }
-            }
-            if (args[0].equalsIgnoreCase("setinfernal")){
-                if (args.length == 2){
-                    newTab.add("10");
-                }
-            }
-            if (args.length == 2){
-                if (args[0].equalsIgnoreCase("spawn") || args[0].equalsIgnoreCase("cspawn") || args[0].equalsIgnoreCase("pspawn")){
-                    if (args[1].isEmpty())
-                        newTab.addAll(Arrays.stream(EntityType.values()).filter(m->m.isSpawnable() && m.isAlive()).map(Enum::name).collect(Collectors.toList()));
-                    else
-                        Arrays.stream(EntityType.values()).filter(m->m.isSpawnable() && m.isAlive()).map(Enum::name).collect(Collectors.toList()).forEach(tab->{
-                            if (tab.toLowerCase().startsWith(args[1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-                if (args[0].equalsIgnoreCase("killall")){
-                    if (args[args.length - 1].isEmpty())
-                        newTab.addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
-                    else
-                        Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()).forEach(tab -> {
-                            if (tab.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-                if (args[0].equalsIgnoreCase("kill")){
-                    newTab.add("1");
-                }
-            }
-            if (args[0].equalsIgnoreCase("cspawn")) {
-                if (args.length == 3) {
-                    if (args[args.length - 1].isEmpty())
-                        newTab.addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
-                    else
-                        Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()).forEach(tab -> {
-                            if (tab.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-                if (args.length > 3 && args.length < 7) {
-                    newTab.add("~");
-                }
-                if (args.length >= 7){
-                    if (args[args.length-1].isEmpty())
-                        newTab.addAll(allAbilitiesList);
-                    else
-                        allAbilitiesList.forEach(tab->{
-                            if (tab.toLowerCase().startsWith(args[args.length-1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-            }
-            if (args[0].equalsIgnoreCase("pspawn")) {
-                if (args.length == 3) {
-                    if (args[args.length - 1].isEmpty())
-                        newTab.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
-                    else
-                        Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()).forEach(tab -> {
-                            if (tab.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-                if (args.length > 3){
-                    if (args[args.length-1].isEmpty())
-                        newTab.addAll(allAbilitiesList);
-                    else
-                        allAbilitiesList.forEach(tab->{
-                            if (tab.toLowerCase().startsWith(args[args.length-1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-            }
-            if (args.length >= 3){
-                if (args[0].equalsIgnoreCase("spawn")){
-                    if (args[args.length-1].isEmpty())
-                        newTab.addAll(allAbilitiesList);
-                    else
-                        allAbilitiesList.forEach(tab->{
-                            if (tab.toLowerCase().startsWith(args[args.length-1].toLowerCase()))
-                                newTab.add(tab);
-                        });
-                }
-            }
-            return newTab;
-        }
-        return null;
     }
     
     public ItemStack getDiviningStaff(){
@@ -1815,329 +1708,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     		m.setLore(loreList);
     	item.setItemMeta(m);
   	  	return item;
-    }
-    
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if ((cmd.getName().equalsIgnoreCase("infernalmobs")) || (cmd.getName().equalsIgnoreCase("im"))) {
-            try {
-                Player player = null;
-                if (!(sender instanceof Player)) {
-                    if (args != null && args.length > 0 && (!args[0].equalsIgnoreCase("cspawn")) && (!args[0].equalsIgnoreCase("pspawn")) && (!args[0].equalsIgnoreCase("giveloot")) && (!args[0].equalsIgnoreCase("reload")) && (!args[0].equalsIgnoreCase("killall"))) {
-                        sender.sendMessage("This command can only be run by a player!");
-                        return true;
-                    }
-                } else
-                    player = (Player) sender;
-                if (sender.hasPermission("InfernalMobs.commands")) {
-                    if (args.length == 0) {
-                        throwError(sender);
-                        return true;
-                    }
-                    if ((args.length == 1) && (args[0].equalsIgnoreCase("reload"))) {
-                        reloadConfig();
-                        refreshLoot();
-                        reloadMobSave();
-                        sender.sendMessage("§eConfig files reloaded successfully!");
-                        return true;
-                    } else if (args[0].equals("mobList")) {
-                        sender.sendMessage("§6Mob List:");
-                        for (EntityType et : EntityType.values())
-                            if (et != null && et.getName() != null)
-                                sender.sendMessage("§e" + et.getName());
-                        return true;
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("error"))) {
-                        this.errorList.add(player);
-                        sender.sendMessage("§eClick on a mob to send an error report about it.");
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("info"))) {
-                        sender.sendMessage("§eMounts: " + this.mountList.size());
-                        sender.sendMessage("§eLoops: " + this.loops);
-                        sender.sendMessage("§eInfernals: " + this.infernalList.size());
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("worldInfo"))) {
-                        List<String> enWorldList = getConfig().getStringList("mobWorlds");
-                        World world = player.getWorld();
-                        String enabled = "is not";
-                        if (enWorldList.contains(world.getName()) || enWorldList.contains("<all>")) {
-                            enabled = "is";
-                        }
-                        sender.sendMessage("The world you are currently in, " + world + " " + enabled + " enabled.");
-                        sender.sendMessage("All the worlds that are enabled are: " + enWorldList.toString());
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("help"))) {
-                        throwError(sender);
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("getloot"))) {
-                        int min = getConfig().getInt("minPowers");
-                        int max = getConfig().getInt("maxPowers");
-                        int powers = rand(min, max);
-                        ItemStack gottenLoot = getRandomLoot(player, getRandomMob(), powers);
-                        if (gottenLoot != null) {
-                            player.getInventory().addItem(gottenLoot);
-                        }
-                        sender.sendMessage("§eGave you some random loot!");
-                    } else if ((args.length == 2) && (args[0].equalsIgnoreCase("getloot"))) {
-                        try {
-                            int index = Integer.parseInt(args[1]);
-                            ItemStack i = getLoot(player, index);
-                            if (i != null) {
-                                player.getInventory().addItem(i);
-                                sender.sendMessage("§eGave you the loot at index §9" + index);
-                                return true;
-                            }
-                        } catch (Exception ignored) {
-                        }
-                        sender.sendMessage("§cUnable to get that loot!");
-                    } else if ((args.length == 3) && (args[0].equalsIgnoreCase("giveloot"))) {
-                        try {
-                            Player p = getServer().getPlayer(args[1]);
-                            if (p != null) {
-                                int index = Integer.parseInt(args[2]);
-                                ItemStack i = getLoot(p, index);
-                                if (i != null) {
-                                    p.getInventory().addItem(i);
-                                    sender.sendMessage("§eGave the player the loot at index §9" + index);
-                                    return true;
-                                }
-                            } else {
-                                sender.sendMessage("§cPlayer not found!!");
-                                return true;
-                            }
-                        } catch (Exception ignored) {
-                        }
-                        sender.sendMessage("§cUnable to get that loot!");
-                    } else if (((args.length == 2) && (args[0].equalsIgnoreCase("spawn"))) || ((args[0].equalsIgnoreCase("cspawn")) && (args.length == 6))) {
-                        if ((EntityType.valueOf(args[1].toUpperCase()) != null)) {
-                            boolean exmsg;
-                            World world;
-                            Entity ent;
-                            if ((args[0].equalsIgnoreCase("cspawn")) && (args[2] != null) && (args[3] != null) && (args[4] != null) && (args[5] != null)) {
-                                if (Bukkit.getServer().getWorld(args[2]) == null) {
-                                    sender.sendMessage(args[2] + " does not exist!");
-                                    return true;
-                                }
-                                world = Bukkit.getServer().getWorld(args[2]);
-                                Location spoint = new Location(Bukkit.getServer().getWorld(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
-                                ent = world.spawnEntity(spoint, EntityType.valueOf(args[1].toUpperCase()));
-                                exmsg = true;
-                            } else {
-                                Location farSpawnLoc = player.getTargetBlock(null, 200).getLocation();
-                                farSpawnLoc.setY(farSpawnLoc.getY() + 1.0D);
-                                ent = player.getWorld().spawnEntity(farSpawnLoc, EntityType.valueOf(args[1].toUpperCase()));
-                                exmsg = false;
-                            }
-                            List<String> abList = getAbilitiesAmount(ent);
-                            InfernalMob newMob;
-                            UUID id = ent.getUniqueId();
-                            if (abList.contains("1up")) {
-                                newMob = new InfernalMob(ent, id, true, abList, 2, getEffect());
-                            } else {
-                                newMob = new InfernalMob(ent, id, true, abList, 1, getEffect());
-                            }
-
-                            if (abList.contains("flying")) {
-                                makeFly(ent);
-                            }
-                            this.infernalList.add(newMob);
-                            this.gui.setName(ent);
-
-                            giveMobGear(ent, false);
-                            addHealth(ent, abList);
-                            if (!exmsg) {
-                                sender.sendMessage("Spawned a " + args[1]);
-                            } else if (sender instanceof Player) {
-                                sender.sendMessage("Spawned a " + args[1] + " in " + args[2] + " at " + args[3] + ", " + args[4] + ", " + args[5]);
-                            }
-                        } else {
-                            sender.sendMessage("Can't spawn a " + args[1] + "!");
-                            return true;
-                        }
-                    } else if (((args.length >= 3) && (args[0].equalsIgnoreCase("spawn"))) || ((args[0].equalsIgnoreCase("cspawn")) && (args.length >= 6)) || ((args[0].equalsIgnoreCase("pspawn")) && (args.length >= 3))) {
-                        if (args[0].equalsIgnoreCase("spawn")) {
-                            if ((EntityType.valueOf(args[1].toUpperCase()) != null)) {
-                                Location farSpawnLoc = player.getTargetBlock(null, 200).getLocation();
-                                farSpawnLoc.setY(farSpawnLoc.getY() + 1.0D);
-                                Entity ent = player.getWorld().spawnEntity(farSpawnLoc, EntityType.valueOf(args[1].toUpperCase()));
-                                ArrayList<String> specificAbList = new ArrayList();
-                                for (int i = 0; i <= args.length - 3; i++) {
-                                    if (getConfig().getString(args[(i + 2)]) != null) {
-                                        specificAbList.add(args[(i + 2)]);
-                                    } else {
-                                        sender.sendMessage(args[(i + 2)] + " is not a valid ability!");
-                                        return true;
-                                    }
-                                }
-                                InfernalMob newMob;
-                                UUID id = ent.getUniqueId();
-                                if (specificAbList.contains("1up")) {
-                                    newMob = new InfernalMob(ent, id, true, specificAbList, 2, getEffect());
-                                } else {
-                                    newMob = new InfernalMob(ent, id, true, specificAbList, 1, getEffect());
-                                }
-                                if (specificAbList.contains("flying")) {
-                                    makeFly(ent);
-                                }
-                                this.infernalList.add(newMob);
-                                this.gui.setName(ent);
-                                giveMobGear(ent, false);
-
-                                addHealth(ent, specificAbList);
-
-                                sender.sendMessage("Spawned a " + args[1] + " with the abilities:");
-                                sender.sendMessage(specificAbList.toString());
-                            } else {
-                                sender.sendMessage("Can't spawn a " + args[1] + "!");
-                            }
-                        } else if (args[0].equalsIgnoreCase("cspawn")) {
-                            if (Bukkit.getServer().getWorld(args[2]) == null) {
-                                sender.sendMessage(args[2] + " does not exist!");
-                                return true;
-                            }
-                            World world = Bukkit.getServer().getWorld(args[2]);
-                            Location spoint = new Location(world, Integer.parseInt(args[3]), Integer.parseInt(args[4]), Integer.parseInt(args[5]));
-                            ArrayList<String> abList = new ArrayList(Arrays.asList(args).subList(6, args.length));
-                            if (cSpawn(sender, args[1], spoint, abList)) {
-                                sender.sendMessage("Spawned a " + args[1] + " in " + args[2] + " at " + args[3] + ", " + args[4] + ", " + args[5] + " with the abilities:");
-                                sender.sendMessage(abList.toString());
-                            }
-                        } else {
-                            Player p = getServer().getPlayer(args[2]);
-                            if (p == null) {
-                                sender.sendMessage(args[2] + " is not online!");
-                                return true;
-                            }
-                            ArrayList<String> abList = new ArrayList(Arrays.asList(args).subList(3, args.length));
-                            if (cSpawn(sender, args[1], p.getLocation(), abList)) {
-                                sender.sendMessage("Spawned a " + args[1] + " at " + p.getName() + " with the abilities:");
-                                sender.sendMessage(abList.toString());
-                            }
-                        }
-                    } else if ((args.length == 1) && (args[0].equalsIgnoreCase("abilities"))) {
-                        sender.sendMessage("--Infernal Mobs Abilities--");
-                        sender.sendMessage("mama, molten, weakness, vengeance, webber, storm, sprint, lifesteal, ghastly, ender, cloaked, berserk, 1up, sapper, rust, bullwark, quicksand, thief, tosser, withering, blinding, armoured, poisonous, potions, explode, gravity, archer, necromancer, firework, flying, mounted, morph, ghost, confusing");
-                    } else {
-                        List<String> oldMobAbilityList;
-                        if ((args.length == 1) && (args[0].equalsIgnoreCase("showAbilities"))) {
-                            if (getTarget(player) != null) {
-                                Entity targeted = getTarget(player);
-                                UUID mobId = targeted.getUniqueId();
-                                if (idSearch(mobId) != -1) {
-                                    oldMobAbilityList = findMobAbilities(mobId);
-                                    if (!targeted.isDead()) {
-                                        sender.sendMessage("--Targeted InfernalMob's Abilities--");
-                                        sender.sendMessage(oldMobAbilityList.toString());
-                                    }
-                                } else {
-                                    sender.sendMessage("§cThis " + targeted.getType().getName() + " §cis not an infernal mob!");
-                                }
-                            } else {
-                                sender.sendMessage("§cUnable to find mob!");
-                            }
-                        } else if ((args[0].equalsIgnoreCase("setInfernal")) && (args.length == 2)) {
-                            if (player.getTargetBlock(null, 25).getType().equals(Material.SPAWNER)) {
-                                int delay = Integer.parseInt(args[1]);
-
-                                String name = getLocationName(player.getTargetBlock(null, 25).getLocation());
-
-                                this.saveFile.set("infernalSpawners." + name, delay);
-                                try {
-                                    this.saveFile.save(this.saveYML);
-                                } catch (IOException e) {
-                                    this.getLogger().log(Level.SEVERE, "Failed to save spawner data!", e);
-                                }
-                                sender.sendMessage("§cSpawner set to infernal with a " + delay + " second delay!");
-                            } else {
-                                sender.sendMessage("§cYou must be looking at a spawner to make it infernal!");
-                            }
-                        } else if ((args[0].equalsIgnoreCase("kill")) && (args.length == 2)) {
-                            int size = Integer.parseInt(args[1]);
-                            for (Entity e : player.getNearbyEntities(size, size, size)) {
-                                int id = idSearch(e.getUniqueId());
-                                if (id != -1) {
-                                    removeMob(id);
-                                    e.remove();
-                                    this.getLogger().log(Level.INFO, "Entity remove due to /kill");
-                                }
-                            }
-                            sender.sendMessage("§eKilled all infernal mobs near you!");
-                        } else if ((args[0].equalsIgnoreCase("killall")) && (args.length == 1 || args.length == 2)) {
-                            World w = null;
-                            if (args.length == 1 && sender instanceof Player){
-                                w = ((Player) sender).getWorld();
-                            } else if (args.length == 2){
-                                w = getServer().getWorld(args[1]);
-                            }
-
-                            if (w != null) {
-                                for (Entity e : w.getEntities()) {
-                                    int id = idSearch(e.getUniqueId());
-                                    if (id != -1) {
-                                        removeMob(id);
-                                        if(e instanceof LivingEntity) {
-                                        	((LivingEntity)e).setCustomName(null);
-                                        }
-                                        this.getLogger().log(Level.INFO, "Entity remove due to /killall");
-                                        e.remove();
-                                    }
-                                }
-                                sender.sendMessage("§eKilled all loaded infernal mobs in that world!");
-                            } else {
-                                sender.sendMessage("§cWorld not found!");
-                            }
-                        } else if (args[0].equalsIgnoreCase("mobs")) {
-                            sender.sendMessage("§6List of Mobs:");
-                            for (EntityType e : EntityType.values())
-                                if (e != null)
-                                    sender.sendMessage(e.toString());
-                        } else if (args[0].equalsIgnoreCase("setloot")) {
-                            try {
-                                ItemStack item = player.getInventory().getItemInMainHand();
-                                String lootPath = "loot." + args[1];
-                                lootFile.set(lootPath + ".item", item.getType().toString());
-                                lootFile.set(lootPath + ".amount", item.getAmount());
-                                if (item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
-                                    lootFile.set(lootPath + ".name", item.getItemMeta().getDisplayName());
-                                }
-                                if (item.getItemMeta() != null && item.getItemMeta().hasLore()) {
-                                    lootFile.set(lootPath + ".lore", item.getItemMeta().getLore());
-                                }
-                                if (item.getItemMeta() instanceof Damageable) {
-                                    lootFile.set(lootPath + ".durability", ((Damageable)item.getItemMeta()).getDamage());
-                                }
-                                
-                                lootFile.save(lootYML);
-                                sender.sendMessage("§eSet loot at index " + args[1] + " §eto item in hand and saved to file.");
-                            } catch (IOException e) {
-                                sender.sendMessage("§cFailed to save loot file: " + e.getMessage());
-                                e.printStackTrace();
-                            }
-                        } else {
-                            throwError(sender);
-                        }
-                    }
-                } else {
-                    sender.sendMessage("§cYou don't have permission to use this command!");
-                }
-            } catch (Exception x) {
-                throwError(sender);
-                x.printStackTrace();
-            }
-        }
-        return true;
-    }
-
-    private void throwError(CommandSender sender) {
-        sender.sendMessage("--Infernal Mobs v" + this.getDescription().getVersion() + "--");
-        sender.sendMessage("Usage: /im reload");
-        sender.sendMessage("Usage: /im worldInfo");
-        sender.sendMessage("Usage: /im error");
-        sender.sendMessage("Usage: /im getloot <index>");
-        sender.sendMessage("Usage: /im setloot <index>");
-        sender.sendMessage("Usage: /im giveloot <player> <index>");
-        sender.sendMessage("Usage: /im abilities");
-        sender.sendMessage("Usage: /im showAbilities");
-        sender.sendMessage("Usage: /im setInfernal <time delay>");
-        sender.sendMessage("Usage: /im spawn <mob> <ability> <ability>");
-        sender.sendMessage("Usage: /im cspawn <mob> <world> <x> <y> <z> <ability> <ability>");
-        sender.sendMessage("Usage: /im pspawn <mob> <player> <ability> <ability>");
-        sender.sendMessage("Usage: /im kill <size>");
-        sender.sendMessage("Usage: /im killall <world>");
     }
 
     @Override
@@ -2186,5 +1756,37 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public PotionEffectHandler getPotionEffectHandler() {
         return this.potionEffectHandler;
+    }
+
+    public ArrayList<InfernalMob> getInfernalList() {
+        return this.infernalList;
+    }
+    
+    public HashMap<Entity, Entity> getMountList() {
+        return this.mountList;
+    }
+    
+    public int getLoops() {
+        return this.loops;
+    }
+    
+    public ArrayList<Player> getErrorList() {
+        return this.errorList;
+    }
+    
+    public GUI getGui() {
+        return this.gui;
+    }
+    
+    public FileConfiguration getSaveFile() {
+        return this.saveFile;
+    }
+    
+    public File getSaveYML() {
+        return this.saveYML;
+    }
+    
+    public File getLootYML() {
+        return this.lootYML;
     }
 }

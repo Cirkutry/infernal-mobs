@@ -39,7 +39,11 @@ public class LootManager {
         
         if (lootSection != null) {
             for (String i : lootSection.getKeys(false)) {
-                if ((lootFile.getString("loot." + i) != null) &&
+                // Check if loot entry has either an item or commands defined
+                boolean hasItem = lootFile.getString("loot." + i + ".item") != null;
+                boolean hasCommands = !lootFile.getStringList("loot." + i + ".commands").isEmpty();
+                
+                if ((hasItem || hasCommands) &&
                         ((lootFile.getList("loot." + i + ".mobs") == null) ||
                                 (lootFile.getList("loot." + i + ".mobs", new ArrayList<>()).contains(mob))) &&
                         (lootFile.getString("loot." + i + ".chancePercentage") == null ||
@@ -72,17 +76,20 @@ public class LootManager {
     public ItemStack getLoot(Player player, int loot) {
         ItemStack i = null;
         try {
+            // Execute commands first if they exist
             if (!this.lootFile.getStringList("loot." + loot + ".commands").isEmpty()) {
                 List<String> commandList = this.lootFile.getStringList("loot." + loot + ".commands");
                 for (String command : commandList) {
                     command = org.bukkit.ChatColor.translateAlternateColorCodes('&', command);
-                    command = command.replace("player", player.getName());
+                    command = replaceCommandVariables(command, player);
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
                 }
             }
+            
+            // Try to get the item (may be null if only commands are defined)
             i = lootGenerator.getItem(loot);
         } catch(Exception x) {
-            plugin.getServer().getLogger().log(Level.WARNING, "No loot found with ID: " + loot);
+            plugin.getServer().getLogger().log(Level.WARNING, "Error processing loot with ID: " + loot, x);
         }
         return i;
     }
@@ -108,6 +115,28 @@ public class LootManager {
         if (plugin.getConfig().getBoolean("debug"))
             plugin.getLogger().log(Level.INFO, "Loot " + lootId + " min = " + min + " and max = " + max);
         return (mobPowers >= min) && (mobPowers <= max);
+    }
+    
+    /**
+     * Replaces variables in command strings with actual values
+     * Available variables:
+     * - player: Player's name
+     * - worldName: Name of the player's current world
+     * - playerX: Player's X coordinate (rounded)
+     * - playerY: Player's Y coordinate (rounded) 
+     * - playerZ: Player's Z coordinate (rounded)
+     */
+    private String replaceCommandVariables(String command, org.bukkit.entity.Player player) {
+        // Basic player info
+        command = command.replace("{player}", player.getName());
+        
+        // Location info
+        command = command.replace("{worldName}", player.getWorld().getName());
+        command = command.replace("{playerX}", String.valueOf((int) Math.round(player.getLocation().getX())));
+        command = command.replace("{playerY}", String.valueOf((int) Math.round(player.getLocation().getY())));
+        command = command.replace("{playerZ}", String.valueOf((int) Math.round(player.getLocation().getZ())));
+        
+        return command;
     }
     
     /**
