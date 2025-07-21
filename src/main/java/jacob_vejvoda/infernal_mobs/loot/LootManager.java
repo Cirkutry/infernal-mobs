@@ -63,9 +63,8 @@ public class LootManager {
             } else
                 return null;
         } catch (Exception e) {
-            System.out.println("Error in get random loot ");
-            e.printStackTrace();
-            System.out.println("Error: No valid drops found!");
+            plugin.getLogger().log(Level.WARNING, "Error in get random loot ", e);
+            plugin.getLogger().warning("Error: No valid drops found!");
         }
         return null;
     }

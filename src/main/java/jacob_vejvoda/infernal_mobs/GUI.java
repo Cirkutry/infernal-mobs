@@ -103,8 +103,7 @@ public class GUI implements Listener {
                 }
             } while (title.length() + abilities.length() + mobName.length() > 64);
         } catch (Exception x) {
-            System.out.println("showBossBar error: ");
-            x.printStackTrace();
+            plugin.getLogger().log(Level.WARNING, "showBossBar error: ", x);
         }
         title = title.replace("<abilities>", abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
         title = ConsumeEffectHandler.hex(title);
@@ -120,10 +119,10 @@ public class GUI implements Listener {
             if (ls != null)
                 bs = BarStyle.valueOf(ls);
 
-            String mc = plugin.getConfig().getString("bossBarSettings.perMob." + e.getType().getName() + ".color");
+            String mc = plugin.getConfig().getString("bossBarSettings.perMob." + e.getType().name() + ".color");
             if (mc != null)
                 bc = BarColor.valueOf(mc);
-            String ms = plugin.getConfig().getString("bossBarSettings.perMob." + e.getType().getName() + ".style");
+            String ms = plugin.getConfig().getString("bossBarSettings.perMob." + e.getType().name() + ".style");
             if (ms != null)
                 bs = BarStyle.valueOf(ms);
             BossBar bar = Bukkit.createBossBar(title, bc, bs, BarFlag.CREATE_FOG);
@@ -245,8 +244,7 @@ public class GUI implements Listener {
                 }
             }
         } catch (Exception x) {
-            System.out.println("Error in setName: ");
-            x.printStackTrace();
+            plugin.getLogger().log(Level.WARNING, "Error in setName: ", x);
         }
     }
 

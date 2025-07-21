@@ -139,9 +139,9 @@ public class InfernalMobs extends JavaPlugin implements Listener {
             }
             saveFile = YamlConfiguration.loadConfiguration(saveYML);
 
+            this.lootManager = new LootManager(this, lootFile);
             this.potionEffectHandler = new PotionEffectHandler(this);
             this.consumeEffectHandler = new ConsumeEffectHandler(this);
-            this.lootManager = new LootManager(this, lootFile);
             
             this.getLogger().log(Level.INFO, "Configuration files loaded successfully!");
         } catch (IOException e) {
@@ -331,7 +331,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                                     }
                                 }
                             } else {
-                                System.out.println("No valid spawn messages found!");
+                                this.getLogger().warning("No valid spawn messages found!");
                             }
                         }
                     }
@@ -370,7 +370,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                 ((LivingEntity) ent).getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).setBaseValue(setHealth);
                 ((LivingEntity) ent).setHealth(setHealth);
             } catch (Exception e) {
-                System.out.println("addHealth: " + e);
+                this.getLogger().log(Level.WARNING, "addHealth: " + e);
             }
         }
         String list = getPowerString(ent, powerList);
@@ -755,7 +755,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                         doMagic(player, mob, playerIsVictim, ability, id);
                 }
             }
-        } catch (Exception e) {/**System.out.println("Do Effect Error: " + e);**/}
+        } catch (Exception e) {/**this.getLogger().log(Level.WARNING, "Do Effect Error: ", e);**/}
     }
 
     private void doMagic(Entity vic, Entity atc, boolean playerIsVictim, String ability, UUID id) {
@@ -840,7 +840,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                         }
                     }
                     if (newEnt == null) {
-                        System.out.println("Infernal Mobs can't find mob type: " + mobName + "!");
+                        this.getLogger().log(Level.WARNING, "Infernal Mobs can't find mob type: " + mobName + "!");
                         return;
                     }
                     InfernalMob newMob;
@@ -863,8 +863,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                     }
                     ((org.bukkit.entity.Damageable) newEnt).setHealth(h);
                 } catch (Exception ex) {
-                    System.out.print("Morph Error: ");
-                    ex.printStackTrace();
+                    this.getLogger().log(Level.SEVERE, "Morph Error: ", ex);
                 }
             }
             if ((ability.equals("molten")) && (isLegitVictim(atc, playerIsVictim, ability))) {
@@ -1473,8 +1472,8 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                     }
                 }
             } else {
-                System.out.println("Can't spawn mount!");
-                System.out.println(mount + " is not a valid Entity!");
+                this.getLogger().warning("Can't spawn mount!");
+                this.getLogger().warning(mount + " is not a valid Entity!");
             }
         }
     }

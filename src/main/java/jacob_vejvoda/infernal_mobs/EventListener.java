@@ -439,7 +439,7 @@ public class EventListener implements Listener {
                         
                         Bukkit.broadcastMessage(deathMessage);
                     } else {
-                        System.out.println("No valid death messages found!");
+                        plugin.getLogger().warning("No valid death messages found!");
                     }
                 }
                 if ((plugin.getConfig().getBoolean("enableDrops")) &&
@@ -469,12 +469,12 @@ public class EventListener implements Listener {
                 try {
                     plugin.removeMob(mobIndex);
                 } catch (Exception e) {
-                    System.out.println("Error: " + e);
+                    plugin.getLogger().log(Level.WARNING, "Error: ", e);
                 }
             }
             return;
         } catch (Exception e) {
-            System.out.println("EntityDeathEvent: " + e);
+            plugin.getLogger().log(Level.SEVERE, "EntityDeathEvent: ", e);
         }
     }
 
