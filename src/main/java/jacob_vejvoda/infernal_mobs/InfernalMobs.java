@@ -98,6 +98,7 @@ import jacob_vejvoda.InfernalMobs.loot.ConsumeEffectHandler;
 import jacob_vejvoda.InfernalMobs.loot.PotionEffectHandler;
 import jacob_vejvoda.InfernalMobs.loot.LootManager;
 import jacob_vejvoda.InfernalMobs.loot.LootUtils;
+import jacob_vejvoda.InfernalMobs.loot.DiviningStaff;
 import jacob_vejvoda.InfernalMobs.cmd.CommandManager;
 
 public class InfernalMobs extends JavaPlugin implements Listener {
@@ -117,6 +118,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     private ConsumeEffectHandler consumeEffectHandler;
     private LootManager lootManager;
     private LootUtils lootUtils;
+    private DiviningStaff diviningStaff;
 
 	public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -154,6 +156,9 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         this.gui = new GUI(this);
         getServer().getPluginManager().registerEvents(this.gui, this);
         
+        // Initialize DiviningStaff
+        this.diviningStaff = new DiviningStaff(this);
+        
         EventListener events = new EventListener(this);
         getServer().getPluginManager().registerEvents(events, this);
         
@@ -162,7 +167,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         applyEffect();
         reloadPowers();
         showEffect();
-        addRecipes();
+        diviningStaff.addRecipes();
         
         // Initialize command manager
         CommandManager commandManager = new CommandManager(this);
@@ -1478,11 +1483,11 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }
     }
 
-    private void displayParticle(String effect, Location l, double radius, int speed, int amount) {
+    public void displayParticle(String effect, Location l, double radius, int speed, int amount) {
         displayParticle(effect, l.getWorld(), l.getX(), l.getY(), l.getZ(), radius, speed, amount);
     }
 
-    void displayParticle(String effect, World w, double x, double y, double z, double radius, int speed, int amount) {
+    public void displayParticle(String effect, World w, double x, double y, double z, double radius, int speed, int amount) {
         amount = (amount <= 0) ? 1 : amount;
         Location l = new Location(w, x, y, z);
         try {
@@ -1681,32 +1686,11 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     }
     
     public ItemStack getDiviningStaff(){
-    	ItemStack s = getItem(Material.BLAZE_ROD, "§6§lDivining Rod", 1, Arrays.asList("Click to find infernal mobs."));
-    	ItemMeta m = s.getItemMeta();
-    	m.addEnchant(Enchantment.CHANNELING, 1, true);
-    	s.setItemMeta(m);
-    	return s;
-    }
-
-    public void addRecipes() {
-    	ItemStack staff = getDiviningStaff();
-    	NamespacedKey key = new NamespacedKey(this, "divining_staff");
-    	ShapedRecipe sr = new ShapedRecipe(key, staff);
-		sr.shape("ANA", "ASA", "ASA");
-		sr.setIngredient('N', Material.NETHER_STAR);
-		sr.setIngredient('S', Material.BLAZE_ROD);
-		Bukkit.addRecipe(sr);
+        return diviningStaff.getDiviningStaff();
     }
     
-    private ItemStack getItem(Material mat, String name, int amount, List<String> loreList){
-    	ItemStack item = new ItemStack(mat, amount);
-    	ItemMeta m = item.getItemMeta();
-    	if(name != null)
-    		m.setDisplayName(name);
-    	if(loreList != null)
-    		m.setLore(loreList);
-    	item.setItemMeta(m);
-  	  	return item;
+    public DiviningStaff getDiviningStaffManager(){
+        return diviningStaff;
     }
 
     @Override

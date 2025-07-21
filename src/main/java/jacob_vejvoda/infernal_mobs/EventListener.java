@@ -58,77 +58,9 @@ public class EventListener implements Listener {
     	try {
     		ItemStack s = plugin.getDiviningStaff();
     		if(p.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals(s.getItemMeta().getDisplayName())) {
-    	        Entity b = GUI.getNearbyBoss(p);
-
-    	        if(b != null) {
-    	        	boolean took = false;
-    	        	for(ItemStack i : p.getInventory())
-    	        		if(i != null && i.getType().equals(Material.BLAZE_POWDER)) {
-    	        			if(i.getAmount() == 1) {
-    	        				p.getInventory().remove(i);
-    	        			}else
-    	        				i.setAmount(i.getAmount()-1);
-    	        			took = true;
-    	        			break;
-    	        		}
-    	        	if(!took) {
-    	        		p.sendMessage("§cYou need blaze powder to use this!");
-    	        		return;
-    	        	}
-
-	    			Entity source = b;
-	    			Entity target = p;
-	    	     
-	    	        Vector direction = getVector(target).subtract(getVector(source)).normalize();
-	    	        double x = direction.getX();
-	    	        double y = direction.getY();
-	    	        double z = direction.getZ();
-	    	     
-	    	        Location changed = target.getLocation().clone();
-	    	        changed.setYaw(180 - toDegree(Math.atan2(x, z)));
-	    	        changed.setPitch(90 - toDegree(Math.acos(y)));
-	    	        target.teleport(changed);
-
-	    	        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable(){
-	    	        	public void run(){
-	    	    			Location eyeLoc = p.getEyeLocation();
-	    	    			double px = eyeLoc.getX();
-	    	    			double py = eyeLoc.getY();
-	    	    			double pz = eyeLoc.getZ();
-	    	    			double yaw  = Math.toRadians(eyeLoc.getYaw() + 90);
-	    	    			double pitch = Math.toRadians(eyeLoc.getPitch() + 90);
-	    	    			double x = Math.sin(pitch) * Math.cos(yaw);
-	    	    			double y = Math.sin(pitch) * Math.sin(yaw);
-	    	    			double z = Math.cos(pitch);
-	    	    			for (int j = 1 ; j <= 10 ; j++) {
-	    		    			for (int i = 1 ; i <= 10 ; i++) {
-	    							Location loc = new Location(p.getWorld(), px + (i * x), py + (i * z), pz + (i * y));
-	    							beamParticles(loc);
-	    		    			}
-	    	    			}
-	    	        	}
-	    	        }, 5);
-    	        }
+    			plugin.getDiviningStaffManager().handlePlayerInteract(e);
     		}
     	}catch(Exception x) {}
-    }
-    
-    private void beamParticles(Location loc){
-    	int speed = -1;
-    	int amount = 1;
-        double r = 0;
-        plugin.displayParticle("DRIP_LAVA", loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), r, speed, amount);
-    }
-     
-    private float toDegree(double angle) {
-        return (float) Math.toDegrees(angle);
-    }
-     
-    private Vector getVector(Entity entity) {
-        if (entity instanceof Player)
-            return ((Player) entity).getEyeLocation().toVector();
-        else
-            return entity.getLocation().toVector();
     }
     
     @EventHandler
