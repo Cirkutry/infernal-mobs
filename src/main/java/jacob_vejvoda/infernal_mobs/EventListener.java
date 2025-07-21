@@ -1,10 +1,16 @@
 package jacob_vejvoda.InfernalMobs;
 
+import jacob_vejvoda.InfernalMobs.loot.ConsumeEffectHandler;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.logging.Level;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,34 +21,22 @@ import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.Set;
-import java.util.List;
-
-import jacob_vejvoda.InfernalMobs.loot.ConsumeEffectHandler;
 
 public class EventListener implements Listener {
     private static InfernalMobs plugin;
@@ -51,50 +45,64 @@ public class EventListener implements Listener {
     EventListener(InfernalMobs instance) {
         plugin = instance;
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerInteract(PlayerInteractEvent e) {
-    	Player p = e.getPlayer();
-    	try {
-    		ItemStack s = plugin.getDiviningStaff();
-    		if(p.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equals(s.getItemMeta().getDisplayName())) {
-    			plugin.getDiviningStaffManager().handlePlayerInteract(e);
-    		}
-    	}catch(Exception x) {}
+        Player p = e.getPlayer();
+        try {
+            ItemStack s = plugin.getDiviningStaff();
+            if (p.getInventory()
+                    .getItemInMainHand()
+                    .getItemMeta()
+                    .getDisplayName()
+                    .equals(s.getItemMeta().getDisplayName())) {
+                plugin.getDiviningStaffManager().handlePlayerInteract(e);
+            }
+        } catch (Exception x) {
+        }
     }
-    
+
     @EventHandler
     public void onEntityBreed(EntityBreedEvent e) {
-    	if(e.getBreeder() instanceof Player) {
-    		Player p = (Player) e.getBreeder();
-    		if(plugin.fertileList.contains(p)) {
-    			for(int i = 0; i < plugin.rand(1, 4); i++) {
-    				LivingEntity babe = (LivingEntity) e.getEntity().getLocation().getWorld().spawnEntity(e.getEntity().getLocation(), e.getEntityType());
-    				if(babe instanceof Ageable)
-    					((Ageable)babe).setBaby();
-    				if(e.getEntity() instanceof Sheep)
-    					((Sheep)babe).setColor(((Sheep)e.getEntity()).getColor());
-    			}
-    		}
-    	}
+        if (e.getBreeder() instanceof Player) {
+            Player p = (Player) e.getBreeder();
+            if (plugin.fertileList.contains(p)) {
+                for (int i = 0; i < plugin.rand(1, 4); i++) {
+                    LivingEntity babe =
+                            (LivingEntity)
+                                    e.getEntity()
+                                            .getLocation()
+                                            .getWorld()
+                                            .spawnEntity(
+                                                    e.getEntity().getLocation(), e.getEntityType());
+                    if (babe instanceof Ageable) ((Ageable) babe).setBaby();
+                    if (e.getEntity() instanceof Sheep)
+                        ((Sheep) babe).setColor(((Sheep) e.getEntity()).getColor());
+                }
+            }
+        }
     }
-    
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerItemConsumeEvent(PlayerItemConsumeEvent e) {
-    	Player p = e.getPlayer();
-    	ItemStack check = e.getItem();
-    	
+        Player p = e.getPlayer();
+        ItemStack check = e.getItem();
+
         if (plugin.lootFile.contains("consumeEffects")) {
-            ConfigurationSection section = plugin.lootFile.getConfigurationSection("consumeEffects");
+            ConfigurationSection section =
+                    plugin.lootFile.getConfigurationSection("consumeEffects");
             if (section != null) {
                 for (String id : section.getKeys(false)) {
                     List<Integer> items = section.getIntegerList(id + ".items");
                     for (int itemID : items) {
                         ItemStack neededItem = plugin.getItem(itemID);
-                        if (neededItem != null && neededItem.getItemMeta() != null && 
-                            check.getItemMeta() != null && 
-                            check.getItemMeta().getDisplayName().equals(neededItem.getItemMeta().getDisplayName()) && 
-                            check.getType().equals(neededItem.getType())) {
+                        if (neededItem != null
+                                && neededItem.getItemMeta() != null
+                                && check.getItemMeta() != null
+                                && check.getItemMeta()
+                                        .getDisplayName()
+                                        .equals(neededItem.getItemMeta().getDisplayName())
+                                && check.getType().equals(neededItem.getType())) {
                             plugin.applyEatEffects(p, Integer.parseInt(id));
                             break;
                         }
@@ -119,7 +127,11 @@ public class EventListener implements Listener {
             }
             p.sendMessage("§eName: §f" + name);
             p.sendMessage("§eSaved: §f" + plugin.saveFile.getString(ent.getUniqueId().toString()));
-            p.sendMessage("§eHealth: §f" + ((LivingEntity) ent).getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue());
+            p.sendMessage(
+                    "§eHealth: §f"
+                            + ((LivingEntity) ent)
+                                    .getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH)
+                                    .getValue());
             p.sendMessage("§eInfernal: §f" + plugin.idSearch(ent.getUniqueId()));
         }
     }
@@ -170,7 +182,9 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onChunkLoad(ChunkLoadEvent e) {
         for (Entity ent : e.getChunk().getEntities()) {
-            if (((ent instanceof LivingEntity)) && (ent.getCustomName() != null) && (plugin.saveFile.getString(ent.getUniqueId().toString()) != null)) {
+            if (((ent instanceof LivingEntity))
+                    && (ent.getCustomName() != null)
+                    && (plugin.saveFile.getString(ent.getUniqueId().toString()) != null)) {
                 plugin.giveMobPowers(ent);
             }
         }
@@ -212,7 +226,8 @@ public class EventListener implements Listener {
                         mob = victim;
                         Player player = (Player) snowBall.getShooter();
                         plugin.doEffect(player, mob, false);
-                    } else if (!(snowBall.getShooter() instanceof Player) && (victim instanceof Player)) {
+                    } else if (!(snowBall.getShooter() instanceof Player)
+                            && (victim instanceof Player)) {
                         if (snowBall.getShooter() instanceof Entity) {
                             mob = (Entity) snowBall.getShooter();
                             Player player = (Player) victim;
@@ -245,11 +260,14 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onMobSpawn(CreatureSpawnEvent event) {
         World world = event.getEntity().getWorld();
-        if ((!event.getEntity().hasMetadata("NPC")) && (!event.getEntity().hasMetadata("shopkeeper")) && event.getEntity().getCustomName() == null) {
-        	if(event.getEntity().getType().equals(EntityType.ENDER_DRAGON))
-        		plugin.getLogger().log(Level.INFO, "Detected Entity Spawn: Ender Dragon");
+        if ((!event.getEntity().hasMetadata("NPC"))
+                && (!event.getEntity().hasMetadata("shopkeeper"))
+                && event.getEntity().getCustomName() == null) {
+            if (event.getEntity().getType().equals(EntityType.ENDER_DRAGON))
+                plugin.getLogger().log(Level.INFO, "Detected Entity Spawn: Ender Dragon");
             if (event.getSpawnReason().equals(CreatureSpawnEvent.SpawnReason.SPAWNER)) {
-                Block spawner = plugin.blockNear(event.getEntity().getLocation(), Material.SPAWNER, 10);
+                Block spawner =
+                        plugin.blockNear(event.getEntity().getLocation(), Material.SPAWNER, 10);
                 if (spawner != null) {
                     String name = plugin.getLocationName(spawner.getLocation());
                     if (plugin.saveFile.getString("infernalSpawners." + name) != null) {
@@ -271,22 +289,26 @@ public class EventListener implements Listener {
                     }
                 }
             }
-            if ((event.getEntity().hasMetadata("NPC")) || (event.getEntity().hasMetadata("shopkeeper"))) {
+            if ((event.getEntity().hasMetadata("NPC"))
+                    || (event.getEntity().hasMetadata("shopkeeper"))) {
                 return;
             }
             String entName = event.getEntity().getType().name();
-            if (((plugin.getConfig().getStringList("mobWorlds").contains(world.getName())) || (plugin.getConfig().getStringList("mobWorlds").contains("<all>"))) &&
-                    (plugin.getConfig().getStringList("enabledMobs").contains(entName)) &&
-                    (plugin.getConfig().getInt("naturalSpawnHeight") < event.getEntity().getLocation().getY()) &&
-                    (plugin.getConfig().getStringList("enabledSpawnReasons").contains(event.getSpawnReason().toString()))) {
+            if (((plugin.getConfig().getStringList("mobWorlds").contains(world.getName()))
+                            || (plugin.getConfig().getStringList("mobWorlds").contains("<all>")))
+                    && (plugin.getConfig().getStringList("enabledMobs").contains(entName))
+                    && (plugin.getConfig().getInt("naturalSpawnHeight")
+                            < event.getEntity().getLocation().getY())
+                    && (plugin.getConfig()
+                            .getStringList("enabledSpawnReasons")
+                            .contains(event.getSpawnReason().toString()))) {
                 plugin.makeInfernal(event.getEntity(), false);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onBlockBreak(BlockBreakEvent e)
-            throws IOException {
+    public void onBlockBreak(BlockBreakEvent e) throws IOException {
         if (e.getBlock().getType().equals(Material.SPAWNER)) {
             String name = plugin.getLocationName(e.getBlock().getLocation());
             if (plugin.saveFile.getString("infernalSpawners." + name) != null) {
@@ -311,14 +333,25 @@ public class EventListener implements Listener {
                 } else {
                     return;
                 }
-                
+
                 if (aList.contains("explode")) {
-                    TNTPrimed tnt = (TNTPrimed) event.getEntity().getWorld().spawnEntity(event.getEntity().getLocation(), EntityType.TNT);
+                    TNTPrimed tnt =
+                            (TNTPrimed)
+                                    event.getEntity()
+                                            .getWorld()
+                                            .spawnEntity(
+                                                    event.getEntity().getLocation(),
+                                                    EntityType.TNT);
                     tnt.setFuseTicks(1);
                 }
                 boolean isGhost = false;
                 try {
-                    if (event.getEntity().getEquipment().getHelmet().getItemMeta().getDisplayName().equals("§fGhost Head")) {
+                    if (event.getEntity()
+                            .getEquipment()
+                            .getHelmet()
+                            .getItemMeta()
+                            .getDisplayName()
+                            .equals("§fGhost Head")) {
                         isGhost = true;
                     }
                 } catch (Exception localException1) {
@@ -334,10 +367,13 @@ public class EventListener implements Listener {
                 } else {
                     dropSpot = event.getEntity().getLocation();
                 }
-                if ((plugin.getConfig().getBoolean("enableDeathMessages")) && ((event.getEntity().getKiller() instanceof Player)) && (!isGhost)) {
+                if ((plugin.getConfig().getBoolean("enableDeathMessages"))
+                        && ((event.getEntity().getKiller() instanceof Player))
+                        && (!isGhost)) {
                     Player player = event.getEntity().getKiller();
                     if (plugin.getConfig().getList("deathMessages") != null) {
-                        ArrayList<String> deathMessagesList = (ArrayList<String>) plugin.getConfig().getList("deathMessages");
+                        ArrayList<String> deathMessagesList =
+                                (ArrayList<String>) plugin.getConfig().getList("deathMessages");
                         Random randomGenerator = new Random();
                         int index = randomGenerator.nextInt(deathMessagesList.size());
                         String deathMessage = deathMessagesList.get(index);
@@ -354,11 +390,29 @@ public class EventListener implements Listener {
                         prefix = ConsumeEffectHandler.hex(prefix);
 
                         String weaponName = "fist";
-                        if ((player.getInventory().getItemInMainHand() != null) && (!player.getInventory().getItemInMainHand().getType().equals(Material.AIR))) {
-                            if (player.getInventory().getItemInMainHand().getItemMeta().getDisplayName() != null) {
-                                weaponName = player.getInventory().getItemInMainHand().getItemMeta().getDisplayName();
+                        if ((player.getInventory().getItemInMainHand() != null)
+                                && (!player.getInventory()
+                                        .getItemInMainHand()
+                                        .getType()
+                                        .equals(Material.AIR))) {
+                            if (player.getInventory()
+                                            .getItemInMainHand()
+                                            .getItemMeta()
+                                            .getDisplayName()
+                                    != null) {
+                                weaponName =
+                                        player.getInventory()
+                                                .getItemInMainHand()
+                                                .getItemMeta()
+                                                .getDisplayName();
                             } else {
-                                weaponName = player.getInventory().getItemInMainHand().getType().name().replace("_", " ").toLowerCase();
+                                weaponName =
+                                        player.getInventory()
+                                                .getItemInMainHand()
+                                                .getType()
+                                                .name()
+                                                .replace("_", " ")
+                                                .toLowerCase();
                             }
                         }
 
@@ -368,29 +422,36 @@ public class EventListener implements Listener {
                         deathMessage = deathMessage.replace("<mobLevel>", "" + mobLevel);
                         deathMessage = deathMessage.replace("<abilities>", abilities);
                         deathMessage = deathMessage.replace("<prefix>", prefix);
-                        
+
                         Bukkit.broadcastMessage(deathMessage);
                     } else {
                         plugin.getLogger().warning("No valid death messages found!");
                     }
                 }
-                if ((plugin.getConfig().getBoolean("enableDrops")) &&
-                        ((plugin.getConfig().getBoolean("enableFarmingDrops")) || (event.getEntity().getKiller() != null)) &&
-                        ((plugin.getConfig().getBoolean("enableFarmingDrops")) || ((event.getEntity().getKiller() instanceof Player)))) {
+                if ((plugin.getConfig().getBoolean("enableDrops"))
+                        && ((plugin.getConfig().getBoolean("enableFarmingDrops"))
+                                || (event.getEntity().getKiller() != null))
+                        && ((plugin.getConfig().getBoolean("enableFarmingDrops"))
+                                || ((event.getEntity().getKiller() instanceof Player)))) {
                     Player player = null;
                     if ((event.getEntity().getKiller() instanceof Player)) {
                         player = event.getEntity().getKiller();
                     }
-                    if ((player != null) && (player.getGameMode().equals(GameMode.CREATIVE)) && (plugin.getConfig().getBoolean("noCreativeDrops"))) {
+                    if ((player != null)
+                            && (player.getGameMode().equals(GameMode.CREATIVE))
+                            && (plugin.getConfig().getBoolean("noCreativeDrops"))) {
                         return;
                     }
-                    ItemStack drop = plugin.getRandomLoot(player, event.getEntity().getType().getName(), aList.size());
+                    ItemStack drop =
+                            plugin.getRandomLoot(
+                                    player, event.getEntity().getType().getName(), aList.size());
                     if (drop != null) {
                         int min = 1;
                         int max = plugin.getConfig().getInt("dropChance");
                         int randomNum = new Random().nextInt(max - min + 1) + min;
                         if ((dropSpot != null) && (randomNum == 1)) {
-                            Item droppedItem = event.getEntity().getWorld().dropItemNaturally(dropSpot, drop);
+                            Item droppedItem =
+                                    event.getEntity().getWorld().dropItemNaturally(dropSpot, drop);
                             plugin.keepAlive(droppedItem);
                         }
                         int xpm = plugin.getConfig().getInt("xpMultiplier");
@@ -413,18 +474,24 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerDropItem(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
-        });
+        Bukkit.getScheduler()
+                .runTask(
+                        plugin,
+                        () -> {
+                            plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+                        });
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onEntityPickupItem(EntityPickupItemEvent event) {
         if (event.getEntity() instanceof Player) {
             Player player = (Player) event.getEntity();
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
-            });
+            Bukkit.getScheduler()
+                    .runTask(
+                            plugin,
+                            () -> {
+                                plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+                            });
         }
     }
 
@@ -432,11 +499,15 @@ public class EventListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getWhoClicked() instanceof Player) {
             Player player = (Player) event.getWhoClicked();
-            if (event.getInventory().getType() == InventoryType.PLAYER || 
-                event.getInventory().getType() == InventoryType.CRAFTING) {
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
-                });
+            if (event.getInventory().getType() == InventoryType.PLAYER
+                    || event.getInventory().getType() == InventoryType.CRAFTING) {
+                Bukkit.getScheduler()
+                        .runTask(
+                                plugin,
+                                () -> {
+                                    plugin.getPotionEffectHandler()
+                                            .checkPlayerPotionEffects(player);
+                                });
             }
         }
     }
@@ -444,9 +515,12 @@ public class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
-        });
+        Bukkit.getScheduler()
+                .runTask(
+                        plugin,
+                        () -> {
+                            plugin.getPotionEffectHandler().checkPlayerPotionEffects(player);
+                        });
     }
 
     @EventHandler(priority = EventPriority.HIGH)

@@ -1,38 +1,35 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import org.bukkit.command.CommandSender;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
 public class SetLootCommand extends BaseCommand {
-    
+
     private final LocaleManager localeManager;
-    
+
     public SetLootCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
         this.localeManager = localeManager;
     }
-    
+
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(localeManager.getMessage("commands.player-only"));
             return true;
         }
-        
+
         if (args.length != 2) {
             sender.sendMessage(localeManager.getMessage("commands.usage", getUsage()));
             return true;
         }
-        
+
         Player player = (Player) sender;
         try {
             ItemStack item = player.getInventory().getItemInMainHand();
@@ -46,9 +43,12 @@ public class SetLootCommand extends BaseCommand {
                 plugin.getLootFile().set(lootPath + ".lore", item.getItemMeta().getLore());
             }
             if (item.getItemMeta() instanceof Damageable) {
-                plugin.getLootFile().set(lootPath + ".durability", ((Damageable)item.getItemMeta()).getDamage());
+                plugin.getLootFile()
+                        .set(
+                                lootPath + ".durability",
+                                ((Damageable) item.getItemMeta()).getDamage());
             }
-            
+
             plugin.getLootFile().save(plugin.getLootYML());
             sender.sendMessage(localeManager.getMessage("commands.setloot.success", args[1]));
         } catch (IOException e) {
@@ -57,7 +57,7 @@ public class SetLootCommand extends BaseCommand {
         }
         return true;
     }
-    
+
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         List<String> newTab = new ArrayList<>();
@@ -66,7 +66,7 @@ public class SetLootCommand extends BaseCommand {
         }
         return newTab;
     }
-    
+
     @Override
     public String getName() {
         return "setloot";

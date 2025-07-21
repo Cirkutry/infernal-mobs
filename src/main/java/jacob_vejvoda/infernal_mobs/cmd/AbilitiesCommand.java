@@ -1,11 +1,7 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import org.bukkit.command.CommandSender;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.command.CommandSender;
 
 public class AbilitiesCommand extends BaseCommand {
 

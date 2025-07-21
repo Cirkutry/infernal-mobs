@@ -1,28 +1,26 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
-import org.bukkit.command.TabExecutor;
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 
 public class CommandManager implements TabExecutor {
     private final InfernalMobs plugin;
     private final Map<String, BaseCommand> commands;
     private final LocaleManager localeManager;
-    
+
     public CommandManager(InfernalMobs plugin) {
         this.plugin = plugin;
         this.commands = new HashMap<>();
         this.localeManager = new LocaleManager(plugin);
         registerCommands();
     }
-    
+
     private void registerCommands() {
         registerCommand(new ReloadCommand(plugin, localeManager));
         registerCommand(new WorldInfoCommand(plugin, localeManager));
@@ -43,25 +41,26 @@ public class CommandManager implements TabExecutor {
         registerCommand(new MobListCommand(plugin, localeManager));
         registerCommand(new HelpCommand(plugin, localeManager));
     }
-    
+
     private void registerCommand(BaseCommand command) {
         commands.put(command.getName().toLowerCase(), command);
     }
-    
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if ((cmd.getName().equalsIgnoreCase("infernalmobs")) || (cmd.getName().equalsIgnoreCase("im"))) {
+        if ((cmd.getName().equalsIgnoreCase("infernalmobs"))
+                || (cmd.getName().equalsIgnoreCase("im"))) {
             try {
                 if (!sender.hasPermission("infernalmobs.commands")) {
                     sender.sendMessage(localeManager.getMessage("commands.no-permission"));
                     return true;
                 }
-                
+
                 if (args.length == 0) {
                     commands.get("help").execute(sender, args);
                     return true;
                 }
-                
+
                 BaseCommand command = commands.get(args[0].toLowerCase());
                 if (command != null) {
                     if (!sender.hasPermission(command.getPermission())) {
@@ -79,21 +78,24 @@ public class CommandManager implements TabExecutor {
         }
         return true;
     }
-    
+
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        if ((cmd.getName().equalsIgnoreCase("infernalmobs")) || (cmd.getName().equalsIgnoreCase("im"))) {
+    public List<String> onTabComplete(
+            CommandSender sender, Command cmd, String label, String[] args) {
+        if ((cmd.getName().equalsIgnoreCase("infernalmobs"))
+                || (cmd.getName().equalsIgnoreCase("im"))) {
             if (!sender.hasPermission("infernalmobs.commands")) {
                 return new ArrayList<>();
             }
-            
+
             if (args.length == 1) {
                 List<String> completions = new ArrayList<>();
                 String partial = args[0].toLowerCase();
-                
+
                 for (String commandName : commands.keySet()) {
                     BaseCommand command = commands.get(commandName);
-                    if (commandName.startsWith(partial) && sender.hasPermission(command.getPermission())) {
+                    if (commandName.startsWith(partial)
+                            && sender.hasPermission(command.getPermission())) {
                         completions.add(commandName);
                     }
                 }
@@ -107,11 +109,11 @@ public class CommandManager implements TabExecutor {
         }
         return new ArrayList<>();
     }
-    
+
     public LocaleManager getLocaleManager() {
         return localeManager;
     }
-    
+
     public void reloadLocale() {
         localeManager.reload();
     }

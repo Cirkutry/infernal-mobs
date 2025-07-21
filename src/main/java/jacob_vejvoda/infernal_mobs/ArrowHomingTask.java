@@ -24,7 +24,13 @@ class ArrowHomingTask extends BukkitRunnable {
                 return;
             }
 
-            Vector toTarget = this.target.getLocation().clone().add(new Vector(0.0D, 0.5D, 0.0D)).subtract(this.arrow.getLocation()).toVector();
+            Vector toTarget =
+                    this.target
+                            .getLocation()
+                            .clone()
+                            .add(new Vector(0.0D, 0.5D, 0.0D))
+                            .subtract(this.arrow.getLocation())
+                            .toVector();
 
             Vector dirVelocity = this.arrow.getVelocity().clone().normalize();
             Vector dirToTarget = toTarget.clone().normalize();
@@ -36,7 +42,11 @@ class ArrowHomingTask extends BukkitRunnable {
             if (angle < 0.12D) {
                 newVelocity = dirVelocity.clone().multiply(newSpeed);
             } else {
-                Vector newDir = dirVelocity.clone().multiply((angle - 0.12D) / angle).add(dirToTarget.clone().multiply(0.12D / angle));
+                Vector newDir =
+                        dirVelocity
+                                .clone()
+                                .multiply((angle - 0.12D) / angle)
+                                .add(dirToTarget.clone().multiply(0.12D / angle));
                 newDir.normalize();
                 newVelocity = newDir.clone().multiply(newSpeed);
             }

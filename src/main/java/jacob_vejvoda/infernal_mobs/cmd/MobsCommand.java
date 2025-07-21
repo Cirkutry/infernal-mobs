@@ -1,19 +1,15 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import org.bukkit.entity.EntityType;
-import org.bukkit.command.CommandSender;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 
 public class MobsCommand extends BaseCommand {
-    
+
     public MobsCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
     }
-    
+
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         sender.sendMessage(localeManager.getMessage("commands.mobs.header"));
@@ -24,7 +20,7 @@ public class MobsCommand extends BaseCommand {
         }
         return true;
     }
-    
+
     @Override
     public String getName() {
         return "mobs";

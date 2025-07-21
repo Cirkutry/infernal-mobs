@@ -1,32 +1,27 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 public class GetLootCommand extends BaseCommand {
-    
+
     public GetLootCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
     }
-    
+
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("This command can only be run by a player!");
             return true;
         }
-        
+
         Player player = (Player) sender;
-        
+
         if (args.length == 1) {
             // Get random loot
             int min = plugin.getConfig().getInt("minPowers");
@@ -47,7 +42,10 @@ public class GetLootCommand extends BaseCommand {
                     sender.sendMessage("§eGave you the loot at index §9" + index);
                 } else {
                     // Commands may have been executed even without an item
-                    sender.sendMessage("§eExecuted commands for loot at index §9" + index + " §e(no item to give)");
+                    sender.sendMessage(
+                            "§eExecuted commands for loot at index §9"
+                                    + index
+                                    + " §e(no item to give)");
                 }
                 return true;
             } catch (Exception ignored) {
@@ -56,7 +54,7 @@ public class GetLootCommand extends BaseCommand {
         }
         return true;
     }
-    
+
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         List<String> newTab = new ArrayList<>();
@@ -65,7 +63,7 @@ public class GetLootCommand extends BaseCommand {
         }
         return newTab;
     }
-    
+
     @Override
     public String getName() {
         return "getloot";

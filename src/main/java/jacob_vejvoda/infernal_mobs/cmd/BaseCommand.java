@@ -1,12 +1,9 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import java.util.ArrayList;
-import org.bukkit.command.CommandSender;
-
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-
+import java.util.ArrayList;
 import java.util.List;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
+import org.bukkit.command.CommandSender;
 
 public abstract class BaseCommand {
     protected final InfernalMobs plugin;
@@ -21,7 +18,7 @@ public abstract class BaseCommand {
 
     /**
      * Override this method only if your command needs tab completion
-     * 
+     *
      * @param sender The command sender
      * @param args   The command arguments
      * @return List of tab completions

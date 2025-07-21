@@ -1,9 +1,9 @@
 package jacob_vejvoda.InfernalMobs.loot;
 
+import jacob_vejvoda.InfernalMobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
@@ -13,8 +13,6 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import jacob_vejvoda.InfernalMobs.InfernalMobs;
-
 /**
  * Handles enchantment application to loot items
  */
@@ -22,19 +20,20 @@ public class EnchantmentHandler {
     private final InfernalMobs plugin;
     private final FileConfiguration lootFile;
     private final LootUtils lootUtils;
-    
+
     public EnchantmentHandler(InfernalMobs plugin, FileConfiguration lootFile) {
         this.plugin = plugin;
         this.lootFile = lootFile;
         this.lootUtils = new LootUtils(plugin, lootFile);
     }
-    
+
     /**
      * Applies enchantments to an item based on loot configuration
      */
     public void applyEnchantments(ItemStack stack, int loot) {
         if (lootFile.isConfigurationSection("loot." + loot + ".enchantments")) {
-            ConfigurationSection enchantmentsSection = lootFile.getConfigurationSection("loot." + loot + ".enchantments");
+            ConfigurationSection enchantmentsSection =
+                    lootFile.getConfigurationSection("loot." + loot + ".enchantments");
             if (enchantmentsSection != null) {
                 for (String key : enchantmentsSection.getKeys(false)) {
                     applySingleEnchantment(stack, loot, key);
@@ -42,19 +41,22 @@ public class EnchantmentHandler {
             }
         }
     }
-    
+
     /**
      * Applies a single enchantment to an item
      */
     private void applySingleEnchantment(ItemStack stack, int loot, String key) {
-        String enchantmentName = lootFile.getString("loot." + loot + ".enchantments." + key + ".enchantment");
+        String enchantmentName =
+                lootFile.getString("loot." + loot + ".enchantments." + key + ".enchantment");
         if (enchantmentName != null) {
             try {
-                Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(enchantmentName.toLowerCase()));
+                Enchantment enchant =
+                        Enchantment.getByKey(
+                                NamespacedKey.minecraft(enchantmentName.toLowerCase()));
                 if (enchant != null) {
                     int level = getEnchantmentLevel(loot, key);
                     int chance = getEnchantmentChance(loot, key);
-                    
+
                     if (chance >= 100 || (new Random().nextInt(100) < chance)) {
                         applyEnchantmentToItem(stack, enchant, level);
                     }
@@ -62,11 +64,16 @@ public class EnchantmentHandler {
                     plugin.getLogger().warning("Unknown enchantment: " + enchantmentName);
                 }
             } catch (Exception e) {
-                plugin.getLogger().warning("Error applying enchantment " + enchantmentName + ": " + e.getMessage());
+                plugin.getLogger()
+                        .warning(
+                                "Error applying enchantment "
+                                        + enchantmentName
+                                        + ": "
+                                        + e.getMessage());
             }
         }
     }
-    
+
     /**
      * Gets the enchantment level from configuration
      */
@@ -78,7 +85,7 @@ public class EnchantmentHandler {
         }
         return level;
     }
-    
+
     /**
      * Gets the enchantment chance from configuration
      */
@@ -89,33 +96,33 @@ public class EnchantmentHandler {
         }
         return chance;
     }
-    
+
     /**
      * Applies the enchantment to the item with proper formatting
      */
     private void applyEnchantmentToItem(ItemStack stack, Enchantment enchant, int level) {
         try {
             int maxAllowedLevel = getMaxAllowedEnchantmentLevel(enchant);
-            
+
             if (level > maxAllowedLevel) {
                 level = maxAllowedLevel;
             }
-            
+
             ItemMeta meta = stack.getItemMeta();
             if (meta != null) {
                 // Add base enchantment first
                 meta.addEnchant(enchant, 1, true);
-                
+
                 // Add to lore for display
                 addEnchantmentToLore(meta, enchant, level);
-                
+
                 // Hide enchants if level exceeds normal maximum
                 if (level > enchant.getMaxLevel()) {
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 }
-                
+
                 stack.setItemMeta(meta);
-                
+
                 // Apply the actual enchantment level
                 stack.addUnsafeEnchantment(enchant, level);
             } else {
@@ -123,10 +130,11 @@ public class EnchantmentHandler {
             }
         } catch (Exception e) {
             stack.addUnsafeEnchantment(enchant, level);
-            plugin.getLogger().warning("Couldn't apply custom enchantment format: " + e.getMessage());
+            plugin.getLogger()
+                    .warning("Couldn't apply custom enchantment format: " + e.getMessage());
         }
     }
-    
+
     /**
      * Adds enchantment information to item lore
      */
@@ -135,27 +143,29 @@ public class EnchantmentHandler {
         if (lore == null) {
             lore = new ArrayList<>();
         }
-        
+
         String enchantmentDisplayName = enchant.getKey().getKey();
-        enchantmentDisplayName = enchantmentDisplayName.substring(0, 1).toUpperCase() + 
-                                   enchantmentDisplayName.substring(1).replace('_', ' ');
-        
-        String formattedEnchant = ChatColor.GRAY + enchantmentDisplayName + " " + lootUtils.toRomanNumeral(level);
-        
+        enchantmentDisplayName =
+                enchantmentDisplayName.substring(0, 1).toUpperCase()
+                        + enchantmentDisplayName.substring(1).replace('_', ' ');
+
+        String formattedEnchant =
+                ChatColor.GRAY + enchantmentDisplayName + " " + lootUtils.toRomanNumeral(level);
+
         lore.add(formattedEnchant);
         meta.setLore(lore);
     }
-    
+
     /**
      * Gets the maximum allowed level for an enchantment
      */
     private int getMaxAllowedEnchantmentLevel(Enchantment enchant) {
         String enchantKey = enchant.getKey().getKey().toLowerCase();
-        if (enchantKey.equals("mending") || 
-            enchantKey.equals("silk_touch") ||
-            enchantKey.equals("infinity") ||
-            enchantKey.equals("channeling") ||
-            enchantKey.equals("aqua_affinity")) {
+        if (enchantKey.equals("mending")
+                || enchantKey.equals("silk_touch")
+                || enchantKey.equals("infinity")
+                || enchantKey.equals("channeling")
+                || enchantKey.equals("aqua_affinity")) {
             return 1;
         }
         return 255;

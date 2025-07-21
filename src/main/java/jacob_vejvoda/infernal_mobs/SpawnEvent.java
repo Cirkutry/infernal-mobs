@@ -11,16 +11,16 @@ public class SpawnEvent extends Event implements Cancellable {
     private InfernalMob infernal;
     private boolean cancelled;
 
-    public SpawnEvent(Entity ent, InfernalMob infernal){
+    public SpawnEvent(Entity ent, InfernalMob infernal) {
         this.ent = ent;
         this.infernal = infernal;
     }
 
-    public Entity getEntity(){
+    public Entity getEntity() {
         return this.ent;
     }
 
-    public InfernalMob getInfernal(){
+    public InfernalMob getInfernal() {
         return this.infernal;
     }
 

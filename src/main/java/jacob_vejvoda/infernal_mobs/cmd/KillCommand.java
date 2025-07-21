@@ -1,37 +1,35 @@
 package jacob_vejvoda.InfernalMobs.cmd;
 
-import org.bukkit.command.CommandSender;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import jacob_vejvoda.InfernalMobs.InfernalMobs;
-import jacob_vejvoda.InfernalMobs.cmd.LocaleManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 public class KillCommand extends BaseCommand {
-    
+
     private final LocaleManager localeManager;
-    
+
     public KillCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
         this.localeManager = localeManager;
     }
-    
+
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(localeManager.getMessage("commands.player-only"));
             return true;
         }
-    
+
         if (args.length != 2) {
             sender.sendMessage(localeManager.getMessage("commands.usage", getUsage()));
             return true;
         }
-    
+
         Player player = (Player) sender;
         try {
             int size = Integer.parseInt(args[1]);
@@ -64,7 +62,7 @@ public class KillCommand extends BaseCommand {
         }
         return newTab;
     }
-    
+
     @Override
     public String getName() {
         return "kill";

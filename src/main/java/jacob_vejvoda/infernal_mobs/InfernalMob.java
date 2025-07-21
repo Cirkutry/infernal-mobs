@@ -1,9 +1,8 @@
 package jacob_vejvoda.InfernalMobs;
 
-import org.bukkit.entity.Entity;
-
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.entity.Entity;
 
 public class InfernalMob {
     private boolean infernal;
@@ -23,7 +22,12 @@ public class InfernalMob {
     }
 
     public String toString() {
-        return "Name: " + this.entity.getType().name() + " Infernal: " + this.infernal + "Abilities:" + this.abilityList;
+        return "Name: "
+                + this.entity.getType().name()
+                + " Infernal: "
+                + this.infernal
+                + "Abilities:"
+                + this.abilityList;
     }
 
     void setLives(int i) {
