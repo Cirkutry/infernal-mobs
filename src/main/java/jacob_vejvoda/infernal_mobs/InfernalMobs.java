@@ -2127,6 +2127,9 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     @Override
     public void reloadConfig() {
         super.reloadConfig();
+        if (this.diviningStaff != null) {
+            this.diviningStaff.reload();
+        }
         this.getLogger().info("Config reloaded successfully.");
     }
 

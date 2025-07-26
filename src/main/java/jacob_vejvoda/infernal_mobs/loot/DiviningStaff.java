@@ -20,32 +20,90 @@ import org.bukkit.util.Vector;
 public class DiviningStaff {
 
     private final InfernalMobs plugin;
+    private final LootUtils lootUtils;
 
     public DiviningStaff(InfernalMobs plugin) {
         this.plugin = plugin;
+        this.lootUtils = new LootUtils(plugin, plugin.getConfig());
     }
 
     public ItemStack getDiviningStaff() {
-        ItemStack s =
-                getItem(
-                        Material.BLAZE_ROD,
-                        "§6§lDivining Rod",
-                        1,
-                        Arrays.asList("Click to find infernal mobs."));
-        ItemMeta m = s.getItemMeta();
-        m.addEnchant(Enchantment.CHANNELING, 1, true);
-        s.setItemMeta(m);
-        return s;
+        ItemStack staff = lootUtils.createItemFromConfig("diviningRod", plugin.getConfig());
+
+        if (staff == null) {
+            staff =
+                    getItem(
+                            Material.BLAZE_ROD,
+                            "§6§lDivining Rod",
+                            1,
+                            Arrays.asList("Click to find infernal mobs."));
+        }
+
+        if (lootUtils.isEnchantedFromConfig("diviningRod", plugin.getConfig())) {
+            ItemMeta meta = staff.getItemMeta();
+            if (meta != null) {
+                meta.addEnchant(Enchantment.CHANNELING, 1, true);
+                staff.setItemMeta(meta);
+            }
+        }
+
+        return staff;
     }
 
     public void addRecipes() {
+        if (!plugin.getConfig().getBoolean("diviningRod.recipe.enabled", true)) {
+            return;
+        }
+
         ItemStack staff = getDiviningStaff();
         NamespacedKey key = new NamespacedKey(plugin, "divining_staff");
         ShapedRecipe sr = new ShapedRecipe(key, staff);
-        sr.shape("ANA", "ASA", "ASA");
-        sr.setIngredient('N', Material.NETHER_STAR);
-        sr.setIngredient('S', Material.BLAZE_ROD);
+
+        List<String> shape = plugin.getConfig().getStringList("diviningRod.recipe.shape");
+        if (shape == null || shape.isEmpty()) {
+
+            shape = Arrays.asList("121", "131", "131");
+        }
+
+        sr.shape(shape.toArray(new String[0]));
+
+        if (plugin.getConfig().isConfigurationSection("diviningRod.recipe.ingredients")) {
+            var ingredients =
+                    plugin.getConfig().getConfigurationSection("diviningRod.recipe.ingredients");
+            if (ingredients != null) {
+                for (String key1 : ingredients.getKeys(false)) {
+                    String materialName = ingredients.getString(key1);
+                    if (materialName != null && !materialName.equals("AIR")) {
+                        try {
+                            Material material = Material.valueOf(materialName.toUpperCase());
+                            sr.setIngredient(key1.charAt(0), material);
+                        } catch (IllegalArgumentException e) {
+                            plugin.getLogger()
+                                    .warning(
+                                            "Invalid material '"
+                                                    + materialName
+                                                    + "' in divining rod recipe");
+                        }
+                    }
+                }
+            }
+        } else {
+
+            sr.setIngredient('2', Material.NETHER_STAR);
+            sr.setIngredient('3', Material.BLAZE_ROD);
+        }
+
         Bukkit.addRecipe(sr);
+    }
+
+    public void reload() {
+        removeRecipe();
+        addRecipes();
+    }
+
+    private void removeRecipe() {
+        NamespacedKey key = new NamespacedKey(plugin, "divining_staff");
+        Bukkit.removeRecipe(key);
     }
 
     private ItemStack getItem(Material mat, String name, int amount, List<String> loreList) {
@@ -135,8 +193,9 @@ public class DiviningStaff {
         int speed = -1;
         int amount = 1;
         double r = 0;
+        String particle = lootUtils.getParticleFromConfig("diviningRod", plugin.getConfig());
         plugin.displayParticle(
-                "DRIP_LAVA", loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), r, speed, amount);
+                particle, loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), r, speed, amount);
     }
 
     private float toDegree(double angle) {

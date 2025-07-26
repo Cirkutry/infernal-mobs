@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Utility methods for loot processing and manipulation
@@ -148,5 +151,70 @@ public class LootUtils {
             int amount = getIntFromString(amountStr);
             stack.setAmount(amount);
         }
+    }
+
+    /**
+     * Creates an ItemStack from configuration section
+     */
+    public ItemStack createItemFromConfig(String configPath, FileConfiguration config) {
+        if (config == null || !config.isConfigurationSection(configPath)) {
+            return null;
+        }
+
+        String materialStr = config.getString(configPath + ".material", "STICK");
+        Material material;
+        try {
+            material = Material.valueOf(materialStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger()
+                    .warning("Invalid material '" + materialStr + "' in config at " + configPath);
+            material = Material.STICK;
+        }
+
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return item;
+        }
+
+        String name = config.getString(configPath + ".name");
+        if (name != null) {
+            name = ConsumeEffectHandler.hex(name);
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        }
+
+        List<String> loreConfig = config.getStringList(configPath + ".lore");
+        if (loreConfig != null && !loreConfig.isEmpty()) {
+            List<String> lore = new ArrayList<>();
+            for (String line : loreConfig) {
+                line = ConsumeEffectHandler.hex(line);
+                lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            }
+            meta.setLore(lore);
+        }
+
+        if (config.isInt(configPath + ".customModelData")) {
+            int customModelData = config.getInt(configPath + ".customModelData");
+            if (customModelData > 0) {
+                meta.setCustomModelData(customModelData);
+            }
+        }
+
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    /**
+     * Gets particle type from configuration
+     */
+    public String getParticleFromConfig(String configPath, FileConfiguration config) {
+        return config.getString(configPath + ".particle", "DRIP_LAVA");
+    }
+
+    /**
+     * Checks if item should be enchanted based on configuration
+     */
+    public boolean isEnchantedFromConfig(String configPath, FileConfiguration config) {
+        return config.getBoolean(configPath + ".enchanted", false);
     }
 }
