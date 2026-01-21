@@ -1,6 +1,6 @@
-package jacob_vejvoda.InfernalMobs.loot;
+package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.InfernalMobs.InfernalMobs;
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

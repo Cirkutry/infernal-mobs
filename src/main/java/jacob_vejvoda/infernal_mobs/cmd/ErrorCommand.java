@@ -1,6 +1,6 @@
-package jacob_vejvoda.InfernalMobs.cmd;
+package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.InfernalMobs.InfernalMobs;
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

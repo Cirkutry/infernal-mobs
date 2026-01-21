@@ -1,7 +1,7 @@
-package jacob_vejvoda.InfernalMobs.loot;
+package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.InfernalMobs.GUI;
-import jacob_vejvoda.InfernalMobs.InfernalMobs;
+import jacob_vejvoda.infernal_mobs.GUI;
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.Bukkit;

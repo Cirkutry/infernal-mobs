@@ -1,6 +1,6 @@
-package jacob_vejvoda.InfernalMobs;
+package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.InfernalMobs.loot.ConsumeEffectHandler;
+import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;

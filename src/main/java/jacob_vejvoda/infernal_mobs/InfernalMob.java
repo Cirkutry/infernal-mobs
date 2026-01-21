@@ -1,4 +1,4 @@
-package jacob_vejvoda.InfernalMobs;
+package jacob_vejvoda.infernal_mobs;
 
 import java.util.List;
 import java.util.UUID;

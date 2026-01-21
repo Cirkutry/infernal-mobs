@@ -1,11 +1,11 @@
-package jacob_vejvoda.InfernalMobs;
+package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.InfernalMobs.cmd.CommandManager;
-import jacob_vejvoda.InfernalMobs.loot.ConsumeEffectHandler;
-import jacob_vejvoda.InfernalMobs.loot.DiviningStaff;
-import jacob_vejvoda.InfernalMobs.loot.LootManager;
-import jacob_vejvoda.InfernalMobs.loot.LootUtils;
-import jacob_vejvoda.InfernalMobs.loot.PotionEffectHandler;
+import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
+import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
+import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
+import jacob_vejvoda.infernal_mobs.loot.LootManager;
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

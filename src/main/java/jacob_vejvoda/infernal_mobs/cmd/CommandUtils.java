@@ -1,4 +1,4 @@
-package jacob_vejvoda.InfernalMobs.cmd;
+package jacob_vejvoda.infernal_mobs.cmd;
 
 import java.util.Arrays;
 import java.util.List;
