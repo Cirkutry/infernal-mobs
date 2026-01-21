@@ -15,7 +15,7 @@ This project is a fork of the [original](https://www.spigotmc.org/resources/infe
 
 ### 📦 Version Compatibility
 
-Supports only 1.21 - 1.21.5 and as such issues in older versions will not be fixed in this fork.
+Supports only 1.21.7 and as such issues in older versions will not be fixed in this fork.
 
 See below table to find the original Infernal Mobs plugin version that supports legacy Minecraft versions.
 

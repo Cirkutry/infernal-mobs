@@ -5,22 +5,22 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class InfernalSpawnEvent extends Event implements Cancellable {
+public class SpawnEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private Entity ent;
     private InfernalMob infernal;
     private boolean cancelled;
 
-    public InfernalSpawnEvent(Entity ent, InfernalMob infernal){
+    public SpawnEvent(Entity ent, InfernalMob infernal) {
         this.ent = ent;
         this.infernal = infernal;
     }
 
-    public Entity getEntity(){
+    public Entity getEntity() {
         return this.ent;
     }
 
-    public InfernalMob getInfernal(){
+    public InfernalMob getInfernal() {
         return this.infernal;
     }
 

@@ -1,10 +1,8 @@
 name: InfernalMobsReloaded
-main: jacob_vejvoda.infernal_mobs.infernal_mobs
+main: jacob_vejvoda.infernal_mobs.InfernalMobs
 version: 1.0
-softdepend: [Vault]
-api-version: 1.21
-authors: [Eliminator]
-contributors: [Kre0lidge]
+api-version: 1.21.7
+authors: [Eliminator, Kre0lidge]
 description: Add Infernal Mobs with special abilities to your server!
 
 commands:

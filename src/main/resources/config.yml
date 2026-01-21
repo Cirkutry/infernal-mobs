@@ -26,6 +26,8 @@
 # <health> - Current health of the mob (rounded to 2 decimal places)
 # <maxHealth> - Maximum health of the mob
 
+# Language/Locale settings
+locale: en_US
 
 # The base spawn weight for Infernal mobs (1/N chance of a mob becoming Infernal)
 # Higher value = lower probability (1/100 chance when set to 100)
@@ -78,7 +80,7 @@ bossBarSettings:
   defaultStyle: "SOLID"
   # Custom boss bar settings for specific mob types
   perMob:
-    Ghast:
+    Wither_skeleton:
       color: "RED"
       style: "SEGMENTED_12"
 
@@ -148,6 +150,27 @@ mobWorlds:
 # Worlds where Infernal mob effects are active (<all> = all worlds)
 effectWorlds:
 - <all>
+
+# Divining Rod configuration
+diviningRod:
+  name: '&#F9BA5Cᴅ&#F7AD58ɪ&#F5A053ᴠ&#F2934Fɪ&#F0864Aɴ&#EE7946ɪ&#EC6C41ɴ&#EA5F3Dɢ &#E54534ʀ&#E3382Fᴏ&#E12B2Bᴅ'
+  lore:
+    - '&7| &6Click to find Infernals!'
+    - '&7| &6Requires blaze powder to use.'
+  customModelData: 0 # Custom model data for resource packs (only integers)
+  particle: DRIP_LAVA # Particle effect used when item is activated
+  material: BLAZE_ROD
+  enchanted: true # Adds enchantment glint effect
+  recipe:
+    enabled: true # Enables crafting recipe
+    shape: # Crafting grid row 1, 2 and 3
+      - '121'
+      - '131'  
+      - '131'
+    ingredients:
+      1: AIR
+      2: NETHER_STAR
+      3: BLAZE_ROD
 
 # Mob types that can turn into Infernal mobs
 # List of mob types: https://minecraft.wiki/w/Mob#List_of_mobs
@@ -335,7 +358,6 @@ enabledMounts:
 - SLIME
 - GHAST
 - MAGMA_CUBE
-- ENDER_DRAGON
 - BAT
 - PIG
 - SHEEP
@@ -422,6 +444,3 @@ enableFarmingDrops: false
 
 # Minimum height requirement for natural spawns to become Infernal (0 = no minimum)
 naturalSpawnHeight: 0
-
-# Config version - Do not touch :)
-configVersion: '7.0'
