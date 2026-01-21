@@ -80,7 +80,7 @@ bossBarSettings:
   defaultStyle: "SOLID"
   # Custom boss bar settings for specific mob types
   perMob:
-    Ghast:
+    Wither_skeleton:
       color: "RED"
       style: "SEGMENTED_12"
 
@@ -358,7 +358,6 @@ enabledMounts:
 - SLIME
 - GHAST
 - MAGMA_CUBE
-- ENDER_DRAGON
 - BAT
 - PIG
 - SHEEP

@@ -134,14 +134,18 @@ public class GUI implements Listener {
                                             + ".style");
             if (ls != null) bs = BarStyle.valueOf(ls);
 
-            String mc =
-                    plugin.getConfig()
-                            .getString("bossBarSettings.perMob." + e.getType().name() + ".color");
-            if (mc != null) bc = BarColor.valueOf(mc);
-            String ms =
-                    plugin.getConfig()
-                            .getString("bossBarSettings.perMob." + e.getType().name() + ".style");
-            if (ms != null) bs = BarStyle.valueOf(ms);
+            var perMobSection = plugin.getConfig().getConfigurationSection("bossBarSettings.perMob");
+            if (perMobSection != null) {
+                for (String key : perMobSection.getKeys(false)) {
+                    if (key.equalsIgnoreCase(e.getType().name())) {
+                        String mc = plugin.getConfig().getString("bossBarSettings.perMob." + key + ".color");
+                        if (mc != null) bc = BarColor.valueOf(mc);
+                        String ms = plugin.getConfig().getString("bossBarSettings.perMob." + key + ".style");
+                        if (ms != null) bs = BarStyle.valueOf(ms);
+                        break;
+                    }
+                }
+            }
             BossBar bar = Bukkit.createBossBar(title, bc, bs, BarFlag.CREATE_FOG);
             bar.setVisible(true);
             bossBars.put(e, bar);

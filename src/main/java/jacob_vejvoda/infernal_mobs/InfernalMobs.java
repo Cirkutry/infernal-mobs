@@ -528,16 +528,10 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return lootManager.getRandomLoot(player, mob, powers);
     }
 
-    /**
-     * Gets specific loot item by ID for command usage
-     */
     public ItemStack getLoot(Player player, int loot) {
         return lootManager.getLoot(player, loot);
     }
 
-    /**
-     * Gets item by loot ID (for compatibility with PotionEffectHandler)
-     */
     public ItemStack getItem(int loot) {
         return lootManager.getItem(loot);
     }
