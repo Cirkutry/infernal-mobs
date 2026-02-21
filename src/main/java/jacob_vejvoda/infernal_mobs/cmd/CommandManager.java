@@ -1,20 +1,22 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class CommandManager implements TabExecutor {
     private final InfernalMobs plugin;
     private final Map<String, BaseCommand> commands;
     private final LocaleManager localeManager;
 
-    public CommandManager(InfernalMobs plugin) {
+    public CommandManager(InfernalMobs plugin) throws Exception {
         this.plugin = plugin;
         this.commands = new HashMap<>();
         this.localeManager = new LocaleManager(plugin);
@@ -23,22 +25,11 @@ public class CommandManager implements TabExecutor {
 
     private void registerCommands() {
         registerCommand(new ReloadCommand(plugin, localeManager));
-        registerCommand(new WorldInfoCommand(plugin, localeManager));
         registerCommand(new ErrorCommand(plugin, localeManager));
-        registerCommand(new InfoCommand(plugin, localeManager));
-        registerCommand(new AbilitiesCommand(plugin, localeManager));
-        registerCommand(new GetLootCommand(plugin, localeManager));
         registerCommand(new GiveLootCommand(plugin, localeManager));
         registerCommand(new SetLootCommand(plugin, localeManager));
-        registerCommand(new ShowAbilitiesCommand(plugin, localeManager));
         registerCommand(new SetInfernalCommand(plugin, localeManager));
         registerCommand(new SpawnCommand(plugin, localeManager));
-        registerCommand(new CSpawnCommand(plugin, localeManager));
-        registerCommand(new PSpawnCommand(plugin, localeManager));
-        registerCommand(new KillCommand(plugin, localeManager));
-        registerCommand(new KillAllCommand(plugin, localeManager));
-        registerCommand(new MobsCommand(plugin, localeManager));
-        registerCommand(new MobListCommand(plugin, localeManager));
         registerCommand(new HelpCommand(plugin, localeManager));
     }
 
@@ -112,9 +103,5 @@ public class CommandManager implements TabExecutor {
 
     public LocaleManager getLocaleManager() {
         return localeManager;
-    }
-
-    public void reloadLocale() {
-        localeManager.reload();
     }
 }

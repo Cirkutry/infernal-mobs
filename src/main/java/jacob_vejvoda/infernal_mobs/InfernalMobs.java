@@ -1,24 +1,17 @@
 package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
-import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
-import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
-import jacob_vejvoda.infernal_mobs.loot.LootManager;
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
-import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -27,16 +20,14 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
@@ -76,19 +67,25 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
+import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
+import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
+import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
+import jacob_vejvoda.infernal_mobs.loot.LootManager;
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
+
 public class InfernalMobs extends JavaPlugin implements Listener {
     GUI gui;
     long serverTime = 0L;
-    private int loops;
-    ArrayList<InfernalMob> infernalList = new ArrayList();
+    ArrayList<InfernalMob> infernalList = new ArrayList<>();
     private File lootYML = new File(getDataFolder(), "loot.yml");
     File saveYML = new File(getDataFolder(), "save.yml");
     public FileConfiguration saveFile;
     public FileConfiguration lootFile;
-    private HashMap<Entity, Entity> mountList = new HashMap();
-    ArrayList<Player> errorList = new ArrayList();
-    ArrayList<Player> levitateList = new ArrayList();
-    public ArrayList<Player> fertileList = new ArrayList();
+    private HashMap<Entity, Entity> mountList = new HashMap<>();
+    ArrayList<Player> errorList = new ArrayList<>();
+    ArrayList<Player> levitateList = new ArrayList<>();
+    public ArrayList<Player> fertileList = new ArrayList<>();
     private PotionEffectHandler potionEffectHandler;
     private ConsumeEffectHandler consumeEffectHandler;
     private LootManager lootManager;
@@ -102,27 +99,50 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         if (!dir.exists()) dir.mkdir();
 
         try {
-            // Save default config if it doesn't exist
             saveDefaultConfig();
+            getLogger().info("config.yml loaded successfully.");
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to load config.yml!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
             if (!lootYML.exists()) {
                 saveResource("loot.yml", false);
             }
-            lootFile = YamlConfiguration.loadConfiguration(lootYML);
+        
+            lootFile = new YamlConfiguration();
+            lootFile.load(lootYML);
+            getLogger().info("loot.yml loaded successfully.");
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to load loot.yml!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
             if (!saveYML.exists()) {
                 saveYML.createNewFile();
             }
-            saveFile = YamlConfiguration.loadConfiguration(saveYML);
+        
+            saveFile = new YamlConfiguration();
+            saveFile.load(saveYML);
+            getLogger().info("save.yml loaded successfully.");
+        } catch (IOException | InvalidConfigurationException e) {
+            getLogger().log(Level.SEVERE, "Failed to load save.yml!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
             this.lootManager = new LootManager(this, lootFile);
             this.potionEffectHandler = new PotionEffectHandler(this);
             this.consumeEffectHandler = new ConsumeEffectHandler(this);
-
-            this.getLogger().log(Level.INFO, "Configuration files loaded successfully!");
-        } catch (IOException e) {
-            this.getLogger().log(Level.SEVERE, "Failed to load configuration files!", e);
-            e.printStackTrace();
+        
+            getLogger().info("Configuration files initialized successfully!");
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to initialize configuration managers!", e);
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -130,7 +150,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         this.gui = new GUI(this);
         getServer().getPluginManager().registerEvents(this.gui, this);
 
-        // Initialize DiviningStaff
         this.diviningStaff = new DiviningStaff(this);
 
         EventListener events = new EventListener(this);
@@ -139,20 +158,25 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         this.getLogger().log(Level.INFO, "Registered Events.");
 
         applyEffect();
-        reloadPowers();
+        loadPowers();
         showEffect();
         diviningStaff.addRecipes();
 
-        // Initialize command manager
-        CommandManager commandManager = new CommandManager(this);
-        this.getCommand("infernalmobs").setExecutor(commandManager);
-        this.getCommand("infernalmobs").setTabCompleter(commandManager);
-        this.getCommand("im").setExecutor(commandManager);
-        this.getCommand("im").setTabCompleter(commandManager);
+        try {
+            CommandManager commandManager = new CommandManager(this);
+            this.getCommand("infernalmobs").setExecutor(commandManager);
+            this.getCommand("infernalmobs").setTabCompleter(commandManager);
+            this.getCommand("im").setExecutor(commandManager);
+            this.getCommand("im").setTabCompleter(commandManager);
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to load language configuration!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
     }
 
-    private void reloadPowers() {
-        ArrayList<World> wList = new ArrayList();
+    private void loadPowers() {
+        ArrayList<World> wList = new ArrayList<>();
         for (Player p : getServer().getOnlinePlayers()) {
             if (!wList.contains(p.getWorld())) {
                 wList.add(p.getWorld());
@@ -200,12 +224,12 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         if (idSearch(id) == -1) {
             List<String> aList = null;
             for (MetadataValue v : ent.getMetadata("infernalMetadata")) {
-                aList = new ArrayList(Arrays.asList(v.asString().split(",")));
+                aList = new ArrayList<>(Arrays.asList(v.asString().split(",")));
             }
             if (aList == null) {
                 if (this.saveFile.getString(ent.getUniqueId().toString()) != null) {
                     aList =
-                            new ArrayList(
+                            new ArrayList<>(
                                     Arrays.asList(
                                             this.saveFile
                                                     .getString(ent.getUniqueId().toString())
@@ -321,7 +345,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                                                 String spawnMessage = spawnMessageList.get(index);
 
                                                 spawnMessage =
-                                                        ConsumeEffectHandler.hex(spawnMessage);
+                                                        LootUtils.hex(spawnMessage);
                                                 if (e.getCustomName() != null) {
                                                     spawnMessage =
                                                             spawnMessage.replace(
@@ -446,10 +470,13 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         ItemStack skull;
         if (evil) {
             skull = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
-            dye(chest, Color.BLACK);
         } else {
             skull = new ItemStack(Material.SKELETON_SKULL, 1);
-            dye(chest, Color.WHITE);
+        }
+
+        if (chest.getItemMeta() instanceof LeatherArmorMeta meta) {
+            meta.setColor(evil ? Color.BLACK : Color.WHITE);
+            chest.setItemMeta(meta);
         }
         chest.addUnsafeEnchantment(
                 org.bukkit.enchantments.Enchantment.PROTECTION, new Random().nextInt(10) + 1);
@@ -469,7 +496,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }
         ghostMove(g);
 
-        ArrayList<String> aList = new ArrayList();
+        ArrayList<String> aList = new ArrayList<>();
         aList.add("ender");
         if (evil) {
             aList.add("necromancer");
@@ -509,31 +536,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                             }
                         },
                         2L);
-    }
-
-    private void dye(ItemStack item, Color color) {
-        try {
-            LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
-            meta.setColor(color);
-            item.setItemMeta(meta);
-        } catch (Exception localException) {
-        }
-    }
-
-    void keepAlive(Item item) {
-        lootManager.keepAlive(item);
-    }
-
-    public ItemStack getRandomLoot(Player player, String mob, int powers) {
-        return lootManager.getRandomLoot(player, mob, powers);
-    }
-
-    public ItemStack getLoot(Player player, int loot) {
-        return lootManager.getLoot(player, loot);
-    }
-
-    public ItemStack getItem(int loot) {
-        return lootManager.getItem(loot);
     }
 
     private boolean isBaby(Entity mob) {
@@ -804,58 +806,11 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                 .scheduleSyncDelayedTask(this, this::applyEffect, (10 * 20));
     }
 
-    private boolean isArmor(ItemStack s) {
-        String t = s.getType().toString().toLowerCase();
-        return t.contains("helm") || t.contains("plate") || t.contains("leg") || t.contains("boot");
-    }
-
-    public void applyEatEffects(LivingEntity e, int effectID) {
-        this.consumeEffectHandler.applyConsumeEffects(e, effectID);
-    }
-
-    private void showEffectParticles(final Entity p, final String e, int time) {
-        displayEffect(p.getLocation(), e);
-        final int nt = time - 1;
-        if (time > 0) {
-            Bukkit.getServer()
-                    .getScheduler()
-                    .scheduleSyncDelayedTask(
-                            this, () -> InfernalMobs.this.showEffectParticles(p, e, nt), 20L);
-        }
-    }
-
     private void levitate(final Entity e, final int time) {
         if ((e instanceof LivingEntity)) {
             ((LivingEntity) e)
                     .addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, time * 20, 0));
         }
-    }
-
-    public void airHold(final Entity e, int time) {
-        for (int i = 0; i < time * 20; i++) {
-            Bukkit.getServer()
-                    .getScheduler()
-                    .scheduleSyncDelayedTask(
-                            this,
-                            () -> {
-                                Vector vec = e.getVelocity();
-                                vec.setY(0.01D);
-                                e.setVelocity(vec);
-                            },
-                            i);
-            i++;
-        }
-        Bukkit.getServer()
-                .getScheduler()
-                .scheduleSyncDelayedTask(
-                        this,
-                        () -> {
-                            if ((e instanceof Player) && levitateList.contains(e)) {
-                                ((Player) e).setAllowFlight(false);
-                                levitateList.remove(e);
-                            }
-                        },
-                        20 * time);
     }
 
     void doEffect(Player player, final Entity mob, boolean playerIsVictim) {
@@ -1367,7 +1322,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                         } else if ((ability.equals("archer"))
                                 && (isLegitVictim(atc, playerIsVictim, ability))) {
                             if ((randomNum > 7) || (randomNum == 1)) {
-                                ArrayList<Arrow> arrowList = new ArrayList();
+                                ArrayList<Arrow> arrowList = new ArrayList<>();
                                 Location loc1 = vic.getLocation();
                                 Location loc2 = atc.getLocation();
                                 if (!isSmall(atc)) {
@@ -1451,7 +1406,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     }
 
     private static List<Block> getSphere(Block block1) {
-        List<Block> blocks = new LinkedList();
+        List<Block> blocks = new LinkedList<>();
         double xi = block1.getLocation().getX() + 0.5D;
         double yi = block1.getLocation().getY() + 0.5D;
         double zi = block1.getLocation().getZ() + 0.5D;
@@ -1559,7 +1514,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         if (getConfig().getBoolean("effectAllPlayerAttacks")) {
             return true;
         }
-        ArrayList<String> attackAbilityList = new ArrayList();
+        ArrayList<String> attackAbilityList = new ArrayList<>();
         attackAbilityList.add("poisonous");
         attackAbilityList.add("blinding");
         attackAbilityList.add("withering");
@@ -1576,7 +1531,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         if ((playerIsVictim) && (attackAbilityList.contains(ability))) {
             return true;
         }
-        ArrayList<String> defendAbilityList = new ArrayList();
+        ArrayList<String> defendAbilityList = new ArrayList<>();
         defendAbilityList.add("thief");
         defendAbilityList.add("storm");
         defendAbilityList.add("webber");
@@ -1663,7 +1618,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                                 "blinding",
                                 "armoured",
                                 "poisonous"));
-        List<String> abilityList = new ArrayList();
+        List<String> abilityList = new ArrayList<>();
         int min = 1;
         for (int i = 0; i < amount; i++) {
             int max = allAbilitiesList.size();
@@ -1909,7 +1864,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     }
 
     private List<Location> getArea(Location l, double r, double t) {
-        List<Location> ll = new ArrayList();
+        List<Location> ll = new ArrayList<>();
         for (double x = l.getX() - r; x < l.getX() + r; x += t) {
             for (double y = l.getY() - r; y < l.getY() + r; y += t) {
                 for (double z = l.getZ() - r; z < l.getZ() + r; z += t) {
@@ -1946,120 +1901,11 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return namesString.toString();
     }
 
-    private void checkEnchantmentLimits() {
-        if (lootFile == null) return;
-
-        ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
-        if (lootSection == null) return;
-
-        int issuesFound = 0;
-
-        for (String lootId : lootSection.getKeys(false)) {
-            String itemType = lootFile.getString("loot." + lootId + ".item");
-            ConfigurationSection enchantmentsSection =
-                    lootFile.getConfigurationSection("loot." + lootId + ".enchantments");
-            if (enchantmentsSection == null) continue;
-
-            for (String key : enchantmentsSection.getKeys(false)) {
-                String enchantmentName =
-                        lootFile.getString(
-                                "loot." + lootId + ".enchantments." + key + ".enchantment");
-                if (enchantmentName == null) continue;
-
-                String levelStr =
-                        lootFile.getString("loot." + lootId + ".enchantments." + key + ".level");
-                if (levelStr == null) continue;
-
-                try {
-                    Enchantment enchant =
-                            Enchantment.getByKey(
-                                    NamespacedKey.minecraft(enchantmentName.toLowerCase()));
-                    if (enchant == null) {
-                        getLogger()
-                                .warning(
-                                        "Unknown enchantment: "
-                                                + enchantmentName
-                                                + " on item "
-                                                + lootId);
-                        continue;
-                    }
-
-                    int level = lootUtils.getIntFromString(levelStr);
-                    int maxAllowedLevel = getMaxAllowedEnchantmentLevel(enchant);
-
-                    if (level > maxAllowedLevel) {
-                        issuesFound++;
-                        getLogger()
-                                .warning(
-                                        "Item at index "
-                                                + lootId
-                                                + " ("
-                                                + itemType
-                                                + ") has "
-                                                + enchant.getKey().getKey()
-                                                + " enchant level "
-                                                + level
-                                                + " but max is "
-                                                + maxAllowedLevel);
-                    }
-                } catch (Exception e) {
-                    getLogger()
-                            .warning(
-                                    "Error checking enchantment "
-                                            + enchantmentName
-                                            + ": "
-                                            + e.getMessage());
-                }
-            }
-        }
-    }
-
-    private void reloadLoot() {
-        try {
-            if (this.lootYML == null) {
-                this.lootYML = new File(getDataFolder(), "loot.yml");
-            }
-
-            if (!lootYML.exists()) {
-                saveResource("loot.yml", false);
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            } else {
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            }
-
-            checkEnchantmentLimits();
-
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Error reloading loot configuration", e);
-        }
-    }
-
-    private int getMaxAllowedEnchantmentLevel(Enchantment enchant) {
-        String enchantKey = enchant.getKey().getKey().toLowerCase();
-        if (enchantKey.equals("mending")
-                || enchantKey.equals("silk_touch")
-                || enchantKey.equals("infinity")
-                || enchantKey.equals("channeling")
-                || enchantKey.equals("aqua_affinity")) {
-            return 1;
-        }
-        return 255;
-    }
-
-    public Set<String> getConfigurationSectionKeys(String path) {
-        ConfigurationSection section = lootFile.getConfigurationSection(path);
-        return section != null ? section.getKeys(false) : new HashSet<>();
-    }
-
-    public List<Integer> getIntegerList(String path) {
-        return lootFile.getIntegerList(path);
-    }
-
     public String getLocationName(Location l) {
         return (l.getX() + "." + l.getY() + "." + l.getZ() + l.getWorld().getName())
-                .replace(".", "");
+        .replace(".", "");
     }
-
+    
     Block blockNear(Location l, Material mat, int radius) {
         double xTmp = l.getX();
         double yTmp = l.getY();
@@ -2080,34 +1926,21 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }
         return null;
     }
-
-    public boolean cSpawn(CommandSender sender, String mob, Location l, ArrayList<String> abList) {
-        if ((EntityType.valueOf(mob.toUpperCase()) != null)) {
-            Entity ent = l.getWorld().spawnEntity(l, EntityType.valueOf(mob.toUpperCase()));
-            InfernalMob newMob;
-            UUID id = ent.getUniqueId();
-            if (abList.contains("1up")) {
-                newMob = new InfernalMob(ent, id, true, abList, 2, getEffect());
-            } else {
-                newMob = new InfernalMob(ent, id, true, abList, 1, getEffect());
-            }
-            if (abList.contains("flying")) {
-                makeFly(ent);
-            }
-            this.infernalList.add(newMob);
-            this.gui.setName(ent);
-
-            giveMobGear(ent, false);
-            addHealth(ent, abList);
-            return true;
-        } else {
-            sender.sendMessage("Can't spawn a " + mob + "!");
-            return false;
-        }
-    }
-
+    
     public int rand(int min, int max) {
         return min + (int) (Math.random() * (1 + max - min));
+    }
+
+    public void applyEatEffects(LivingEntity e, int effectID) {
+        this.consumeEffectHandler.applyConsumeEffects(e, effectID);
+    }
+
+    public List<Integer> getIntegerList(String path) {
+        return lootFile.getIntegerList(path);
+    }
+    
+    void keepAlive(Item item) {
+        lootManager.keepAlive(item);
     }
 
     public ItemStack getDiviningStaff() {
@@ -2116,41 +1949,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public DiviningStaff getDiviningStaffManager() {
         return diviningStaff;
-    }
-
-    @Override
-    public void reloadConfig() {
-        super.reloadConfig();
-        if (this.diviningStaff != null) {
-            this.diviningStaff.reload();
-        }
-        this.getLogger().info("Config reloaded successfully.");
-    }
-
-    public void refreshLoot() {
-        try {
-            if (!lootYML.exists()) {
-                saveResource("loot.yml", false);
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            } else {
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            }
-            checkEnchantmentLimits();
-            if (this.potionEffectHandler != null) {
-                this.potionEffectHandler = new PotionEffectHandler(this);
-            }
-            this.getLogger().info("Loot configuration reloaded successfully.");
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Failed to reload loot configuration!", e);
-        }
-    }
-
-    public void reloadMobSave() {
-        try {
-            this.saveFile = YamlConfiguration.loadConfiguration(this.saveYML);
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Failed to reload mob save configuration!", e);
-        }
     }
 
     public ConfigurationSection getConfigurationSection(String path) {
@@ -2165,8 +1963,28 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return this.lootManager;
     }
 
+    public ItemStack getRandomLoot(Player player, String mob, int powers) {
+        return lootManager.getRandomLoot(player, mob, powers);
+    }
+
+    public ItemStack getLoot(Player player, int loot) {
+        return lootManager.getLoot(player, loot);
+    }
+
+    public ItemStack getItem(int loot) {
+        return lootManager.getItem(loot);
+    }
+
+    public LootUtils getLootUtils() {
+        return this.lootUtils;
+    }
+
     public PotionEffectHandler getPotionEffectHandler() {
         return this.potionEffectHandler;
+    }
+
+    public ConsumeEffectHandler getConsumeEffectHandler() {
+        return this.consumeEffectHandler;
     }
 
     public ArrayList<InfernalMob> getInfernalList() {
@@ -2175,10 +1993,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public HashMap<Entity, Entity> getMountList() {
         return this.mountList;
-    }
-
-    public int getLoops() {
-        return this.loops;
     }
 
     public ArrayList<Player> getErrorList() {
@@ -2199,5 +2013,29 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public File getLootYML() {
         return this.lootYML;
+    }
+
+    public void setLootFile(FileConfiguration lootFile) {
+        this.lootFile = lootFile;
+    }
+
+    public void setSaveFile(FileConfiguration saveFile) {
+        this.saveFile = saveFile;
+    }
+
+    public void setLootUtils(LootUtils lootUtils) {
+        this.lootUtils = lootUtils;
+    }
+
+    public void setLootManager(LootManager lootManager) {
+        this.lootManager = lootManager;
+    }
+
+    public void setConsumeEffectHandler(ConsumeEffectHandler handler) {
+        this.consumeEffectHandler = handler;
+    }
+
+    public void setPotionEffectHandler(PotionEffectHandler handler) {
+        this.potionEffectHandler = handler;
     }
 }

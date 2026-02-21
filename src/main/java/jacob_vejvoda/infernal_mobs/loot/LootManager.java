@@ -1,16 +1,19 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 /**
  * Manages loot configuration, selection, and generation for infernal mobs
@@ -69,7 +72,7 @@ public class LootManager {
     }
 
     /**
-     * Gets specific loot item by ID for a player (public method for commands)
+     * Gets specific loot item by ID for a player
      */
     public ItemStack getLoot(Player player, int loot) {
         ItemStack i = null;
@@ -79,13 +82,12 @@ public class LootManager {
                 List<String> commandList =
                         this.lootFile.getStringList("loot." + loot + ".commands");
                 for (String command : commandList) {
-                    command = org.bukkit.ChatColor.translateAlternateColorCodes('&', command);
+                    command = ChatColor.translateAlternateColorCodes('&', command);
                     command = replaceCommandVariables(command, player);
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
                 }
             }
 
-            // Try to get the item (may be null if only commands are defined)
             i = lootGenerator.getItem(loot);
         } catch (Exception x) {
             plugin.getServer()
@@ -96,7 +98,7 @@ public class LootManager {
     }
 
     /**
-     * Gets item by loot ID without executing commands (for PotionEffectHandler)
+     * Gets item by loot ID without executing commands
      */
     public ItemStack getItem(int loot) {
         return lootGenerator.getItem(loot);
@@ -129,10 +131,9 @@ public class LootManager {
      * - playerZ: Player's Z coordinate (rounded)
      */
     private String replaceCommandVariables(String command, org.bukkit.entity.Player player) {
-        // Basic player info
+
         command = command.replace("{player}", player.getName());
 
-        // Location info
         command = command.replace("{worldName}", player.getWorld().getName());
         command =
                 command.replace(

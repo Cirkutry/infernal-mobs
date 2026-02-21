@@ -1,8 +1,9 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class ErrorCommand extends BaseCommand {
 

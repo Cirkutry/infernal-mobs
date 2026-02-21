@@ -1,28 +1,23 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
+
 public class ConsumeEffectHandler {
 
     private final InfernalMobs plugin;
-    private final FileConfiguration lootFile;
-
     public ConsumeEffectHandler(InfernalMobs plugin) {
         this.plugin = plugin;
-        this.lootFile = plugin.getLootFile();
+        plugin.getLootFile();
     }
 
     public void applyConsumeEffects(LivingEntity entity, int effectID) {
@@ -42,7 +37,7 @@ public class ConsumeEffectHandler {
         for (Map<?, ?> potionConfig : potionEffects) {
             String potionTypeName = String.valueOf(potionConfig.get("type"));
 
-            PotionEffectType potionEffectType = getPotionEffectType(potionTypeName);
+            PotionEffectType potionEffectType = LootUtils.getPotionEffectType(potionTypeName);
             if (potionEffectType == null) {
                 plugin.getLogger().warning("Invalid potion effect type: " + potionTypeName);
                 continue;
@@ -96,32 +91,8 @@ public class ConsumeEffectHandler {
         if (entity instanceof Player) {
             String message = effectSection.getString("message");
             if (message != null) {
-                ((Player) entity).sendMessage(hex(message));
+                ((Player) entity).sendMessage(LootUtils.hex(message));
             }
         }
-    }
-
-    private PotionEffectType getPotionEffectType(String name) {
-        PotionEffectType effectType = PotionEffectType.getByName(name);
-
-        if (effectType == null) {
-            effectType =
-                    Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(name.toLowerCase()));
-        }
-
-        return effectType;
-    }
-
-    public static String hex(String msg) {
-        Matcher matcher = Pattern.compile("&?#([A-Fa-f0-9]{6})").matcher(msg);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            String h = matcher.group(1);
-            StringBuilder r = new StringBuilder("&x");
-            for (char c : h.toCharArray()) r.append("&").append(c);
-            matcher.appendReplacement(sb, r.toString());
-        }
-        matcher.appendTail(sb);
-        return org.bukkit.ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
 }

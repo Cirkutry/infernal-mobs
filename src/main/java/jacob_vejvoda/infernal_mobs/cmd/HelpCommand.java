@@ -1,7 +1,8 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import org.bukkit.command.CommandSender;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class HelpCommand extends BaseCommand {
 
@@ -28,20 +29,12 @@ public class HelpCommand extends BaseCommand {
     private void throwError(CommandSender sender) {
         sender.sendMessage(
                 localeManager.getMessage(
-                        "commands.help.header", plugin.getDescription().getVersion()));
+                        "commands.help.header", plugin.getPluginMeta().getVersion()));
         sender.sendMessage(localeManager.getMessage("commands.reload.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.worldinfo.usage"));
         sender.sendMessage(localeManager.getMessage("commands.error.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.getloot.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.setloot.usage"));
         sender.sendMessage(localeManager.getMessage("commands.giveloot.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.abilities.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.showabilities.usage"));
+        sender.sendMessage(localeManager.getMessage("commands.setloot.usage"));
         sender.sendMessage(localeManager.getMessage("commands.setinfernal.usage"));
         sender.sendMessage(localeManager.getMessage("commands.spawn.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.cspawn.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.pspawn.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.kill.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.killall.usage"));
     }
 }

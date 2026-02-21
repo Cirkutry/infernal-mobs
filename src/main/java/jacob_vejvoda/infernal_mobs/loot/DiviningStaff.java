@@ -1,13 +1,15 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.infernal_mobs.GUI;
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -17,18 +19,67 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 
+import jacob_vejvoda.infernal_mobs.GUI;
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
+
 public class DiviningStaff {
 
     private final InfernalMobs plugin;
-    private final LootUtils lootUtils;
 
     public DiviningStaff(InfernalMobs plugin) {
         this.plugin = plugin;
-        this.lootUtils = new LootUtils(plugin, plugin.getConfig());
+    }
+
+    private ItemStack createRodFromConfig(String configPath, FileConfiguration config) {
+        if (config == null || !config.isConfigurationSection(configPath)) {
+            return null;
+        }
+
+        String materialStr = config.getString(configPath + ".material", "STICK");
+        Material material;
+        try {
+            material = Material.valueOf(materialStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plugin.getLogger()
+                    .warning("Invalid material '" + materialStr + "' in config at " + configPath);
+            material = Material.STICK;
+        }
+
+        ItemStack item = new ItemStack(material, 1);
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) {
+            return item;
+        }
+
+        String name = config.getString(configPath + ".name");
+        if (name != null) {
+            name = LootUtils.hex(name);
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        }
+
+        List<String> loreConfig = config.getStringList(configPath + ".lore");
+        if (loreConfig != null && !loreConfig.isEmpty()) {
+            List<String> lore = new ArrayList<>();
+            for (String line : loreConfig) {
+                line = LootUtils.hex(line);
+                lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            }
+            meta.setLore(lore);
+        }
+
+        if (config.isInt(configPath + ".customModelData")) {
+            int customModelData = config.getInt(configPath + ".customModelData");
+            if (customModelData > 0) {
+                meta.setCustomModelData(customModelData);
+            }
+        }
+
+        item.setItemMeta(meta);
+        return item;
     }
 
     public ItemStack getDiviningStaff() {
-        ItemStack staff = lootUtils.createItemFromConfig("diviningRod", plugin.getConfig());
+        ItemStack staff = createRodFromConfig("diviningRod", plugin.getConfig());
 
         if (staff == null) {
             staff =
@@ -39,7 +90,7 @@ public class DiviningStaff {
                             Arrays.asList("Click to find infernal mobs."));
         }
 
-        if (lootUtils.isEnchantedFromConfig("diviningRod", plugin.getConfig())) {
+        if (LootUtils.isEnchantedFromConfig("diviningRod", plugin.getConfig())) {
             ItemMeta meta = staff.getItemMeta();
             if (meta != null) {
                 meta.addEnchant(Enchantment.CHANNELING, 1, true);
@@ -96,12 +147,7 @@ public class DiviningStaff {
         Bukkit.addRecipe(sr);
     }
 
-    public void reload() {
-        removeRecipe();
-        addRecipes();
-    }
-
-    private void removeRecipe() {
+    public void removeRecipe() {
         NamespacedKey key = new NamespacedKey(plugin, "divining_staff");
         Bukkit.removeRecipe(key);
     }
@@ -193,7 +239,7 @@ public class DiviningStaff {
         int speed = -1;
         int amount = 1;
         double r = 0;
-        String particle = lootUtils.getParticleFromConfig("diviningRod", plugin.getConfig());
+        String particle = LootUtils.getParticleFromConfig("diviningRod", plugin.getConfig());
         plugin.displayParticle(
                 particle, loc.getWorld(), loc.getX(), loc.getY(), loc.getZ(), r, speed, amount);
     }

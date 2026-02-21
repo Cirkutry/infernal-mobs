@@ -1,6 +1,5 @@
 package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +7,24 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
-import org.bukkit.*;
+
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -37,6 +50,8 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 
 public class EventListener implements Listener {
     private static InfernalMobs plugin;
@@ -377,7 +392,7 @@ public class EventListener implements Listener {
                         Random randomGenerator = new Random();
                         int index = randomGenerator.nextInt(deathMessagesList.size());
                         String deathMessage = deathMessagesList.get(index);
-                        deathMessage = ConsumeEffectHandler.hex(deathMessage);
+                        deathMessage = LootUtils.hex(deathMessage);
 
                         String mobName = event.getEntity().getType().getName().replace("_", " ");
                         mobName = mobName.substring(0, 1).toUpperCase() + mobName.substring(1);
@@ -387,7 +402,7 @@ public class EventListener implements Listener {
                         if (plugin.getConfig().contains("levelPrefixes." + mobLevel)) {
                             prefix = plugin.getConfig().getString("levelPrefixes." + mobLevel);
                         }
-                        prefix = ConsumeEffectHandler.hex(prefix);
+                        prefix = LootUtils.hex(prefix);
 
                         String weaponName = "fist";
                         if ((player.getInventory().getItemInMainHand() != null)

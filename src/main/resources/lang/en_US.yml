@@ -7,55 +7,15 @@ prefix: "&5Infernal Mobs &dReloaded &6>"
 
 commands:
   no-permission: "{p} &cYou don't have permission to use this command!"
-
   usage: "{p} &cUsage: {0}"
-
   player-only: "{p} &cThis command can only be run by a player!"
+  player-not-found: "{p} &cPlayer not found!"
 
-  player:
-    not_found: "{p} &cPlayer not found!"
-    not_online: "{p} &e{0} is not online!"
-
-  world:
-    not_found: "{p} &cWorld not found!"
-
-  coordinates:
-    invalid: "{p} &cInvalid coordinates!"
-
-  abilities:
-    list: "{p} &7Abilities: &6mama, molten, weakness, vengeance, webber, storm, sprint, lifesteal, ghastly, ender, cloaked, berserk, 1up, sapper, rust, bullwark, quicksand, thief, tosser, withering, blinding, armoured, poisonous, potions, explode, gravity, archer, necromancer, firework, flying, mounted, morph, ghost, confusing"
-    usage: "/im abilities"
-  
   reload:
     success: "{p} &eConfig files reloaded successfully!"
+    failed: "{p} &cFailed to reload config files, check console for errors!"
     usage: "/im reload"
-  
-  worldinfo:
-    current-world: "{p} &eThe world you are currently in, {0} {1} enabled."
-    enabled-worlds: "{p} &eAll the worlds that are enabled are: {0}"
-    usage: "/im worldInfo"
-  
-  info:
-    mounts: "{p} &eMounts: {0}"
-    loops: "{p} &eLoops: {0}"
-    infernals: "{p} &eInfernals: {0}"
-    usage: "/im info"
-  
-  showabilities:
-    list: "{p} &e{0}"
-    not-infernal: "{p} &cThis {0} &cis not an infernal mob!"
-    mob-not-found: "{p} &cUnable to find mob!"
-    usage: "/im showAbilities"
-  
-  moblist:
-    header: "{p} &6Mob List:"
-    mob-entry: "{p} &e{0}"
-    usage: "/im moblist"
-  
-  mobs:
-    header: "{p} &6List of Mobs:"
-    usage: "/im mobs"
-  
+
   error:
     instructions: "{p} &eClick on a mob to send an error report about it."
     usage: "/im error"
@@ -64,21 +24,16 @@ commands:
     header: "&6--==-- &5Infernal Mobs &dReloaded &4v{0} &6--==--"
     usage: "/im help"
   
-  getloot:
-    success-random: "{p} &eGave you some random loot!"
-    success-index: "{p} &eGave you the loot at index &9{0}"
-    failed: "{p} &cUnable to get that loot!"
-    usage: "/im getloot <index>"
-  
   giveloot:
-    success: "{p} &eGave the player the loot at index &9{0}"
+    success-player: "{p} &eGave &b{0} &ethe loot at index &9{1}"
+    success-commands-player: "{p} &eExecuted commands for loot at index &9{0} &efor player &b{1} &e(no item to give)"
     error: "{p} &cUnable to get that loot!"
     usage: "/im giveloot <player> <index>"
   
   setloot:
     success: "{p} &eSet loot at index {0} &eto item in hand and saved to file."
     error: "{p} &cFailed to save loot file: {0}"
-    usage: "/im setloot <index>"
+    usage: "/im setloot"
   
   setinfernal:
     success: "{p} &cSpawner set to infernal with a {0} second delay!"
@@ -86,30 +41,9 @@ commands:
     usage: "/im setInfernal <time delay>"
   
   spawn:
-    invalid-ability: "{p} &c{0} is not a valid ability!"
-    success-with-abilities: "{p} &eSpawned a {0} with the abilities:"
-    success-simple: "{p} &eSpawned a {0}"
-    failed: "{p} &cCan't spawn a {0}!"
-    usage: "/im spawn <mob> <ability> <ability>"
-  
-  cspawn:
     world-not-exist: "{p} &c{0} does not exist!"
     success: "{p} &eSpawned a {0} in {1} at {2}, {3}, {4} with the abilities:"
+    failed: "{p} &cCan't spawn a {0}!"
     invalid-coordinates: "{p} &cInvalid coordinates!"
-    usage: "/im cspawn <mob> <world> <x> <y> <z> <ability> <ability>"
-  
-  pspawn:
-    player-not-online: "{p} &c{0} is not online!"
-    success: "{p} &eSpawned a {0} at {1} with the abilities:"
-    usage: "/im pspawn <mob> <player> <ability> <ability>"
-  
-  kill:
-    success: "{p} &eKilled all infernal mobs near you!"
-    invalid-radius: "{p} &cInvalid radius!"
-    usage: "/im kill <size>"
-  
-  killall:
-    success: "{p} &eKilled all loaded infernal mobs in that world!"
-    world-not-found: "{p} &cWorld not found!"
-    usage: "/im killall <world>"
+    usage: "/im spawn <mob> <world> <x> <y> <z> <abilities>"
   

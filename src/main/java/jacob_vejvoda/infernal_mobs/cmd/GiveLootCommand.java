@@ -1,12 +1,14 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class GiveLootCommand extends BaseCommand {
 
@@ -33,24 +35,25 @@ public class GiveLootCommand extends BaseCommand {
                     p.getInventory().addItem(i);
                     sender.sendMessage(
                             localeManager.getMessage(
-                                    "commands.giveloot.success", String.valueOf(index)));
+                                    "commands.giveloot.success-player",
+                                    p.getName(),
+                                    String.valueOf(index)));
                 } else {
                     sender.sendMessage(
-                            "§eExecuted commands for loot at index §9"
-                                    + index
-                                    + " §efor player §b"
-                                    + p.getName()
-                                    + " §e(no item to give)");
+                            localeManager.getMessage(
+                                    "commands.giveloot.success-commands-player",
+                                    String.valueOf(index),
+                                    p.getName()));
                 }
                 return true;
             } else {
-                sender.sendMessage(localeManager.getMessage("commands.player.not_found"));
+                sender.sendMessage(localeManager.getMessage("commands.player-not-found"));
                 return true;
             }
-        } catch (Exception ignored) {
+        } catch (NumberFormatException e) {
+            sender.sendMessage(localeManager.getMessage("commands.giveloot.error"));
+            return true;
         }
-        sender.sendMessage(localeManager.getMessage("commands.giveloot.error"));
-        return true;
     }
 
     @Override
@@ -60,7 +63,7 @@ public class GiveLootCommand extends BaseCommand {
             newTab.addAll(CommandUtils.getOnlinePlayerNames());
         }
         if (args.length == 3) {
-            newTab.add("1");
+            newTab.add("<index>");
         }
         return newTab;
     }
