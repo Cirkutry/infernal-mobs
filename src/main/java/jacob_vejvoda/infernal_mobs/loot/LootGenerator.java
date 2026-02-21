@@ -5,13 +5,13 @@ import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * Handles the generation and customization of loot items

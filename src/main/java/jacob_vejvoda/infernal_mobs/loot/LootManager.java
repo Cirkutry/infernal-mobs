@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
@@ -14,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import net.md_5.bungee.api.ChatColor;
 
 /**
  * Manages loot configuration, selection, and generation for infernal mobs

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -21,6 +20,7 @@ import org.bukkit.util.Vector;
 
 import jacob_vejvoda.infernal_mobs.GUI;
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import net.md_5.bungee.api.ChatColor;
 
 public class DiviningStaff {
 
