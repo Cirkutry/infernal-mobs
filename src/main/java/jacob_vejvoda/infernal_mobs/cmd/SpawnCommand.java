@@ -3,94 +3,89 @@ package jacob_vejvoda.infernal_mobs.cmd;
 import jacob_vejvoda.infernal_mobs.InfernalMob;
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 
 public class SpawnCommand extends BaseCommand {
 
+    private final LocaleManager localeManager;
+
     public SpawnCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
+        this.localeManager = localeManager;
     }
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {
-        if (args.length < 2) {
+        if (args.length < 6) {
             sender.sendMessage(localeManager.getMessage("commands.usage", getUsage()));
             return true;
         }
 
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(localeManager.getMessage("commands.player-only"));
+        if (Bukkit.getServer().getWorld(args[2]) == null) {
+            sender.sendMessage(
+                    localeManager.getMessage("commands.spawn.world-not-exist", args[2]));
             return true;
         }
 
-        Player player = (Player) sender;
-
+        World world = Bukkit.getServer().getWorld(args[2]);
         try {
-            if (EntityType.valueOf(args[1].toUpperCase()) != null) {
-                Location farSpawnLoc = player.getTargetBlock(null, 200).getLocation();
-                farSpawnLoc.setY(farSpawnLoc.getY() + 1.0D);
-                Entity ent =
-                        player.getWorld()
-                                .spawnEntity(
-                                        farSpawnLoc, EntityType.valueOf(args[1].toUpperCase()));
+            Location spoint =
+                    new Location(
+                            world,
+                            Integer.parseInt(args[3]),
+                            Integer.parseInt(args[4]),
+                            Integer.parseInt(args[5]));
+            ArrayList<String> abList = new ArrayList<>(Arrays.asList(args).subList(6, args.length));
 
-                List<String> abList;
-                if (args.length == 2) {
-                    abList = plugin.getAbilitiesAmount(ent);
-                } else {
-                    ArrayList<String> specificAbList = new ArrayList<>();
-                    for (int i = 2; i < args.length; i++) {
-                        if (plugin.getConfig().getString(args[i]) != null) {
-                            specificAbList.add(args[i]);
-                        } else {
-                            sender.sendMessage(
-                                    localeManager.getMessage(
-                                            "commands.spawn.invalid-ability", args[i]));
-                            ent.remove();
-                            return true;
-                        }
-                    }
-                    abList = specificAbList;
-                }
-
-                InfernalMob newMob;
-                UUID id = ent.getUniqueId();
-                if (abList.contains("1up")) {
-                    newMob = new InfernalMob(ent, id, true, abList, 2, plugin.getEffect());
-                } else {
-                    newMob = new InfernalMob(ent, id, true, abList, 1, plugin.getEffect());
-                }
-
-                if (abList.contains("flying")) {
-                    plugin.makeFly(ent);
-                }
-                plugin.getInfernalList().add(newMob);
-                plugin.getGui().setName(ent);
-                plugin.giveMobGear(ent, false);
-                plugin.addHealth(ent, abList);
-
-                if (args.length > 2) {
-                    sender.sendMessage(
-                            localeManager.getMessage(
-                                    "commands.spawn.success-with-abilities", args[1]));
-                    sender.sendMessage(abList.toString());
-                } else {
-                    sender.sendMessage(
-                            localeManager.getMessage("commands.spawn.success-simple", args[1]));
-                }
-            } else {
-                sender.sendMessage(localeManager.getMessage("commands.spawn.failed", args[1]));
+            if (spawn(sender, args[1], spoint, abList)) {
+                sender.sendMessage(
+                        localeManager.getMessage(
+                                "commands.spawn.success",
+                                args[1],
+                                args[2],
+                                args[3],
+                                args[4],
+                                args[5]));
+                sender.sendMessage(abList.toString());
             }
-        } catch (IllegalArgumentException e) {
-            sender.sendMessage(localeManager.getMessage("commands.spawn.failed", args[1]));
+        } catch (NumberFormatException e) {
+            sender.sendMessage(localeManager.getMessage("commands.spawn.invalid-coordinates"));
         }
         return true;
+    }
+
+    private boolean spawn(CommandSender sender, String mob, Location l, ArrayList<String> abList) {
+        try {
+            EntityType entityType = EntityType.valueOf(mob.toUpperCase());
+            Entity ent = l.getWorld().spawnEntity(l, entityType);
+            InfernalMob newMob;
+            UUID id = ent.getUniqueId();
+            if (abList.contains("1up")) {
+                newMob = new InfernalMob(ent, id, true, abList, 2, plugin.getEffect());
+            } else {
+                newMob = new InfernalMob(ent, id, true, abList, 1, plugin.getEffect());
+            }
+            if (abList.contains("flying")) {
+                plugin.makeFly(ent);
+            }
+            plugin.getInfernalList().add(newMob);
+            plugin.getGui().setName(ent);
+
+            plugin.giveMobGear(ent, false);
+            plugin.addHealth(ent, abList);
+            return true;
+        } catch (IllegalArgumentException e) {
+            sender.sendMessage(localeManager.getMessage("commands.spawn.failed", mob));
+            return false;
+        }
     }
 
     @Override
@@ -105,7 +100,17 @@ public class SpawnCommand extends BaseCommand {
                         CommandUtils.filterStartsWith(
                                 CommandUtils.getSpawnableEntities(), args[1]));
             }
-        } else if (args.length >= 3) {
+        } else if (args.length == 3) {
+            if (args[args.length - 1].isEmpty()) {
+                newTab.addAll(CommandUtils.getWorldNames());
+            } else {
+                newTab.addAll(
+                        CommandUtils.filterStartsWith(
+                                CommandUtils.getWorldNames(), args[args.length - 1]));
+            }
+        } else if (args.length > 3 && args.length < 7) {
+            newTab.add("~");
+        } else if (args.length >= 7) {
             if (args[args.length - 1].isEmpty()) {
                 newTab.addAll(CommandUtils.ALL_ABILITIES);
             } else {

@@ -213,7 +213,7 @@ public class LootGenerator {
     /**
      * Dyes leather armor
      */
-    private void dye(ItemStack item, Color color) {
+    public static void dye(ItemStack item, Color color) {
         try {
             LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
             meta.setColor(color);

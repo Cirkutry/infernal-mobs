@@ -30,18 +30,10 @@ public class HelpCommand extends BaseCommand {
                 localeManager.getMessage(
                         "commands.help.header", plugin.getDescription().getVersion()));
         sender.sendMessage(localeManager.getMessage("commands.reload.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.worldinfo.usage"));
         sender.sendMessage(localeManager.getMessage("commands.error.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.getloot.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.setloot.usage"));
         sender.sendMessage(localeManager.getMessage("commands.giveloot.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.abilities.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.showabilities.usage"));
+        sender.sendMessage(localeManager.getMessage("commands.setloot.usage"));
         sender.sendMessage(localeManager.getMessage("commands.setinfernal.usage"));
         sender.sendMessage(localeManager.getMessage("commands.spawn.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.cspawn.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.pspawn.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.kill.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.killall.usage"));
     }
 }

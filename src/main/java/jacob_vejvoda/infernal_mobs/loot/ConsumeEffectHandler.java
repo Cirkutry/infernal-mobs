@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -18,11 +18,9 @@ import org.bukkit.potion.PotionEffectType;
 public class ConsumeEffectHandler {
 
     private final InfernalMobs plugin;
-    private final FileConfiguration lootFile;
-
     public ConsumeEffectHandler(InfernalMobs plugin) {
         this.plugin = plugin;
-        this.lootFile = plugin.getLootFile();
+        plugin.getLootFile();
     }
 
     public void applyConsumeEffects(LivingEntity entity, int effectID) {
@@ -122,6 +120,6 @@ public class ConsumeEffectHandler {
             matcher.appendReplacement(sb, r.toString());
         }
         matcher.appendTail(sb);
-        return org.bukkit.ChatColor.translateAlternateColorCodes('&', sb.toString());
+        return ChatColor.translateAlternateColorCodes('&', sb.toString());
     }
 }

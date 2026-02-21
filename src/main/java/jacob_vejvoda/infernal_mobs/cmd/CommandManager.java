@@ -23,22 +23,11 @@ public class CommandManager implements TabExecutor {
 
     private void registerCommands() {
         registerCommand(new ReloadCommand(plugin, localeManager));
-        registerCommand(new WorldInfoCommand(plugin, localeManager));
         registerCommand(new ErrorCommand(plugin, localeManager));
-        registerCommand(new InfoCommand(plugin, localeManager));
-        registerCommand(new AbilitiesCommand(plugin, localeManager));
-        registerCommand(new GetLootCommand(plugin, localeManager));
         registerCommand(new GiveLootCommand(plugin, localeManager));
         registerCommand(new SetLootCommand(plugin, localeManager));
-        registerCommand(new ShowAbilitiesCommand(plugin, localeManager));
         registerCommand(new SetInfernalCommand(plugin, localeManager));
         registerCommand(new SpawnCommand(plugin, localeManager));
-        registerCommand(new CSpawnCommand(plugin, localeManager));
-        registerCommand(new PSpawnCommand(plugin, localeManager));
-        registerCommand(new KillCommand(plugin, localeManager));
-        registerCommand(new KillAllCommand(plugin, localeManager));
-        registerCommand(new MobsCommand(plugin, localeManager));
-        registerCommand(new MobListCommand(plugin, localeManager));
         registerCommand(new HelpCommand(plugin, localeManager));
     }
 

@@ -110,20 +110,16 @@ public class EnchantmentHandler {
 
             ItemMeta meta = stack.getItemMeta();
             if (meta != null) {
-                // Add base enchantment first
                 meta.addEnchant(enchant, 1, true);
 
-                // Add to lore for display
                 addEnchantmentToLore(meta, enchant, level);
 
-                // Hide enchants if level exceeds normal maximum
                 if (level > enchant.getMaxLevel()) {
                     meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 }
 
                 stack.setItemMeta(meta);
 
-                // Apply the actual enchantment level
                 stack.addUnsafeEnchantment(enchant, level);
             } else {
                 stack.addUnsafeEnchantment(enchant, level);
@@ -159,7 +155,7 @@ public class EnchantmentHandler {
     /**
      * Gets the maximum allowed level for an enchantment
      */
-    private int getMaxAllowedEnchantmentLevel(Enchantment enchant) {
+    public static int getMaxAllowedEnchantmentLevel(Enchantment enchant) {
         String enchantKey = enchant.getKey().getKey().toLowerCase();
         if (enchantKey.equals("mending")
                 || enchantKey.equals("silk_touch")

@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -79,7 +80,7 @@ public class LootManager {
                 List<String> commandList =
                         this.lootFile.getStringList("loot." + loot + ".commands");
                 for (String command : commandList) {
-                    command = org.bukkit.ChatColor.translateAlternateColorCodes('&', command);
+                    command = ChatColor.translateAlternateColorCodes('&', command);
                     command = replaceCommandVariables(command, player);
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
                 }
