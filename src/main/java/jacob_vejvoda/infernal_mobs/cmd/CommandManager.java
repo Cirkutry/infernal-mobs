@@ -14,7 +14,7 @@ public class CommandManager implements TabExecutor {
     private final Map<String, BaseCommand> commands;
     private final LocaleManager localeManager;
 
-    public CommandManager(InfernalMobs plugin) {
+    public CommandManager(InfernalMobs plugin) throws Exception {
         this.plugin = plugin;
         this.commands = new HashMap<>();
         this.localeManager = new LocaleManager(plugin);
@@ -112,9 +112,5 @@ public class CommandManager implements TabExecutor {
 
     public LocaleManager getLocaleManager() {
         return localeManager;
-    }
-
-    public void reloadLocale() {
-        localeManager.reload();
     }
 }

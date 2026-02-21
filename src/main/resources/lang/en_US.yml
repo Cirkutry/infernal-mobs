@@ -28,6 +28,7 @@ commands:
   
   reload:
     success: "{p} &eConfig files reloaded successfully!"
+    failed: "{p} &cFailed to reload config files, check console for errors!"
     usage: "/im reload"
   
   worldinfo:

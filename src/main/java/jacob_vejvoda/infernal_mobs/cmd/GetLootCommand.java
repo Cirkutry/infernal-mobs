@@ -23,7 +23,6 @@ public class GetLootCommand extends BaseCommand {
         Player player = (Player) sender;
 
         if (args.length == 1) {
-            // Get random loot
             int min = plugin.getConfig().getInt("minPowers");
             int max = plugin.getConfig().getInt("maxPowers");
             int powers = plugin.rand(min, max);
@@ -33,7 +32,6 @@ public class GetLootCommand extends BaseCommand {
             }
             sender.sendMessage("§eGave you some random loot!");
         } else if (args.length == 2) {
-            // Get loot by index
             try {
                 int index = Integer.parseInt(args[1]);
                 ItemStack i = plugin.getLoot(player, index);
@@ -41,7 +39,6 @@ public class GetLootCommand extends BaseCommand {
                     player.getInventory().addItem(i);
                     sender.sendMessage("§eGave you the loot at index §9" + index);
                 } else {
-                    // Commands may have been executed even without an item
                     sender.sendMessage(
                             "§eExecuted commands for loot at index §9"
                                     + index

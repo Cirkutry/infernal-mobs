@@ -42,10 +42,8 @@ public class SpawnCommand extends BaseCommand {
 
                 List<String> abList;
                 if (args.length == 2) {
-                    // No specific abilities, get random ones
                     abList = plugin.getAbilitiesAmount(ent);
                 } else {
-                    // Specific abilities provided
                     ArrayList<String> specificAbList = new ArrayList<>();
                     for (int i = 2; i < args.length; i++) {
                         if (plugin.getConfig().getString(args[i]) != null) {

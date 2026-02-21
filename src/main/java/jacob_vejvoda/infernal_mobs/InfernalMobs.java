@@ -34,6 +34,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -102,27 +103,50 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         if (!dir.exists()) dir.mkdir();
 
         try {
-            // Save default config if it doesn't exist
             saveDefaultConfig();
+            getLogger().info("config.yml loaded successfully.");
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to load config.yml!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
             if (!lootYML.exists()) {
                 saveResource("loot.yml", false);
             }
-            lootFile = YamlConfiguration.loadConfiguration(lootYML);
+        
+            lootFile = new YamlConfiguration();
+            lootFile.load(lootYML);
+            getLogger().info("loot.yml loaded successfully.");
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to load loot.yml!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
             if (!saveYML.exists()) {
                 saveYML.createNewFile();
             }
-            saveFile = YamlConfiguration.loadConfiguration(saveYML);
+        
+            saveFile = new YamlConfiguration();
+            saveFile.load(saveYML);
+            getLogger().info("save.yml loaded successfully.");
+        } catch (IOException | InvalidConfigurationException e) {
+            getLogger().log(Level.SEVERE, "Failed to load save.yml!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
+        try {
             this.lootManager = new LootManager(this, lootFile);
             this.potionEffectHandler = new PotionEffectHandler(this);
             this.consumeEffectHandler = new ConsumeEffectHandler(this);
-
-            this.getLogger().log(Level.INFO, "Configuration files loaded successfully!");
-        } catch (IOException e) {
-            this.getLogger().log(Level.SEVERE, "Failed to load configuration files!", e);
-            e.printStackTrace();
+        
+            getLogger().info("Configuration files initialized successfully!");
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to initialize configuration managers!", e);
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
@@ -130,7 +154,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         this.gui = new GUI(this);
         getServer().getPluginManager().registerEvents(this.gui, this);
 
-        // Initialize DiviningStaff
         this.diviningStaff = new DiviningStaff(this);
 
         EventListener events = new EventListener(this);
@@ -139,19 +162,24 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         this.getLogger().log(Level.INFO, "Registered Events.");
 
         applyEffect();
-        reloadPowers();
+        loadPowers();
         showEffect();
         diviningStaff.addRecipes();
 
-        // Initialize command manager
-        CommandManager commandManager = new CommandManager(this);
-        this.getCommand("infernalmobs").setExecutor(commandManager);
-        this.getCommand("infernalmobs").setTabCompleter(commandManager);
-        this.getCommand("im").setExecutor(commandManager);
-        this.getCommand("im").setTabCompleter(commandManager);
+        try {
+            CommandManager commandManager = new CommandManager(this);
+            this.getCommand("infernalmobs").setExecutor(commandManager);
+            this.getCommand("infernalmobs").setTabCompleter(commandManager);
+            this.getCommand("im").setExecutor(commandManager);
+            this.getCommand("im").setTabCompleter(commandManager);
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Failed to load language configuration!", e);
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
     }
 
-    private void reloadPowers() {
+    private void loadPowers() {
         ArrayList<World> wList = new ArrayList();
         for (Player p : getServer().getOnlinePlayers()) {
             if (!wList.contains(p.getWorld())) {
@@ -1946,7 +1974,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return namesString.toString();
     }
 
-    private void checkEnchantmentLimits() {
+    public void checkEnchantmentLimits() {
         if (lootFile == null) return;
 
         ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
@@ -2011,26 +2039,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                                             + e.getMessage());
                 }
             }
-        }
-    }
-
-    private void reloadLoot() {
-        try {
-            if (this.lootYML == null) {
-                this.lootYML = new File(getDataFolder(), "loot.yml");
-            }
-
-            if (!lootYML.exists()) {
-                saveResource("loot.yml", false);
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            } else {
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            }
-
-            checkEnchantmentLimits();
-
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Error reloading loot configuration", e);
         }
     }
 
@@ -2118,41 +2126,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return diviningStaff;
     }
 
-    @Override
-    public void reloadConfig() {
-        super.reloadConfig();
-        if (this.diviningStaff != null) {
-            this.diviningStaff.reload();
-        }
-        this.getLogger().info("Config reloaded successfully.");
-    }
-
-    public void refreshLoot() {
-        try {
-            if (!lootYML.exists()) {
-                saveResource("loot.yml", false);
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            } else {
-                this.lootFile = YamlConfiguration.loadConfiguration(lootYML);
-            }
-            checkEnchantmentLimits();
-            if (this.potionEffectHandler != null) {
-                this.potionEffectHandler = new PotionEffectHandler(this);
-            }
-            this.getLogger().info("Loot configuration reloaded successfully.");
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Failed to reload loot configuration!", e);
-        }
-    }
-
-    public void reloadMobSave() {
-        try {
-            this.saveFile = YamlConfiguration.loadConfiguration(this.saveYML);
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Failed to reload mob save configuration!", e);
-        }
-    }
-
     public ConfigurationSection getConfigurationSection(String path) {
         return lootFile.getConfigurationSection(path);
     }
@@ -2165,8 +2138,16 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return this.lootManager;
     }
 
+    public LootUtils getLootUtils() {
+        return this.lootUtils;
+    }
+
     public PotionEffectHandler getPotionEffectHandler() {
         return this.potionEffectHandler;
+    }
+
+    public ConsumeEffectHandler getConsumeEffectHandler() {
+        return this.consumeEffectHandler;
     }
 
     public ArrayList<InfernalMob> getInfernalList() {
@@ -2199,5 +2180,29 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public File getLootYML() {
         return this.lootYML;
+    }
+
+    public void setLootFile(FileConfiguration lootFile) {
+        this.lootFile = lootFile;
+    }
+
+    public void setSaveFile(FileConfiguration saveFile) {
+        this.saveFile = saveFile;
+    }
+
+    public void setLootUtils(LootUtils lootUtils) {
+        this.lootUtils = lootUtils;
+    }
+
+    public void setLootManager(LootManager lootManager) {
+        this.lootManager = lootManager;
+    }
+
+    public void setConsumeEffectHandler(ConsumeEffectHandler handler) {
+        this.consumeEffectHandler = handler;
+    }
+
+    public void setPotionEffectHandler(PotionEffectHandler handler) {
+        this.potionEffectHandler = handler;
     }
 }

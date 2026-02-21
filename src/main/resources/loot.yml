@@ -55,4 +55,4 @@ loot:
       - "minecraft:give {player} emerald 5"
   '3':
     commands: # Executes commands as console as reward
-      - "kill {player}"
+      - "me {player}"

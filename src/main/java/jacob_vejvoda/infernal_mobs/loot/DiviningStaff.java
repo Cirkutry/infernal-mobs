@@ -96,12 +96,7 @@ public class DiviningStaff {
         Bukkit.addRecipe(sr);
     }
 
-    public void reload() {
-        removeRecipe();
-        addRecipes();
-    }
-
-    private void removeRecipe() {
+    public void removeRecipe() {
         NamespacedKey key = new NamespacedKey(plugin, "divining_staff");
         Bukkit.removeRecipe(key);
     }
