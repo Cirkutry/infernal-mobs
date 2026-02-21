@@ -35,17 +35,14 @@ public class SetLootCommand extends BaseCommand {
 
         Player player = (Player) sender;
         try {
-            // Calculate the next available index
             int nextIndex = getNextLootIndex();
 
             ItemStack item = player.getInventory().getItemInMainHand();
             String lootPath = "loot." + nextIndex;
             
-            // Serialize ItemStack to base64
             byte[] bytes = item.serializeAsBytes();
             String base64 = Base64.getEncoder().encodeToString(bytes);
             
-            // Store base64 encoded ItemStack
             plugin.getLootFile().set(lootPath + ".b64", base64);
 
             plugin.getLootFile().save(plugin.getLootYML());
@@ -73,7 +70,6 @@ public class SetLootCommand extends BaseCommand {
                     maxIndex = index;
                 }
             } catch (NumberFormatException e) {
-                // Skip non-numeric keys
             }
         }
 

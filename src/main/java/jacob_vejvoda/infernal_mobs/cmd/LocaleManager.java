@@ -76,7 +76,6 @@ public class LocaleManager {
             plugin.getLogger().log(Level.WARNING, "Missing translation key: " + key);
         }
 
-        // Replace {p} placeholder with prefix
         String prefix = langConfig.getString("prefix", "");
         if (prefix != null && !prefix.isEmpty()) {
             message = message.replace("{p}", prefix);

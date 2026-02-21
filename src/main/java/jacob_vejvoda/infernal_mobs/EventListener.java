@@ -51,6 +51,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
+import jacob_vejvoda.infernal_mobs.cmd.InfoCommand;
 import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 
 public class EventListener implements Listener {
@@ -131,9 +132,16 @@ public class EventListener implements Listener {
     public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
         Player p = e.getPlayer();
         Entity ent = e.getRightClicked();
-        if (plugin.errorList.contains(p)) {
-            plugin.errorList.remove(p);
-            p.sendMessage("§6Error report:");
+        if (InfoCommand.getClickStream().contains(p)) {
+            InfoCommand.getClickStream().remove(p);
+            
+            int infernalIndex = plugin.idSearch(ent.getUniqueId());
+            if (infernalIndex == -1) {
+                p.sendMessage("§cNot an infernal mob!");
+                return;
+            }
+            
+            p.sendMessage("§6Infernal Mob Info:");
 
             String name = "";
             try {
@@ -147,7 +155,7 @@ public class EventListener implements Listener {
                             + ((LivingEntity) ent)
                                     .getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH)
                                     .getValue());
-            p.sendMessage("§eInfernal: §f" + plugin.idSearch(ent.getUniqueId()));
+            p.sendMessage("§eInfernal Index: §f" + infernalIndex);
         }
     }
 

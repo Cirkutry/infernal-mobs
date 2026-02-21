@@ -83,7 +83,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     public FileConfiguration saveFile;
     public FileConfiguration lootFile;
     private HashMap<Entity, Entity> mountList = new HashMap<>();
-    ArrayList<Player> errorList = new ArrayList<>();
     ArrayList<Player> levitateList = new ArrayList<>();
     public ArrayList<Player> fertileList = new ArrayList<>();
     private PotionEffectHandler potionEffectHandler;
@@ -1993,10 +1992,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public HashMap<Entity, Entity> getMountList() {
         return this.mountList;
-    }
-
-    public ArrayList<Player> getErrorList() {
-        return this.errorList;
     }
 
     public GUI getGui() {

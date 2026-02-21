@@ -11,11 +11,11 @@ import org.bukkit.entity.Player;
 
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
-public class SetInfernalCommand extends BaseCommand {
+public class SetSpawnerCommand extends BaseCommand {
 
     private final LocaleManager localeManager;
 
-    public SetInfernalCommand(InfernalMobs plugin, LocaleManager localeManager) {
+    public SetSpawnerCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
         this.localeManager = localeManager;
     }
@@ -34,11 +34,12 @@ public class SetInfernalCommand extends BaseCommand {
 
         Player player = (Player) sender;
         if (player.getTargetBlock(null, 25).getType().equals(Material.SPAWNER)) {
-            int delay = Integer.parseInt(args[1]);
+            int delaySeconds = Integer.parseInt(args[1]);
+            int delayTicks = delaySeconds * 20;
 
             String name = plugin.getLocationName(player.getTargetBlock(null, 25).getLocation());
 
-            plugin.getSaveFile().set("infernalSpawners." + name, delay);
+            plugin.getSaveFile().set("infernalSpawners." + name, delayTicks);
             try {
                 plugin.getSaveFile().save(plugin.getSaveYML());
             } catch (IOException e) {
@@ -46,9 +47,9 @@ public class SetInfernalCommand extends BaseCommand {
             }
             sender.sendMessage(
                     localeManager.getMessage(
-                            "commands.setinfernal.success", String.valueOf(delay)));
+                            "commands.setspawner.success", String.valueOf(delaySeconds)));
         } else {
-            sender.sendMessage(localeManager.getMessage("commands.setinfernal.not_spawner"));
+            sender.sendMessage(localeManager.getMessage("commands.setspawner.not_spawner"));
         }
         return true;
     }
@@ -57,18 +58,18 @@ public class SetInfernalCommand extends BaseCommand {
     public List<String> tabComplete(CommandSender sender, String[] args) {
         List<String> newTab = new ArrayList<>();
         if (args.length == 2) {
-            newTab.add("10");
+            newTab.add("<cooldown>");
         }
         return newTab;
     }
 
     @Override
     public String getName() {
-        return "setInfernal";
+        return "setSpawner";
     }
 
     @Override
     public String getUsage() {
-        return localeManager.getMessage("commands.setinfernal.usage");
+        return localeManager.getMessage("commands.setspawner.usage");
     }
 }

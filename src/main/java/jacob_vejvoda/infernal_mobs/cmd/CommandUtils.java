@@ -48,9 +48,6 @@ public class CommandUtils {
                     "armoured",
                     "poisonous");
 
-    /**
-     * Get a list of spawnable entity types
-     */
     public static List<String> getSpawnableEntities() {
         return Arrays.stream(EntityType.values())
                 .filter(type -> type.isSpawnable() && type.isAlive())
@@ -58,25 +55,16 @@ public class CommandUtils {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Get a list of online player names
-     */
     public static List<String> getOnlinePlayerNames() {
         return Bukkit.getOnlinePlayers().stream()
                 .map(HumanEntity::getName)
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Get a list of world names
-     */
     public static List<String> getWorldNames() {
         return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
     }
 
-    /**
-     * Filter a list based on partial input
-     */
     public static List<String> filterStartsWith(List<String> list, String partial) {
         return list.stream()
                 .filter(item -> item.toLowerCase().startsWith(partial.toLowerCase()))

@@ -16,9 +16,9 @@ commands:
     failed: "{p} &cFailed to reload config files, check console for errors!"
     usage: "/im reload"
 
-  error:
-    instructions: "{p} &eClick on a mob to send an error report about it."
-    usage: "/im error"
+  info:
+    instructions: "{p} &eClick on an infernal mob to view information about it."
+    usage: "/im info"
   
   help:
     header: "&6--==-- &5Infernal Mobs &dReloaded &4v{0} &6--==--"
@@ -35,10 +35,10 @@ commands:
     error: "{p} &cFailed to save loot file: {0}"
     usage: "/im setloot"
   
-  setinfernal:
+  setspawner:
     success: "{p} &cSpawner set to infernal with a {0} second delay!"
     not_spawner: "{p} &cYou must be looking at a spawner to make it infernal!"
-    usage: "/im setInfernal <time delay>"
+    usage: "/im setspawner <cooldown>"
   
   spawn:
     world-not-exist: "{p} &c{0} does not exist!"

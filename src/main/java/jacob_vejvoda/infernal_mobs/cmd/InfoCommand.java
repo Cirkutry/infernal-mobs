@@ -1,14 +1,22 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
+import java.util.ArrayList;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
-public class ErrorCommand extends BaseCommand {
+public class InfoCommand extends BaseCommand {
 
-    public ErrorCommand(InfernalMobs plugin, LocaleManager localeManager) {
+    private static final ArrayList<Player> clickStream = new ArrayList<>();
+
+    public InfoCommand(InfernalMobs plugin, LocaleManager localeManager) {
         super(plugin, localeManager);
+    }
+
+    public static ArrayList<Player> getClickStream() {
+        return clickStream;
     }
 
     @Override
@@ -19,18 +27,18 @@ public class ErrorCommand extends BaseCommand {
         }
 
         Player player = (Player) sender;
-        plugin.getErrorList().add(player);
-        sender.sendMessage(localeManager.getMessage("commands.error.instructions"));
+        clickStream.add(player);
+        sender.sendMessage(localeManager.getMessage("commands.info.instructions"));
         return true;
     }
 
     @Override
     public String getName() {
-        return "error";
+        return "info";
     }
 
     @Override
     public String getUsage() {
-        return localeManager.getMessage("commands.error.usage");
+        return localeManager.getMessage("commands.info.usage");
     }
 }

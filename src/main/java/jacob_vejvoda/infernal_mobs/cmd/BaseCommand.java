@@ -18,13 +18,6 @@ public abstract class BaseCommand {
 
     public abstract boolean execute(CommandSender sender, String[] args);
 
-    /**
-     * Override this method only if your command needs tab completion
-     *
-     * @param sender The command sender
-     * @param args   The command arguments
-     * @return List of tab completions
-     */
     public List<String> tabComplete(CommandSender sender, String[] args) {
         return new ArrayList<>();
     }

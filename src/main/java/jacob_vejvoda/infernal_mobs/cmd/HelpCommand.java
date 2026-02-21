@@ -31,10 +31,10 @@ public class HelpCommand extends BaseCommand {
                 localeManager.getMessage(
                         "commands.help.header", plugin.getPluginMeta().getVersion()));
         sender.sendMessage(localeManager.getMessage("commands.reload.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.error.usage"));
+        sender.sendMessage(localeManager.getMessage("commands.info.usage"));
         sender.sendMessage(localeManager.getMessage("commands.giveloot.usage"));
         sender.sendMessage(localeManager.getMessage("commands.setloot.usage"));
-        sender.sendMessage(localeManager.getMessage("commands.setinfernal.usage"));
+        sender.sendMessage(localeManager.getMessage("commands.setspawner.usage"));
         sender.sendMessage(localeManager.getMessage("commands.spawn.usage"));
     }
 }
