@@ -1,7 +1,8 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import org.bukkit.command.CommandSender;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class HelpCommand extends BaseCommand {
 
@@ -28,7 +29,7 @@ public class HelpCommand extends BaseCommand {
     private void throwError(CommandSender sender) {
         sender.sendMessage(
                 localeManager.getMessage(
-                        "commands.help.header", plugin.getDescription().getVersion()));
+                        "commands.help.header", plugin.getPluginMeta().getVersion()));
         sender.sendMessage(localeManager.getMessage("commands.reload.usage"));
         sender.sendMessage(localeManager.getMessage("commands.error.usage"));
         sender.sendMessage(localeManager.getMessage("commands.giveloot.usage"));

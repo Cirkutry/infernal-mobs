@@ -1,14 +1,15 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
+import java.io.File;
+import java.util.logging.Level;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
 import jacob_vejvoda.infernal_mobs.loot.LootManager;
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
-import java.io.File;
-import java.util.logging.Level;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ReloadCommand extends BaseCommand {
 
@@ -37,9 +38,6 @@ public class ReloadCommand extends BaseCommand {
             lootFile.load(lootYML);
             plugin.setLootFile(lootFile);
             
-            LootUtils lootUtils = new LootUtils(plugin, lootFile);
-            plugin.setLootUtils(lootUtils);
-            
             LootManager lootManager = new LootManager(plugin, lootFile);
             plugin.setLootManager(lootManager);
             
@@ -48,8 +46,6 @@ public class ReloadCommand extends BaseCommand {
             
             PotionEffectHandler potionEffectHandler = new PotionEffectHandler(plugin);
             plugin.setPotionEffectHandler(potionEffectHandler);
-            
-            plugin.checkEnchantmentLimits();
             
             plugin.getLogger().info("loot.yml reloaded successfully.");
             

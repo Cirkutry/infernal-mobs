@@ -1,13 +1,16 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class SetLootCommand extends BaseCommand {
 
@@ -25,32 +28,30 @@ public class SetLootCommand extends BaseCommand {
             return true;
         }
 
-        if (args.length != 2) {
+        if (args.length != 1) {
             sender.sendMessage(localeManager.getMessage("commands.usage", getUsage()));
             return true;
         }
 
         Player player = (Player) sender;
         try {
+            // Calculate the next available index
+            int nextIndex = getNextLootIndex();
+
             ItemStack item = player.getInventory().getItemInMainHand();
-            String lootPath = "loot." + args[1];
-            plugin.getLootFile().set(lootPath + ".item", item.getType().toString());
-            plugin.getLootFile().set(lootPath + ".amount", item.getAmount());
-            if (item.getItemMeta() != null && item.getItemMeta().hasDisplayName()) {
-                plugin.getLootFile().set(lootPath + ".name", item.getItemMeta().getDisplayName());
-            }
-            if (item.getItemMeta() != null && item.getItemMeta().hasLore()) {
-                plugin.getLootFile().set(lootPath + ".lore", item.getItemMeta().getLore());
-            }
-            if (item.getItemMeta() instanceof Damageable) {
-                plugin.getLootFile()
-                        .set(
-                                lootPath + ".durability",
-                                ((Damageable) item.getItemMeta()).getDamage());
-            }
+            String lootPath = "loot." + nextIndex;
+            
+            // Serialize ItemStack to base64
+            byte[] bytes = item.serializeAsBytes();
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            
+            // Store base64 encoded ItemStack
+            plugin.getLootFile().set(lootPath + ".b64", base64);
 
             plugin.getLootFile().save(plugin.getLootYML());
-            sender.sendMessage(localeManager.getMessage("commands.setloot.success", args[1]));
+            sender.sendMessage(
+                    localeManager.getMessage(
+                            "commands.setloot.success", String.valueOf(nextIndex)));
         } catch (IOException e) {
             sender.sendMessage(localeManager.getMessage("commands.setloot.error", e.getMessage()));
             e.printStackTrace();
@@ -58,13 +59,30 @@ public class SetLootCommand extends BaseCommand {
         return true;
     }
 
+    private int getNextLootIndex() {
+        ConfigurationSection lootSection = plugin.getLootFile().getConfigurationSection("loot");
+        if (lootSection == null) {
+            return 1;
+        }
+
+        int maxIndex = 0;
+        for (String key : lootSection.getKeys(false)) {
+            try {
+                int index = Integer.parseInt(key);
+                if (index > maxIndex) {
+                    maxIndex = index;
+                }
+            } catch (NumberFormatException e) {
+                // Skip non-numeric keys
+            }
+        }
+
+        return maxIndex + 1;
+    }
+
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
-        List<String> newTab = new ArrayList<>();
-        if (args.length == 2) {
-            newTab.add("1");
-        }
-        return newTab;
+        return new ArrayList<>();
     }
 
     @Override

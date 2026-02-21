@@ -1,15 +1,12 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -17,15 +14,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
+
 public class PotionEffectHandler {
 
     private final InfernalMobs plugin;
-    private final FileConfiguration lootFile;
     private final LootManager lootManager;
 
     public PotionEffectHandler(InfernalMobs plugin) {
         this.plugin = plugin;
-        this.lootFile = plugin.getLootFile();
+        plugin.getLootFile();
         this.lootManager = plugin.getLootManager();
     }
 
@@ -44,21 +42,17 @@ public class PotionEffectHandler {
         }
 
         String effectTypeStr = effectSection.getString("type", "target");
-        boolean isCharm = effectSection.getBoolean("charm", false);
-
         for (Map<?, ?> potionConfig : potionEffects) {
             String potionTypeName = String.valueOf(potionConfig.get("type"));
 
-            PotionEffectType potionEffectType = getPotionEffectType(potionTypeName);
+            PotionEffectType potionEffectType = LootUtils.getPotionEffectType(potionTypeName);
             if (potionEffectType == null) {
                 plugin.getLogger().warning("Invalid potion effect type: " + potionTypeName);
                 continue;
             }
 
             int duration;
-            if (isCharm && "self".equalsIgnoreCase(effectTypeStr)) {
-                duration = PotionEffect.INFINITE_DURATION;
-            } else if (!isCharm && "self".equalsIgnoreCase(effectTypeStr)) {
+            if ("self".equalsIgnoreCase(effectTypeStr)) {
                 duration = PotionEffect.INFINITE_DURATION;
             } else {
                 Object durationObj = potionConfig.get("duration");
@@ -66,7 +60,9 @@ public class PotionEffectHandler {
                     duration = PotionEffect.INFINITE_DURATION;
                 } else {
                     int rawDuration = Integer.parseInt(String.valueOf(durationObj));
-                    duration = rawDuration <= 0 ? PotionEffect.INFINITE_DURATION : rawDuration * 20;
+                    duration = rawDuration <= 0
+                            ? PotionEffect.INFINITE_DURATION
+                            : rawDuration * 20;
                 }
             }
 
@@ -113,56 +109,31 @@ public class PotionEffectHandler {
 
             if (isCharm) {
                 List<Integer> requiredItems = effectSection.getIntegerList("items");
-
-                List<String> slotStrings = new ArrayList<>();
-                if (effectSection.isList("slot")) {
-                    List<?> rawSlots = effectSection.getList("slot");
-                    if (rawSlots != null) {
-                        for (Object slot : rawSlots) {
-                            if (slot != null) {
-                                slotStrings.add(String.valueOf(slot));
-                            }
-                        }
-                    }
-                } else if (effectSection.isString("slot")) {
-                    slotStrings.add(effectSection.getString("slot"));
-                }
+                List<String> slotStrings = getSlotStrings(effectSection);
 
                 boolean hasRequiredItem = false;
                 for (int itemID : requiredItems) {
                     ItemStack requiredItem = lootManager.getItem(itemID);
                     if (requiredItem == null) continue;
 
-                    for (String slotStr : slotStrings) {
-                        List<Integer> slotNumbers = getSlotNumbers(slotStr);
-                        for (int slotNumber : slotNumbers) {
-                            ItemStack playerItem = player.getInventory().getItem(slotNumber);
-                            if (playerItem != null && isItemMatch(playerItem, requiredItem)) {
-                                hasRequiredItem = true;
-                                break;
-                            }
-                        }
-                        if (hasRequiredItem) break;
+                    if (hasRequiredItemInSlots(player, null, requiredItem, slotStrings, true)) {
+                        hasRequiredItem = true;
+                        break;
                     }
-
-                    if (hasRequiredItem) break;
                 }
 
-                if (hasRequiredItem) {
-                    if ("self".equalsIgnoreCase(type)) {
-                        List<Map<?, ?>> potionEffects = effectSection.getMapList("potion");
-                        if (potionEffects != null && !potionEffects.isEmpty()) {
-                            for (Map<?, ?> potionConfig : potionEffects) {
-                                String potionTypeName = String.valueOf(potionConfig.get("type"));
-                                PotionEffectType effectType = getPotionEffectType(potionTypeName);
-                                if (effectType != null) {
-                                    shouldHaveEffect.put(effectType, true);
-                                }
+                if (hasRequiredItem && "self".equalsIgnoreCase(type)) {
+                    List<Map<?, ?>> potionEffects = effectSection.getMapList("potion");
+                    if (potionEffects != null && !potionEffects.isEmpty()) {
+                        for (Map<?, ?> potionConfig : potionEffects) {
+                            String potionTypeName = String.valueOf(potionConfig.get("type"));
+                            PotionEffectType effectType = LootUtils.getPotionEffectType(potionTypeName);
+                            if (effectType != null) {
+                                shouldHaveEffect.put(effectType, true);
                             }
                         }
-
-                        applyPotionEffects(player, effectID);
                     }
+                    applyPotionEffects(player, effectID);
                 }
             } else if ("self".equalsIgnoreCase(type)) {
                 List<Integer> requiredItems = effectSection.getIntegerList("items");
@@ -172,27 +143,10 @@ public class PotionEffectHandler {
                     ItemStack requiredItem = lootManager.getItem(itemID);
                     if (requiredItem == null) continue;
 
-                    ItemStack mainHandItem = player.getInventory().getItemInMainHand();
-                    if (isItemMatch(mainHandItem, requiredItem)) {
+                    if (hasRequiredItemInInventory(player, requiredItem)) {
                         hasRequiredItem = true;
                         break;
                     }
-
-                    ItemStack offhandItem = player.getInventory().getItemInOffHand();
-                    if (offhandItem != null && isItemMatch(offhandItem, requiredItem)) {
-                        hasRequiredItem = true;
-                        break;
-                    }
-
-                    for (int i = 36; i <= 39; i++) {
-                        ItemStack armorItem = player.getInventory().getItem(i);
-                        if (isItemMatch(armorItem, requiredItem)) {
-                            hasRequiredItem = true;
-                            break;
-                        }
-                    }
-
-                    if (hasRequiredItem) break;
                 }
 
                 if (hasRequiredItem) {
@@ -200,13 +154,12 @@ public class PotionEffectHandler {
                     if (potionEffects != null && !potionEffects.isEmpty()) {
                         for (Map<?, ?> potionConfig : potionEffects) {
                             String potionTypeName = String.valueOf(potionConfig.get("type"));
-                            PotionEffectType effectType = getPotionEffectType(potionTypeName);
+                            PotionEffectType effectType = LootUtils.getPotionEffectType(potionTypeName);
                             if (effectType != null) {
                                 shouldHaveEffect.put(effectType, true);
                             }
                         }
                     }
-
                     applyPotionEffects(player, effectID);
                 }
             }
@@ -217,6 +170,74 @@ public class PotionEffectHandler {
                 player.removePotionEffect(effect.getType());
             }
         }
+    }
+
+    private List<String> getSlotStrings(ConfigurationSection effectSection) {
+        List<String> slotStrings = new ArrayList<>();
+        if (effectSection.isList("slot")) {
+            List<?> rawSlots = effectSection.getList("slot");
+            if (rawSlots != null) {
+                for (Object slot : rawSlots) {
+                    if (slot != null) {
+                        slotStrings.add(String.valueOf(slot));
+                    }
+                }
+            }
+        } else if (effectSection.isString("slot")) {
+            slotStrings.add(effectSection.getString("slot"));
+        }
+        return slotStrings;
+    }
+
+    private boolean hasRequiredItemInSlots(Player player, ItemStack itemUsed, 
+            ItemStack requiredItem, List<String> slotStrings, boolean isCharm) {
+        if (slotStrings.isEmpty()) {
+            if (isCharm || isItemMatch(itemUsed, requiredItem)) {
+                return true;
+            }
+        } else {
+            for (String slotStr : slotStrings) {
+                if ("off".equalsIgnoreCase(slotStr)) {
+                    ItemStack offhandItem = player.getInventory().getItemInOffHand();
+                    if (offhandItem != null && isItemMatch(offhandItem, requiredItem)) {
+                        return true;
+                    }
+                } else if ("main".equalsIgnoreCase(slotStr)) {
+                    if (isItemMatch(itemUsed, requiredItem)) {
+                        return true;
+                    }
+                } else {
+                    List<Integer> slotNumbers = getSlotNumbers(slotStr);
+                    for (int slotNumber : slotNumbers) {
+                        ItemStack playerItem = player.getInventory().getItem(slotNumber);
+                        if (playerItem != null && isItemMatch(playerItem, requiredItem)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasRequiredItemInInventory(Player player, ItemStack requiredItem) {
+        ItemStack mainHandItem = player.getInventory().getItemInMainHand();
+        if (isItemMatch(mainHandItem, requiredItem)) {
+            return true;
+        }
+
+        ItemStack offhandItem = player.getInventory().getItemInOffHand();
+        if (offhandItem != null && isItemMatch(offhandItem, requiredItem)) {
+            return true;
+        }
+
+        for (int i = 36; i <= 39; i++) {
+            ItemStack armorItem = player.getInventory().getItem(i);
+            if (isItemMatch(armorItem, requiredItem)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<Integer> getSlotNumbers(String slotStr) {
@@ -282,7 +303,6 @@ public class PotionEffectHandler {
             if (items.isEmpty()) continue;
 
             boolean isCharm = effectSection.getBoolean("charm", false);
-            boolean slotRequirementMet = false;
             boolean hasRequiredItem = false;
 
             for (int itemID : items) {
@@ -290,85 +310,25 @@ public class PotionEffectHandler {
                 if (requiredItem == null) continue;
 
                 if (isCharm) {
-                    List<String> slotStrings = new ArrayList<>();
-                    if (effectSection.isList("slot")) {
-                        List<?> rawSlots = effectSection.getList("slot");
-                        if (rawSlots != null) {
-                            for (Object slot : rawSlots) {
-                                if (slot != null) {
-                                    slotStrings.add(String.valueOf(slot));
-                                }
-                            }
-                        }
-                    } else if (effectSection.isString("slot")) {
-                        slotStrings.add(effectSection.getString("slot"));
-                    }
-
-                    if (slotStrings.isEmpty()) {
-                        if (isItemMatch(itemUsed, requiredItem)) {
-                            hasRequiredItem = true;
-                            slotRequirementMet = true;
-                            break;
-                        }
-                    } else {
-                        for (String slotStr : slotStrings) {
-                            if ("off".equalsIgnoreCase(slotStr)) {
-                                ItemStack offhandItem = player.getInventory().getItemInOffHand();
-                                if (offhandItem != null && isItemMatch(offhandItem, requiredItem)) {
-                                    hasRequiredItem = true;
-                                    slotRequirementMet = true;
-                                    break;
-                                }
-                            } else if ("main".equalsIgnoreCase(slotStr)) {
-                                if (isItemMatch(itemUsed, requiredItem)) {
-                                    hasRequiredItem = true;
-                                    slotRequirementMet = true;
-                                    break;
-                                }
-                            } else {
-                                List<Integer> slotNumbers = getSlotNumbers(slotStr);
-                                for (int slotNumber : slotNumbers) {
-                                    ItemStack playerItem =
-                                            player.getInventory().getItem(slotNumber);
-                                    if (playerItem != null
-                                            && isItemMatch(playerItem, requiredItem)) {
-                                        hasRequiredItem = true;
-                                        slotRequirementMet = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (slotRequirementMet) break;
-                        }
+                    List<String> slotStrings = getSlotStrings(effectSection);
+                    if (hasRequiredItemInSlots(player, itemUsed, requiredItem, slotStrings, true)) {
+                        hasRequiredItem = true;
+                        break;
                     }
                 } else {
                     if (isItemMatch(itemUsed, requiredItem)) {
                         hasRequiredItem = true;
-                        slotRequirementMet = true;
                         break;
                     }
 
-                    ItemStack offhandItem = player.getInventory().getItemInOffHand();
-                    if (offhandItem != null && isItemMatch(offhandItem, requiredItem)) {
+                    if (hasRequiredItemInInventory(player, requiredItem)) {
                         hasRequiredItem = true;
-                        slotRequirementMet = true;
                         break;
-                    }
-
-                    for (int i = 36; i <= 39; i++) {
-                        ItemStack armorItem = player.getInventory().getItem(i);
-                        if (armorItem != null && isItemMatch(armorItem, requiredItem)) {
-                            hasRequiredItem = true;
-                            slotRequirementMet = true;
-                            break;
-                        }
                     }
                 }
-
-                if (slotRequirementMet) break;
             }
 
-            if (hasRequiredItem && slotRequirementMet) {
+            if (hasRequiredItem) {
                 String type = effectSection.getString("type", "target");
 
                 if ("self".equalsIgnoreCase(type)) {
@@ -378,17 +338,6 @@ public class PotionEffectHandler {
                 }
             }
         }
-    }
-
-    private PotionEffectType getPotionEffectType(String name) {
-        PotionEffectType effectType = PotionEffectType.getByName(name);
-
-        if (effectType == null) {
-            effectType =
-                    Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(name.toLowerCase()));
-        }
-
-        return effectType;
     }
 
     public void handleItemSwap(PlayerSwapHandItemsEvent event) {

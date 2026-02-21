@@ -1,13 +1,15 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class CommandManager implements TabExecutor {
     private final InfernalMobs plugin;

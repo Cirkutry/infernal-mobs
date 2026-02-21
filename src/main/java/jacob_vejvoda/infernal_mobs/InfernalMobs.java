@@ -1,13 +1,5 @@
 package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
-import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
-import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
-import jacob_vejvoda.infernal_mobs.loot.EnchantmentHandler;
-import jacob_vejvoda.infernal_mobs.loot.LootManager;
-import jacob_vejvoda.infernal_mobs.loot.LootGenerator;
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
-import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -27,7 +20,6 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
@@ -36,7 +28,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
@@ -75,6 +66,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
+
+import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
+import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
+import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
+import jacob_vejvoda.infernal_mobs.loot.LootManager;
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
 
 public class InfernalMobs extends JavaPlugin implements Listener {
     GUI gui;
@@ -347,7 +345,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                                                 String spawnMessage = spawnMessageList.get(index);
 
                                                 spawnMessage =
-                                                        ConsumeEffectHandler.hex(spawnMessage);
+                                                        LootUtils.hex(spawnMessage);
                                                 if (e.getCustomName() != null) {
                                                     spawnMessage =
                                                             spawnMessage.replace(
@@ -472,10 +470,13 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         ItemStack skull;
         if (evil) {
             skull = new ItemStack(Material.WITHER_SKELETON_SKULL, 1);
-            LootGenerator.dye(chest, Color.BLACK);
         } else {
             skull = new ItemStack(Material.SKELETON_SKULL, 1);
-            LootGenerator.dye(chest, Color.WHITE);
+        }
+
+        if (chest.getItemMeta() instanceof LeatherArmorMeta meta) {
+            meta.setColor(evil ? Color.BLACK : Color.WHITE);
+            chest.setItemMeta(meta);
         }
         chest.addUnsafeEnchantment(
                 org.bukkit.enchantments.Enchantment.PROTECTION, new Random().nextInt(10) + 1);
@@ -803,10 +804,6 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         Bukkit.getServer()
                 .getScheduler()
                 .scheduleSyncDelayedTask(this, this::applyEffect, (10 * 20));
-    }
-
-    public void applyEatEffects(LivingEntity e, int effectID) {
-        this.consumeEffectHandler.applyConsumeEffects(e, effectID);
     }
 
     private void levitate(final Entity e, final int time) {
@@ -1409,7 +1406,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     }
 
     private static List<Block> getSphere(Block block1) {
-        List<Block> blocks = new LinkedList();
+        List<Block> blocks = new LinkedList<>();
         double xi = block1.getLocation().getX() + 0.5D;
         double yi = block1.getLocation().getY() + 0.5D;
         double zi = block1.getLocation().getZ() + 0.5D;
@@ -1904,83 +1901,11 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         return namesString.toString();
     }
 
-    public void checkEnchantmentLimits() {
-        if (lootFile == null) return;
-
-        ConfigurationSection lootSection = lootFile.getConfigurationSection("loot");
-        if (lootSection == null) return;
-
-        int issuesFound = 0;
-
-        for (String lootId : lootSection.getKeys(false)) {
-            String itemType = lootFile.getString("loot." + lootId + ".item");
-            ConfigurationSection enchantmentsSection =
-                    lootFile.getConfigurationSection("loot." + lootId + ".enchantments");
-            if (enchantmentsSection == null) continue;
-
-            for (String key : enchantmentsSection.getKeys(false)) {
-                String enchantmentName =
-                        lootFile.getString(
-                                "loot." + lootId + ".enchantments." + key + ".enchantment");
-                if (enchantmentName == null) continue;
-
-                String levelStr =
-                        lootFile.getString("loot." + lootId + ".enchantments." + key + ".level");
-                if (levelStr == null) continue;
-
-                try {
-                    Enchantment enchant =
-                            Enchantment.getByKey(
-                                    NamespacedKey.minecraft(enchantmentName.toLowerCase()));
-                    if (enchant == null) {
-                        getLogger()
-                                .warning(
-                                        "Unknown enchantment: "
-                                                + enchantmentName
-                                                + " on item "
-                                                + lootId);
-                        continue;
-                    }
-
-                    int level = lootUtils.getIntFromString(levelStr);
-                    int maxAllowedLevel = EnchantmentHandler.getMaxAllowedEnchantmentLevel(enchant);
-
-                    if (level > maxAllowedLevel) {
-                        issuesFound++;
-                        getLogger()
-                                .warning(
-                                        "Item at index "
-                                                + lootId
-                                                + " ("
-                                                + itemType
-                                                + ") has "
-                                                + enchant.getKey().getKey()
-                                                + " enchant level "
-                                                + level
-                                                + " but max is "
-                                                + maxAllowedLevel);
-                    }
-                } catch (Exception e) {
-                    getLogger()
-                            .warning(
-                                    "Error checking enchantment "
-                                            + enchantmentName
-                                            + ": "
-                                            + e.getMessage());
-                }
-            }
-        }
-    }
-
-    public List<Integer> getIntegerList(String path) {
-        return lootFile.getIntegerList(path);
-    }
-
     public String getLocationName(Location l) {
         return (l.getX() + "." + l.getY() + "." + l.getZ() + l.getWorld().getName())
-                .replace(".", "");
+        .replace(".", "");
     }
-
+    
     Block blockNear(Location l, Material mat, int radius) {
         double xTmp = l.getX();
         double yTmp = l.getY();
@@ -2001,11 +1926,19 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }
         return null;
     }
-
+    
     public int rand(int min, int max) {
         return min + (int) (Math.random() * (1 + max - min));
     }
 
+    public void applyEatEffects(LivingEntity e, int effectID) {
+        this.consumeEffectHandler.applyConsumeEffects(e, effectID);
+    }
+
+    public List<Integer> getIntegerList(String path) {
+        return lootFile.getIntegerList(path);
+    }
+    
     void keepAlive(Item item) {
         lootManager.keepAlive(item);
     }

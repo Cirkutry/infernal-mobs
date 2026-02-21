@@ -1,27 +1,33 @@
 package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Map;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Damageable;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+
 public class GUI implements Listener {
     private static InfernalMobs plugin;
     private static HashMap<String, Scoreboard> playerScoreBoard = new HashMap<String, Scoreboard>();
-    private static HashMap<Entity, Object> bossBars = new HashMap<Entity, Object>();
+    private static final Map<Entity, BossBar> bossBars = new HashMap<>();
 
     GUI(InfernalMobs instance) {
         plugin = instance;
@@ -72,97 +78,120 @@ public class GUI implements Listener {
 
     private static void showBossBar(Player p, Entity e) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(e.getUniqueId());
-        String title =
-                plugin.getConfig()
-                        .getString("bossBarsName", "&fLevel <powers> &fInfernal <mobName>");
-        String mobName = e.getType().getName().replace("_", " ");
-        if (e.getType().equals(EntityType.SKELETON)) {
-            Skeleton sk = (Skeleton) e;
-        }
-        if (e.getType().equals(EntityType.WITHER_SKELETON)) {
-            mobName = "WitherSkeleton";
-        }
+
+        String title = plugin.getConfig()
+                .getString("bossBarsName", "&fLevel <mobLevel> &fInfernal <mobName>");
+
+        // Properly format mob name
+        String mobName = Arrays.stream(e.getType().name().split("_"))
+                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                .collect(Collectors.joining(" "));
+
+        // Prefix handling
         String prefix = plugin.getConfig().getString("namePrefix", "&fInfernal");
+
         if (plugin.getConfig().contains("levelPrefixes." + oldMobAbilityList.size())) {
             prefix = plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size());
         }
-        prefix = ConsumeEffectHandler.hex(prefix);
-        title =
-                title.replace(
-                        "<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
-        title =
-                title.replace(
-                        "<mobName>", mobName.substring(0, 1).toUpperCase() + mobName.substring(1));
-        title = title.replace("<mobLevel>", oldMobAbilityList.size() + "");
+
+        prefix = LootUtils.hex(prefix);
+
+        title = title.replace("<prefix>", prefix);
+        title = title.replace("<mobName>", mobName);
+        title = title.replace("<mobLevel>", String.valueOf(oldMobAbilityList.size()));
+
         String abilities = plugin.generateString(5, oldMobAbilityList);
+
         int count = 4;
         try {
-            do {
+            while (title.length() + abilities.length() > 64 && count > 0) {
                 abilities = plugin.generateString(count, oldMobAbilityList);
                 count--;
-                if (count <= 0) {
-                    break;
-                }
-            } while (title.length() + abilities.length() + mobName.length() > 64);
+            }
         } catch (Exception x) {
             plugin.getLogger().log(Level.WARNING, "showBossBar error: ", x);
         }
-        title =
-                title.replace(
-                        "<abilities>",
-                        abilities.substring(0, 1).toUpperCase() + abilities.substring(1));
-        title = ConsumeEffectHandler.hex(title);
+
+        if (!abilities.isEmpty()) {
+            abilities = abilities.substring(0, 1).toUpperCase() + abilities.substring(1);
+        }
+
+        title = title.replace("<abilities>", abilities);
+        title = LootUtils.hex(title);
 
         if (!bossBars.containsKey(e)) {
-            BarColor bc =
-                    BarColor.valueOf(plugin.getConfig().getString("bossBarSettings.defaultColor"));
-            BarStyle bs =
-                    BarStyle.valueOf(plugin.getConfig().getString("bossBarSettings.defaultStyle"));
 
-            String lc =
-                    plugin.getConfig()
-                            .getString(
-                                    "bossBarSettings.perLevel."
-                                            + oldMobAbilityList.size()
-                                            + ".color");
-            if (lc != null) bc = BarColor.valueOf(lc);
-            String ls =
-                    plugin.getConfig()
-                            .getString(
-                                    "bossBarSettings.perLevel."
-                                            + oldMobAbilityList.size()
-                                            + ".style");
-            if (ls != null) bs = BarStyle.valueOf(ls);
+            BarColor bc = BarColor.WHITE;
+            BarStyle bs = BarStyle.SOLID;
 
-            var perMobSection = plugin.getConfig().getConfigurationSection("bossBarSettings.perMob");
-            if (perMobSection != null) {
-                for (String key : perMobSection.getKeys(false)) {
-                    if (key.equalsIgnoreCase(e.getType().name())) {
-                        String mc = plugin.getConfig().getString("bossBarSettings.perMob." + key + ".color");
-                        if (mc != null) bc = BarColor.valueOf(mc);
-                        String ms = plugin.getConfig().getString("bossBarSettings.perMob." + key + ".style");
-                        if (ms != null) bs = BarStyle.valueOf(ms);
-                        break;
-                    }
-                }
+            try {
+                bc = BarColor.valueOf(plugin.getConfig()
+                        .getString("bossBarSettings.defaultColor", "WHITE"));
+            } catch (IllegalArgumentException ignored) {}
+
+            try {
+                bs = BarStyle.valueOf(plugin.getConfig()
+                        .getString("bossBarSettings.defaultStyle", "SOLID"));
+            } catch (IllegalArgumentException ignored) {}
+
+            // Per-level override
+            String levelPath = "bossBarSettings.perLevel." + oldMobAbilityList.size();
+
+            if (plugin.getConfig().contains(levelPath + ".color")) {
+                try {
+                    bc = BarColor.valueOf(plugin.getConfig().getString(levelPath + ".color"));
+                } catch (IllegalArgumentException ignored) {}
             }
+
+            if (plugin.getConfig().contains(levelPath + ".style")) {
+                try {
+                    bs = BarStyle.valueOf(plugin.getConfig().getString(levelPath + ".style"));
+                } catch (IllegalArgumentException ignored) {}
+            }
+
+            // Per-mob override
+            String mobPath = "bossBarSettings.perMob." + e.getType().name();
+
+            if (plugin.getConfig().contains(mobPath + ".color")) {
+                try {
+                    bc = BarColor.valueOf(plugin.getConfig().getString(mobPath + ".color"));
+                } catch (IllegalArgumentException ignored) {}
+            }
+
+            if (plugin.getConfig().contains(mobPath + ".style")) {
+                try {
+                    bs = BarStyle.valueOf(plugin.getConfig().getString(mobPath + ".style"));
+                } catch (IllegalArgumentException ignored) {}
+            }
+
             BossBar bar = Bukkit.createBossBar(title, bc, bs, BarFlag.CREATE_FOG);
             bar.setVisible(true);
             bossBars.put(e, bar);
         }
-        if (!((BossBar) bossBars.get(e)).getPlayers().contains(p))
-            ((BossBar) bossBars.get(e)).addPlayer(p);
-        float health = (float) ((Damageable) e).getHealth();
-        float maxHealth = (float) ((Damageable) e).getMaxHealth();
-        float setHealth = (health * 100.0f) / maxHealth;
-        ((BossBar) bossBars.get(e)).setProgress(setHealth / 100.0f);
+
+        BossBar bar = bossBars.get(e);
+
+        if (!bar.getPlayers().contains(p)) {
+            bar.addPlayer(p);
+        }
+
+        if (e instanceof Damageable damageable) {
+            double health = damageable.getHealth();
+            double maxHealth = damageable.getMaxHealth();
+
+            if (maxHealth > 0) {
+                bar.setProgress(Math.max(0.0, Math.min(1.0, health / maxHealth)));
+            }
+        }
     }
 
     private static void clearInfo(Player player) {
         if (plugin.getConfig().getBoolean("enableBossBar")) {
-            for (Entry<Entity, Object> hm : bossBars.entrySet())
-                if (((BossBar) hm.getValue()).getPlayers().contains(player))
-                    ((BossBar) hm.getValue()).removePlayer(player);
+            for (BossBar bar : bossBars.values()) {
+                if (bar.getPlayers().contains(player)) {
+                    bar.removePlayer(player);
+                }
+            }
         }
         if (plugin.getConfig().getBoolean("enableScoreBoard")) {
             try {
@@ -260,7 +289,7 @@ public class GUI implements Listener {
         text = text.replace("<health>", String.valueOf(roundHealth));
         text = text.replace("<maxHealth>", String.valueOf(maxHealth));
 
-        return ConsumeEffectHandler.hex(text);
+        return LootUtils.hex(text);
     }
 
     public void setName(Entity ent) {
@@ -302,11 +331,11 @@ public class GUI implements Listener {
             String prefix = plugin.getConfig().getString("namePrefix");
             if (plugin.getConfig().contains("levelPrefixes." + oldMobAbilityList.size()))
                 prefix = plugin.getConfig().getString("levelPrefixes." + oldMobAbilityList.size());
-            prefix = ConsumeEffectHandler.hex(prefix);
+            prefix = LootUtils.hex(prefix);
             title =
                     title.replace(
                             "<prefix>", prefix.substring(0, 1).toUpperCase() + prefix.substring(1));
-            title = ConsumeEffectHandler.hex(title);
+            title = LootUtils.hex(title);
         } catch (Exception x) {
             plugin.getLogger().log(Level.SEVERE, x.getMessage());
             x.printStackTrace();

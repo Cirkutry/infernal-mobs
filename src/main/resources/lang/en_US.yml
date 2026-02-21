@@ -25,19 +25,15 @@ commands:
     usage: "/im help"
   
   giveloot:
-    success-random: "{p} &eGave you some random loot!"
-    success-index: "{p} &eGave you the loot at index &9{0}"
-    success-commands: "{p} &eExecuted commands for loot at index &9{0} &e(no item to give)"
-    success-random-player: "{p} &eGave &b{0} &esome random loot!"
     success-player: "{p} &eGave &b{0} &ethe loot at index &9{1}"
     success-commands-player: "{p} &eExecuted commands for loot at index &9{0} &efor player &b{1} &e(no item to give)"
     error: "{p} &cUnable to get that loot!"
-    usage: "/im giveloot [player] [index]"
+    usage: "/im giveloot <player> <index>"
   
   setloot:
     success: "{p} &eSet loot at index {0} &eto item in hand and saved to file."
     error: "{p} &cFailed to save loot file: {0}"
-    usage: "/im setloot <index>"
+    usage: "/im setloot"
   
   setinfernal:
     success: "{p} &cSpawner set to infernal with a {0} second delay!"
