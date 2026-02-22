@@ -1,6 +1,7 @@
 package jacob_vejvoda.infernal_mobs.infernal;
 
 import jacob_vejvoda.infernal_mobs.ArrowHomingTask;
+import jacob_vejvoda.infernal_mobs.GUI;
 import jacob_vejvoda.infernal_mobs.InfernalMob;
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
@@ -47,10 +48,10 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-public class Magic {
+public class MagicManager {
     private final InfernalMobs plugin;
 
-    public Magic(InfernalMobs plugin) {
+    public MagicManager(InfernalMobs plugin) {
         this.plugin = plugin;
     }
 
@@ -140,7 +141,7 @@ public class Magic {
                     List<String> aList = plugin.findMobAbilities(id);
                     double dis = 46.0D;
                     for (Entity e : atc.getNearbyEntities(dis, dis, dis))
-                        if (e instanceof Player) plugin.fixBar(((Player) e));
+                        if (e instanceof Player) GUI.fixBar(((Player) e));
                     atc.teleport(new Location(atc.getWorld(), l.getX(), 0.0D, l.getZ()));
                     atc.remove();
                     plugin.getLogger().log(Level.INFO, "Entity remove due to Morph");

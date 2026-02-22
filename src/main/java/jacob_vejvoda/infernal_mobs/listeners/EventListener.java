@@ -1,7 +1,9 @@
-package jacob_vejvoda.infernal_mobs;
+package jacob_vejvoda.infernal_mobs.listeners;
 
-import jacob_vejvoda.infernal_mobs.cmd.InfoCommand;
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+import jacob_vejvoda.infernal_mobs.GUI;
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import jacob_vejvoda.infernal_mobs.commands.InfoCommand;
+import jacob_vejvoda.infernal_mobs.utils.LootUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,10 +55,10 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class EventListener implements Listener {
-    private static InfernalMobs plugin;
+    private final InfernalMobs plugin;
     private HashMap<String, Long> spawnerMap = new HashMap<>();
 
-    EventListener(InfernalMobs instance) {
+    public EventListener(InfernalMobs instance) {
         plugin = instance;
     }
 

@@ -1,6 +1,7 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import jacob_vejvoda.infernal_mobs.utils.LootUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

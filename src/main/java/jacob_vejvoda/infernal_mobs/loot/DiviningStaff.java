@@ -1,7 +1,8 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
-import jacob_vejvoda.infernal_mobs.GUI;
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import jacob_vejvoda.infernal_mobs.utils.LootUtils;
+import jacob_vejvoda.infernal_mobs.utils.MobUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -168,7 +169,7 @@ public class DiviningStaff {
                     .getItemMeta()
                     .getDisplayName()
                     .equals(s.getItemMeta().getDisplayName())) {
-                Entity b = GUI.getNearbyBoss(p);
+                Entity b = MobUtils.getNearbyBoss(p, plugin);
 
                 if (b != null) {
                     boolean took = false;

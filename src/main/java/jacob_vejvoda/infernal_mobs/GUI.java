@@ -1,6 +1,7 @@
 package jacob_vejvoda.infernal_mobs;
 
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+import jacob_vejvoda.infernal_mobs.utils.LootUtils;
+import jacob_vejvoda.infernal_mobs.utils.MobUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,26 +31,12 @@ public class GUI implements Listener {
     private static HashMap<String, Scoreboard> playerScoreBoard = new HashMap<String, Scoreboard>();
     private static final Map<Entity, BossBar> bossBars = new HashMap<>();
 
-    GUI(InfernalMobs instance) {
+    public GUI(InfernalMobs instance) {
         plugin = instance;
     }
 
-    public static Entity getNearbyBoss(Player p) {
-        double dis = 26.0D;
-        for (InfernalMob m : plugin.infernalList) {
-            if (m.entity.getWorld().equals(p.getWorld())) {
-                Entity boss = m.entity;
-                if (p.getLocation().distance(boss.getLocation()) < dis) {
-                    dis = p.getLocation().distance(boss.getLocation());
-                    return boss;
-                }
-            }
-        }
-        return null;
-    }
-
-    static void fixBar(Player p) {
-        Entity b = getNearbyBoss(p);
+    public static void fixBar(Player p) {
+        Entity b = MobUtils.getNearbyBoss(p, plugin);
         if (b != null) {
             if (b.isDead() || ((Damageable) b).getHealth() <= 0) {
                 if (plugin.getConfig().getBoolean("enableBossBar")) {

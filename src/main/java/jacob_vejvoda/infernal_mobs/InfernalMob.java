@@ -6,7 +6,7 @@ import org.bukkit.entity.Entity;
 
 public class InfernalMob {
     private boolean infernal;
-    Entity entity;
+    public Entity entity;
     UUID id;
     int lives;
     String effect;

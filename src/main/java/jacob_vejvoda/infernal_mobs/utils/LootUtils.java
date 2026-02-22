@@ -1,4 +1,4 @@
-package jacob_vejvoda.infernal_mobs.loot;
+package jacob_vejvoda.infernal_mobs.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

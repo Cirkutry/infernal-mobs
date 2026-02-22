@@ -1,4 +1,4 @@
-package jacob_vejvoda.infernal_mobs.cmd;
+package jacob_vejvoda.infernal_mobs.commands;
 
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.io.IOException;
