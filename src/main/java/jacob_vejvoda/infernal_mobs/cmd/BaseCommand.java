@@ -1,11 +1,9 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.bukkit.command.CommandSender;
-
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public abstract class BaseCommand {
     protected final InfernalMobs plugin;

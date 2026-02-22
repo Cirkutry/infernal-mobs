@@ -1,17 +1,15 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
-import net.md_5.bungee.api.ChatColor;
 
 /**
  * Handles the generation and customization of loot items
@@ -33,7 +31,7 @@ public class LootGenerator {
             // Check for base64 encoded ItemStack first
             String base64 = this.lootFile.getString("loot." + loot + ".b64");
             ItemStack stack;
-            
+
             if (base64 != null) {
                 byte[] bytes = Base64.getDecoder().decode(base64);
                 stack = ItemStack.deserializeBytes(bytes);

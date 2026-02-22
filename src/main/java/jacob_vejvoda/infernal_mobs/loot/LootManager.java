@@ -1,19 +1,17 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
-import net.md_5.bungee.api.ChatColor;
 
 /**
  * Manages loot configuration, selection, and generation for infernal mobs

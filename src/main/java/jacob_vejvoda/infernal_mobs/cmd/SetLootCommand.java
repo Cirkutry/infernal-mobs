@@ -1,16 +1,14 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class SetLootCommand extends BaseCommand {
 
@@ -39,10 +37,10 @@ public class SetLootCommand extends BaseCommand {
 
             ItemStack item = player.getInventory().getItemInMainHand();
             String lootPath = "loot." + nextIndex;
-            
+
             byte[] bytes = item.serializeAsBytes();
             String base64 = Base64.getEncoder().encodeToString(bytes);
-            
+
             plugin.getLootFile().set(lootPath + ".b64", base64);
 
             plugin.getLootFile().save(plugin.getLootYML());

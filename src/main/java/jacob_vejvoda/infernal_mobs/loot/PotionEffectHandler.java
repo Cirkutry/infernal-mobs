@@ -1,10 +1,10 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
@@ -13,8 +13,6 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class PotionEffectHandler {
 
@@ -59,9 +57,7 @@ public class PotionEffectHandler {
                     duration = PotionEffect.INFINITE_DURATION;
                 } else {
                     int rawDuration = Integer.parseInt(String.valueOf(durationObj));
-                    duration = rawDuration <= 0
-                            ? PotionEffect.INFINITE_DURATION
-                            : rawDuration * 20;
+                    duration = rawDuration <= 0 ? PotionEffect.INFINITE_DURATION : rawDuration * 20;
                 }
             }
 
@@ -126,7 +122,8 @@ public class PotionEffectHandler {
                     if (potionEffects != null && !potionEffects.isEmpty()) {
                         for (Map<?, ?> potionConfig : potionEffects) {
                             String potionTypeName = String.valueOf(potionConfig.get("type"));
-                            PotionEffectType effectType = LootUtils.getPotionEffectType(potionTypeName);
+                            PotionEffectType effectType =
+                                    LootUtils.getPotionEffectType(potionTypeName);
                             if (effectType != null) {
                                 shouldHaveEffect.put(effectType, true);
                             }
@@ -153,7 +150,8 @@ public class PotionEffectHandler {
                     if (potionEffects != null && !potionEffects.isEmpty()) {
                         for (Map<?, ?> potionConfig : potionEffects) {
                             String potionTypeName = String.valueOf(potionConfig.get("type"));
-                            PotionEffectType effectType = LootUtils.getPotionEffectType(potionTypeName);
+                            PotionEffectType effectType =
+                                    LootUtils.getPotionEffectType(potionTypeName);
                             if (effectType != null) {
                                 shouldHaveEffect.put(effectType, true);
                             }
@@ -188,8 +186,12 @@ public class PotionEffectHandler {
         return slotStrings;
     }
 
-    private boolean hasRequiredItemInSlots(Player player, ItemStack itemUsed, 
-            ItemStack requiredItem, List<String> slotStrings, boolean isCharm) {
+    private boolean hasRequiredItemInSlots(
+            Player player,
+            ItemStack itemUsed,
+            ItemStack requiredItem,
+            List<String> slotStrings,
+            boolean isCharm) {
         if (slotStrings.isEmpty()) {
             if (isCharm || isItemMatch(itemUsed, requiredItem)) {
                 return true;

@@ -1,19 +1,17 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
+import jacob_vejvoda.infernal_mobs.InfernalMob;
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-
-import jacob_vejvoda.infernal_mobs.InfernalMob;
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
 
 public class SpawnCommand extends BaseCommand {
 
@@ -32,8 +30,7 @@ public class SpawnCommand extends BaseCommand {
         }
 
         if (Bukkit.getServer().getWorld(args[2]) == null) {
-            sender.sendMessage(
-                    localeManager.getMessage("commands.spawn.world-not-exist", args[2]));
+            sender.sendMessage(localeManager.getMessage("commands.spawn.world-not-exist", args[2]));
             return true;
         }
 

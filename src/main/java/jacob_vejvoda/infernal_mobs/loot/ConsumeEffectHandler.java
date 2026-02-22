@@ -1,8 +1,8 @@
 package jacob_vejvoda.infernal_mobs.loot;
 
+import jacob_vejvoda.infernal_mobs.InfernalMobs;
 import java.util.List;
 import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.LivingEntity;
@@ -10,11 +10,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import jacob_vejvoda.infernal_mobs.InfernalMobs;
-
 public class ConsumeEffectHandler {
 
     private final InfernalMobs plugin;
+
     public ConsumeEffectHandler(InfernalMobs plugin) {
         this.plugin = plugin;
         plugin.getLootFile();

@@ -1,5 +1,11 @@
 package jacob_vejvoda.infernal_mobs;
 
+import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
+import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
+import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
+import jacob_vejvoda.infernal_mobs.loot.LootManager;
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
+import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,7 +17,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -67,13 +72,6 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import jacob_vejvoda.infernal_mobs.cmd.CommandManager;
-import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
-import jacob_vejvoda.infernal_mobs.loot.DiviningStaff;
-import jacob_vejvoda.infernal_mobs.loot.LootManager;
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
-import jacob_vejvoda.infernal_mobs.loot.PotionEffectHandler;
-
 public class InfernalMobs extends JavaPlugin implements Listener {
     GUI gui;
     long serverTime = 0L;
@@ -110,7 +108,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
             if (!lootYML.exists()) {
                 saveResource("loot.yml", false);
             }
-        
+
             lootFile = new YamlConfiguration();
             lootFile.load(lootYML);
             getLogger().info("loot.yml loaded successfully.");
@@ -124,7 +122,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
             if (!saveYML.exists()) {
                 saveYML.createNewFile();
             }
-        
+
             saveFile = new YamlConfiguration();
             saveFile.load(saveYML);
             getLogger().info("save.yml loaded successfully.");
@@ -138,7 +136,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
             this.lootManager = new LootManager(this, lootFile);
             this.potionEffectHandler = new PotionEffectHandler(this);
             this.consumeEffectHandler = new ConsumeEffectHandler(this);
-        
+
             getLogger().info("Configuration files initialized successfully!");
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to initialize configuration managers!", e);
@@ -342,8 +340,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
                                                                 spawnMessageList.size());
                                                 String spawnMessage = spawnMessageList.get(index);
 
-                                                spawnMessage =
-                                                        LootUtils.hex(spawnMessage);
+                                                spawnMessage = LootUtils.hex(spawnMessage);
                                                 if (e.getCustomName() != null) {
                                                     spawnMessage =
                                                             spawnMessage.replace(
@@ -1901,9 +1898,9 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     public String getLocationName(Location l) {
         return (l.getX() + "." + l.getY() + "." + l.getZ() + l.getWorld().getName())
-        .replace(".", "");
+                .replace(".", "");
     }
-    
+
     Block blockNear(Location l, Material mat, int radius) {
         double xTmp = l.getX();
         double yTmp = l.getY();
@@ -1924,7 +1921,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         }
         return null;
     }
-    
+
     public int rand(int min, int max) {
         return min + (int) (Math.random() * (1 + max - min));
     }
@@ -1936,7 +1933,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
     public List<Integer> getIntegerList(String path) {
         return lootFile.getIntegerList(path);
     }
-    
+
     void keepAlive(Item item) {
         lootManager.keepAlive(item);
     }

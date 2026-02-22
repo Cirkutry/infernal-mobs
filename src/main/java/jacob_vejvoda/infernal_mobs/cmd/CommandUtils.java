@@ -3,7 +3,6 @@ package jacob_vejvoda.infernal_mobs.cmd;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;

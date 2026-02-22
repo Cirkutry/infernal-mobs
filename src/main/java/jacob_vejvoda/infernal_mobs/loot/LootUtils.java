@@ -2,14 +2,12 @@ package jacob_vejvoda.infernal_mobs.loot;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffectType;
-
-import net.md_5.bungee.api.ChatColor;
 
 /**
  * Utility methods for loot processing and manipulation

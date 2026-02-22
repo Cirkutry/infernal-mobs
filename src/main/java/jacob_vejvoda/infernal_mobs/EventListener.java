@@ -1,5 +1,7 @@
 package jacob_vejvoda.infernal_mobs;
 
+import jacob_vejvoda.infernal_mobs.cmd.InfoCommand;
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +9,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
-
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -50,9 +51,6 @@ import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.inventory.ItemStack;
-
-import jacob_vejvoda.infernal_mobs.cmd.InfoCommand;
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 
 public class EventListener implements Listener {
     private static InfernalMobs plugin;
@@ -134,13 +132,13 @@ public class EventListener implements Listener {
         Entity ent = e.getRightClicked();
         if (InfoCommand.getClickStream().contains(p)) {
             InfoCommand.getClickStream().remove(p);
-            
+
             int infernalIndex = plugin.idSearch(ent.getUniqueId());
             if (infernalIndex == -1) {
                 p.sendMessage(LootUtils.hex("&cNot an infernal mob!"));
                 return;
             }
-            
+
             p.sendMessage(LootUtils.hex("&6Infernal Mob Info:"));
 
             String name = "";
@@ -149,12 +147,16 @@ public class EventListener implements Listener {
             } catch (Exception ignored) {
             }
             p.sendMessage(LootUtils.hex("&eName: &f" + name));
-            p.sendMessage(LootUtils.hex("&eSaved: &f" + plugin.saveFile.getString(ent.getUniqueId().toString())));
             p.sendMessage(
-                    LootUtils.hex("&eHealth: &f"
-                            + ((LivingEntity) ent)
-                                    .getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH)
-                                    .getValue()));
+                    LootUtils.hex(
+                            "&eSaved: &f"
+                                    + plugin.saveFile.getString(ent.getUniqueId().toString())));
+            p.sendMessage(
+                    LootUtils.hex(
+                            "&eHealth: &f"
+                                    + ((LivingEntity) ent)
+                                            .getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH)
+                                            .getValue()));
             p.sendMessage(LootUtils.hex("&eInfernal Index: &f" + infernalIndex));
         }
     }
@@ -338,7 +340,8 @@ public class EventListener implements Listener {
                 plugin.saveFile.set("infernalSpawners." + name, null);
                 plugin.saveFile.save(plugin.saveYML);
                 if (e.getPlayer().isOp()) {
-                    e.getPlayer().sendMessage(LootUtils.hex("&cYou broke an infernal mob spawner!"));
+                    e.getPlayer()
+                            .sendMessage(LootUtils.hex("&cYou broke an infernal mob spawner!"));
                 }
             }
         }

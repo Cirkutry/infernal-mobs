@@ -1,8 +1,7 @@
 package jacob_vejvoda.infernal_mobs.cmd;
 
-import org.bukkit.command.CommandSender;
-
 import jacob_vejvoda.infernal_mobs.InfernalMobs;
+import org.bukkit.command.CommandSender;
 
 public class HelpCommand extends BaseCommand {
 

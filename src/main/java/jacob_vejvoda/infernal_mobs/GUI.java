@@ -1,5 +1,6 @@
 package jacob_vejvoda.infernal_mobs;
 
+import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -24,8 +24,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-
-import jacob_vejvoda.infernal_mobs.loot.LootUtils;
 
 public class GUI implements Listener {
     private static InfernalMobs plugin;
@@ -82,13 +80,15 @@ public class GUI implements Listener {
     private static void showBossBar(Player p, Entity e) {
         List<String> oldMobAbilityList = plugin.findMobAbilities(e.getUniqueId());
 
-        String title = plugin.getConfig()
-                .getString("bossBarsName", "&fLevel <mobLevel> &fInfernal <mobName>");
+        String title =
+                plugin.getConfig()
+                        .getString("bossBarsName", "&fLevel <mobLevel> &fInfernal <mobName>");
 
         // Properly format mob name
-        String mobName = Arrays.stream(e.getType().name().split("_"))
-                .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
-                .collect(Collectors.joining(" "));
+        String mobName =
+                Arrays.stream(e.getType().name().split("_"))
+                        .map(s -> s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase())
+                        .collect(Collectors.joining(" "));
 
         // Prefix handling
         String prefix = plugin.getConfig().getString("namePrefix", "&fInfernal");
@@ -128,14 +128,20 @@ public class GUI implements Listener {
             BarStyle bs = BarStyle.SOLID;
 
             try {
-                bc = BarColor.valueOf(plugin.getConfig()
-                        .getString("bossBarSettings.defaultColor", "WHITE"));
-            } catch (IllegalArgumentException ignored) {}
+                bc =
+                        BarColor.valueOf(
+                                plugin.getConfig()
+                                        .getString("bossBarSettings.defaultColor", "WHITE"));
+            } catch (IllegalArgumentException ignored) {
+            }
 
             try {
-                bs = BarStyle.valueOf(plugin.getConfig()
-                        .getString("bossBarSettings.defaultStyle", "SOLID"));
-            } catch (IllegalArgumentException ignored) {}
+                bs =
+                        BarStyle.valueOf(
+                                plugin.getConfig()
+                                        .getString("bossBarSettings.defaultStyle", "SOLID"));
+            } catch (IllegalArgumentException ignored) {
+            }
 
             // Per-level override
             String levelPath = "bossBarSettings.perLevel." + oldMobAbilityList.size();
@@ -143,13 +149,15 @@ public class GUI implements Listener {
             if (plugin.getConfig().contains(levelPath + ".color")) {
                 try {
                     bc = BarColor.valueOf(plugin.getConfig().getString(levelPath + ".color"));
-                } catch (IllegalArgumentException ignored) {}
+                } catch (IllegalArgumentException ignored) {
+                }
             }
 
             if (plugin.getConfig().contains(levelPath + ".style")) {
                 try {
                     bs = BarStyle.valueOf(plugin.getConfig().getString(levelPath + ".style"));
-                } catch (IllegalArgumentException ignored) {}
+                } catch (IllegalArgumentException ignored) {
+                }
             }
 
             // Per-mob override
@@ -158,13 +166,15 @@ public class GUI implements Listener {
             if (plugin.getConfig().contains(mobPath + ".color")) {
                 try {
                     bc = BarColor.valueOf(plugin.getConfig().getString(mobPath + ".color"));
-                } catch (IllegalArgumentException ignored) {}
+                } catch (IllegalArgumentException ignored) {
+                }
             }
 
             if (plugin.getConfig().contains(mobPath + ".style")) {
                 try {
                     bs = BarStyle.valueOf(plugin.getConfig().getString(mobPath + ".style"));
-                } catch (IllegalArgumentException ignored) {}
+                } catch (IllegalArgumentException ignored) {
+                }
             }
 
             BossBar bar = Bukkit.createBossBar(title, bc, bs, BarFlag.CREATE_FOG);
@@ -180,11 +190,11 @@ public class GUI implements Listener {
 
         if (e instanceof LivingEntity living) {
             double health = living.getHealth();
-        
+
             AttributeInstance attribute = living.getAttribute(Attribute.MAX_HEALTH);
             if (attribute != null) {
                 double maxHealth = attribute.getValue();
-            
+
                 if (maxHealth > 0) {
                     bar.setProgress(Math.max(0.0, Math.min(1.0, health / maxHealth)));
                 }

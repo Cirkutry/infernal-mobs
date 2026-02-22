@@ -2,7 +2,6 @@ package jacob_vejvoda.infernal_mobs;
 
 import java.util.List;
 import java.util.UUID;
-
 import org.bukkit.entity.Entity;
 
 public class InfernalMob {
