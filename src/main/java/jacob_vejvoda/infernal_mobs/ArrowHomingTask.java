@@ -6,11 +6,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-class ArrowHomingTask extends BukkitRunnable {
+public class ArrowHomingTask extends BukkitRunnable {
     private Arrow arrow;
     private LivingEntity target;
 
-    ArrowHomingTask(Arrow arrow, LivingEntity target, Plugin plugin) {
+    public ArrowHomingTask(Arrow arrow, LivingEntity target, Plugin plugin) {
         this.arrow = arrow;
         this.target = target;
         runTaskTimer(plugin, 1L, 1L);
