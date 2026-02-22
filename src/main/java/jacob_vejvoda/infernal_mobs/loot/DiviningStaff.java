@@ -85,7 +85,7 @@ public class DiviningStaff {
             staff =
                     getItem(
                             Material.BLAZE_ROD,
-                            "§6§lDivining Rod",
+                            LootUtils.hex("&6&lDivining Rod"),
                             1,
                             Arrays.asList("Click to find infernal mobs."));
         }
@@ -101,7 +101,7 @@ public class DiviningStaff {
         return staff;
     }
 
-    public void addRecipes() {
+    public void addRecipe() {
         if (!plugin.getConfig().getBoolean("diviningRod.recipe.enabled", true)) {
             return;
         }
@@ -183,7 +183,7 @@ public class DiviningStaff {
                             break;
                         }
                     if (!took) {
-                        p.sendMessage("§cYou need blaze powder to use this!");
+                        p.sendMessage(LootUtils.hex("&cYou need blaze powder to use this!"));
                         return;
                     }
 

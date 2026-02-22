@@ -3,6 +3,7 @@ package jacob_vejvoda.infernal_mobs.loot;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -54,14 +55,16 @@ public class LootUtils {
      * Applies potion effects to an entity based on configuration
      */
     public static PotionEffectType getPotionEffectType(String name) {
-        PotionEffectType effectType = PotionEffectType.getByName(name);
+        if (name == null || name.isEmpty()) return null;
 
-        if (effectType == null) {
-            effectType =
-                    Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(name.toLowerCase()));
+        NamespacedKey key = NamespacedKey.minecraft(name.toLowerCase());
+        PotionEffectType type = Registry.MOB_EFFECT.get(key);
+
+        if (type == null) {
+            Bukkit.getLogger().warning("Invalid potion effect: " + name);
         }
 
-        return effectType;
+        return type;
     }
 
     /**

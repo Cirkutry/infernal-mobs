@@ -47,7 +47,6 @@ public class PotionEffectHandler {
 
             PotionEffectType potionEffectType = LootUtils.getPotionEffectType(potionTypeName);
             if (potionEffectType == null) {
-                plugin.getLogger().warning("Invalid potion effect type: " + potionTypeName);
                 continue;
             }
 

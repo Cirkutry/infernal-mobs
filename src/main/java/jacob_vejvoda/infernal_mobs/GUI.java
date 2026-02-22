@@ -9,12 +9,15 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -175,12 +178,16 @@ public class GUI implements Listener {
             bar.addPlayer(p);
         }
 
-        if (e instanceof Damageable damageable) {
-            double health = damageable.getHealth();
-            double maxHealth = damageable.getMaxHealth();
-
-            if (maxHealth > 0) {
-                bar.setProgress(Math.max(0.0, Math.min(1.0, health / maxHealth)));
+        if (e instanceof LivingEntity living) {
+            double health = living.getHealth();
+        
+            AttributeInstance attribute = living.getAttribute(Attribute.MAX_HEALTH);
+            if (attribute != null) {
+                double maxHealth = attribute.getValue();
+            
+                if (maxHealth > 0) {
+                    bar.setProgress(Math.max(0.0, Math.min(1.0, health / maxHealth)));
+                }
             }
         }
     }
@@ -235,10 +242,10 @@ public class GUI implements Listener {
                 }
             } else {
                 for (String ability : abilityList) {
-                    o.getScore("§r" + ability).setScore(score);
+                    o.getScore(LootUtils.hex("&r" + ability)).setScore(score);
                     score = score + 1;
                 }
-                o.getScore("§e§lAbilities:").setScore(score);
+                o.getScore(LootUtils.hex("&e&lAbilities:")).setScore(score);
                 if (plugin.getConfig().getBoolean("showHealthOnScoreBoard")) {
                     score = score + 1;
                     float health = (float) ((Damageable) e).getHealth();
@@ -248,7 +255,7 @@ public class GUI implements Listener {
                     o.getScore(roundOff + "/" + maxHealth).setScore(score);
                     score = score + 1;
 
-                    o.getScore("§e§lHealth:").setScore(score);
+                    o.getScore(LootUtils.hex("&e&lHealth:")).setScore(score);
                 }
             }
 

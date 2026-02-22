@@ -159,7 +159,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         applyEffect();
         loadPowers();
         showEffect();
-        diviningStaff.addRecipes();
+        diviningStaff.addRecipe();
 
         try {
             CommandManager commandManager = new CommandManager(this);
@@ -188,7 +188,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 
     private void scoreCheck() {
         for (Player p : getServer().getOnlinePlayers()) GUI.fixBar(p);
-        HashMap<Entity, Entity> tmp = (HashMap<Entity, Entity>) mountList.clone();
+        HashMap<Entity, Entity> tmp = new HashMap<>(mountList);
         for (Map.Entry<Entity, Entity> hm : tmp.entrySet()) {
             if ((hm.getKey() != null) && (!hm.getKey().isDead())) {
                 if ((hm.getValue().isDead()) && ((hm.getKey() instanceof LivingEntity))) {
@@ -256,8 +256,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         String entName = e.getType().name();
         if ((!e.hasMetadata("NPC")) && (!e.hasMetadata("shopkeeper"))) {
             if (!fixed) {
-                ArrayList<String> babyList =
-                        (ArrayList) getConfig().getList("disabledBabyMobs", new ArrayList<>());
+                List<String> babyList = getConfig().getStringList("disabledBabyMobs");
                 if (e instanceof Ageable) {
                     Ageable age = (Ageable) e;
                     boolean baby = !age.isAdult();
@@ -480,7 +479,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
         chest.addUnsafeEnchantment(
                 org.bukkit.enchantments.Enchantment.PROTECTION, new Random().nextInt(10) + 1);
         ItemMeta m = skull.getItemMeta();
-        m.setDisplayName("§fGhost Head");
+        m.setDisplayName(LootUtils.hex("&fGhost Head"));
         skull.setItemMeta(m);
         g.getEquipment().setHelmet(skull);
         g.getEquipment().setChestplate(chest);

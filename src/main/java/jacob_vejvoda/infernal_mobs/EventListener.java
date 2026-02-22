@@ -137,25 +137,25 @@ public class EventListener implements Listener {
             
             int infernalIndex = plugin.idSearch(ent.getUniqueId());
             if (infernalIndex == -1) {
-                p.sendMessage("§cNot an infernal mob!");
+                p.sendMessage(LootUtils.hex("&cNot an infernal mob!"));
                 return;
             }
             
-            p.sendMessage("§6Infernal Mob Info:");
+            p.sendMessage(LootUtils.hex("&6Infernal Mob Info:"));
 
             String name = "";
             try {
                 name = ent.getCustomName();
             } catch (Exception ignored) {
             }
-            p.sendMessage("§eName: §f" + name);
-            p.sendMessage("§eSaved: §f" + plugin.saveFile.getString(ent.getUniqueId().toString()));
+            p.sendMessage(LootUtils.hex("&eName: &f" + name));
+            p.sendMessage(LootUtils.hex("&eSaved: &f" + plugin.saveFile.getString(ent.getUniqueId().toString())));
             p.sendMessage(
-                    "§eHealth: §f"
+                    LootUtils.hex("&eHealth: &f"
                             + ((LivingEntity) ent)
                                     .getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH)
-                                    .getValue());
-            p.sendMessage("§eInfernal Index: §f" + infernalIndex);
+                                    .getValue()));
+            p.sendMessage(LootUtils.hex("&eInfernal Index: &f" + infernalIndex));
         }
     }
 
@@ -338,7 +338,7 @@ public class EventListener implements Listener {
                 plugin.saveFile.set("infernalSpawners." + name, null);
                 plugin.saveFile.save(plugin.saveYML);
                 if (e.getPlayer().isOp()) {
-                    e.getPlayer().sendMessage("§cYou broke an infernal mob spawner!");
+                    e.getPlayer().sendMessage(LootUtils.hex("&cYou broke an infernal mob spawner!"));
                 }
             }
         }
@@ -374,7 +374,7 @@ public class EventListener implements Listener {
                             .getHelmet()
                             .getItemMeta()
                             .getDisplayName()
-                            .equals("§fGhost Head")) {
+                            .equals(LootUtils.hex("&fGhost Head"))) {
                         isGhost = true;
                     }
                 } catch (Exception localException1) {
@@ -395,8 +395,8 @@ public class EventListener implements Listener {
                         && (!isGhost)) {
                     Player player = event.getEntity().getKiller();
                     if (plugin.getConfig().getList("deathMessages") != null) {
-                        ArrayList<String> deathMessagesList =
-                                (ArrayList<String>) plugin.getConfig().getList("deathMessages");
+                        List<String> deathMessagesList =
+                                plugin.getConfig().getStringList("deathMessages");
                         Random randomGenerator = new Random();
                         int index = randomGenerator.nextInt(deathMessagesList.size());
                         String deathMessage = deathMessagesList.get(index);

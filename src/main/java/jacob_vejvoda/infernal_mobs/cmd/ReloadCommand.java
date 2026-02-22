@@ -51,7 +51,7 @@ public class ReloadCommand extends BaseCommand {
             
             if (plugin.getDiviningStaffManager() != null) {
                 plugin.getDiviningStaffManager().removeRecipe();
-                plugin.getDiviningStaffManager().addRecipes();
+                plugin.getDiviningStaffManager().addRecipe();
             }
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to reload loot.yml!", e);

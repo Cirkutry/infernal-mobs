@@ -39,7 +39,6 @@ public class ConsumeEffectHandler {
 
             PotionEffectType potionEffectType = LootUtils.getPotionEffectType(potionTypeName);
             if (potionEffectType == null) {
-                plugin.getLogger().warning("Invalid potion effect type: " + potionTypeName);
                 continue;
             }
 
