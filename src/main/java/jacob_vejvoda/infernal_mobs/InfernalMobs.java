@@ -52,6 +52,7 @@ import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
 import jacob_vejvoda.infernal_mobs.command.CommandManager;
+import jacob_vejvoda.infernal_mobs.config.FileManager;
 import jacob_vejvoda.infernal_mobs.infernal.MagicManager;
 import jacob_vejvoda.infernal_mobs.listeners.EventListener;
 import jacob_vejvoda.infernal_mobs.loot.ConsumeEffectHandler;
@@ -64,8 +65,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 	GUI gui;
 	public long serverTime = 0L;
 	public ArrayList<InfernalMob> infernalList = new ArrayList<>();
-	private File lootYML = new File(getDataFolder(), "loot.yml");
-	public File saveYML = new File(getDataFolder(), "save.yml");
+	private FileManager fileManager;
 	public FileConfiguration saveFile;
 	public FileConfiguration lootFile;
 	private HashMap<Entity, Entity> mountList = new HashMap<>();
@@ -81,43 +81,14 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
 
-		File dir = new File(this.getDataFolder().getParentFile().getPath(), this.getName());
-		if (!dir.exists())
-			dir.mkdir();
-
+		// Initialize FileManager and all config files
 		try {
-			saveDefaultConfig();
-			getLogger().info("config.yml loaded successfully.");
+			this.fileManager = new FileManager(this);
+			this.fileManager.initializeFiles();
+			this.lootFile = fileManager.getLootConfig();
+			this.saveFile = fileManager.getSaveConfig();
 		} catch (Exception e) {
-			getLogger().log(Level.SEVERE, "Failed to load config.yml!", e);
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
-
-		try {
-			if (!lootYML.exists()) {
-				saveResource("loot.yml", false);
-			}
-
-			lootFile = new YamlConfiguration();
-			lootFile.load(lootYML);
-			getLogger().info("loot.yml loaded successfully.");
-		} catch (Exception e) {
-			getLogger().log(Level.SEVERE, "Failed to load loot.yml!", e);
-			getServer().getPluginManager().disablePlugin(this);
-			return;
-		}
-
-		try {
-			if (!saveYML.exists()) {
-				saveYML.createNewFile();
-			}
-
-			saveFile = new YamlConfiguration();
-			saveFile.load(saveYML);
-			getLogger().info("save.yml loaded successfully.");
-		} catch (IOException | InvalidConfigurationException e) {
-			getLogger().log(Level.SEVERE, "Failed to load save.yml!", e);
+			getLogger().log(Level.SEVERE, "Failed to initialize configuration files!", e);
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
@@ -150,7 +121,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 		diviningStaff.addRecipe();
 
 		try {
-			CommandManager commandManager = new CommandManager(this);
+			CommandManager commandManager = new CommandManager(this, fileManager);
 			this.getCommand("infernalmobs").setExecutor(commandManager);
 			this.getCommand("infernalmobs").setTabCompleter(commandManager);
 			this.getCommand("im").setExecutor(commandManager);
@@ -367,7 +338,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 		ent.setMetadata("infernalMetadata", new FixedMetadataValue(this, list));
 		this.saveFile.set(ent.getUniqueId().toString(), list);
 		try {
-			this.saveFile.save(this.saveYML);
+			this.saveFile.save(this.fileManager.getSaveYML());
 		} catch (IOException e) {
 			this.getLogger().log(Level.SEVERE, "Failed to save mob data!", e);
 		}
@@ -390,7 +361,7 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 		this.infernalList.remove(mobIndex);
 		this.saveFile.set(id, null);
 		try {
-			this.saveFile.save(this.saveYML);
+			this.saveFile.save(this.fileManager.getSaveYML());
 		} catch (IOException e) {
 			this.getLogger().log(Level.SEVERE, "Failed to save mob data!", e);
 		}
@@ -1091,11 +1062,15 @@ public class InfernalMobs extends JavaPlugin implements Listener {
 	}
 
 	public File getSaveYML() {
-		return this.saveYML;
+		return this.fileManager.getSaveYML();
 	}
 
 	public File getLootYML() {
-		return this.lootYML;
+		return this.fileManager.getLootYML();
+	}
+
+	public FileManager getFileManager() {
+		return this.fileManager;
 	}
 
 	public void setLootFile(FileConfiguration lootFile) {

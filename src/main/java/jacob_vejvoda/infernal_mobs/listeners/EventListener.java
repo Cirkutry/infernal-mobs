@@ -317,7 +317,7 @@ public class EventListener implements Listener {
 			String name = plugin.getLocationName(e.getBlock().getLocation());
 			if (plugin.saveFile.getString("infernalSpawners." + name) != null) {
 				plugin.saveFile.set("infernalSpawners." + name, null);
-				plugin.saveFile.save(plugin.saveYML);
+				plugin.saveFile.save(plugin.getFileManager().getSaveYML());
 				if (e.getPlayer().isOp()) {
 					e.getPlayer().sendMessage(LootUtils.hex("&cYou broke an infernal mob spawner!"));
 				}

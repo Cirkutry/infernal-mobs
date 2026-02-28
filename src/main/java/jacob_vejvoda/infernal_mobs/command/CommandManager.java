@@ -18,6 +18,7 @@ import jacob_vejvoda.infernal_mobs.command.commands.ReloadCommand;
 import jacob_vejvoda.infernal_mobs.command.commands.SetLootCommand;
 import jacob_vejvoda.infernal_mobs.command.commands.SetSpawnerCommand;
 import jacob_vejvoda.infernal_mobs.command.commands.SpawnCommand;
+import jacob_vejvoda.infernal_mobs.config.FileManager;
 import jacob_vejvoda.infernal_mobs.config.LocaleManager;
 
 public class CommandManager implements TabExecutor {
@@ -25,10 +26,10 @@ public class CommandManager implements TabExecutor {
 	private final Map<String, BaseCommand> commands;
 	private final LocaleManager localeManager;
 
-	public CommandManager(InfernalMobs plugin) throws Exception {
+	public CommandManager(InfernalMobs plugin, FileManager fileManager) throws Exception {
 		this.plugin = plugin;
 		this.commands = new HashMap<>();
-		this.localeManager = new LocaleManager(plugin);
+		this.localeManager = new LocaleManager(plugin, fileManager);
 		registerCommands();
 	}
 

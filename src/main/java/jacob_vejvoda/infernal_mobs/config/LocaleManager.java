@@ -14,42 +14,23 @@ import net.md_5.bungee.api.ChatColor;
 
 public class LocaleManager {
 	private final Plugin plugin;
+	private final FileManager fileManager;
 	private FileConfiguration langConfig;
 	private String locale;
 
-	public LocaleManager(Plugin plugin) throws Exception {
+	public LocaleManager(Plugin plugin, FileManager fileManager) throws Exception {
 		this.plugin = plugin;
+		this.fileManager = fileManager;
 		this.locale = plugin.getConfig().getString("locale", "en_US");
 		loadLanguageFile();
 	}
 
 	private void loadLanguageFile() throws Exception {
 		String fileName = locale + ".yml";
-		File langFile = new File(plugin.getDataFolder() + File.separator + "lang", fileName);
-
-		File langDir = new File(plugin.getDataFolder(), "lang");
-		if (!langDir.exists()) {
-			langDir.mkdirs();
-		}
-
-		if (!langFile.exists()) {
-			try {
-				plugin.saveResource("lang/" + fileName, false);
-			} catch (Exception e) {
-				plugin.getLogger().log(Level.WARNING, "Could not save language file: " + fileName);
-
-				if (!locale.equals("en_US")) {
-					this.locale = "en_US";
-					fileName = "en_US.yml";
-					langFile = new File(plugin.getDataFolder() + File.separator + "lang", fileName);
-					try {
-						plugin.saveResource("lang/" + fileName, false);
-					} catch (Exception e2) {
-						plugin.getLogger().log(Level.SEVERE, "Could not save default language file!");
-						throw e2;
-					}
-				}
-			}
+		File langFile = fileManager.loadLanguageFile(locale);
+		String actualFileName = langFile.getName();
+		if (!actualFileName.equals(fileName)) {
+			this.locale = actualFileName.replace(".yml", "");
 		}
 
 		YamlConfiguration newLangConfig = new YamlConfiguration();

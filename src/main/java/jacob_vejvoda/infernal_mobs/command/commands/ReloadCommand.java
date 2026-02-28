@@ -30,13 +30,8 @@ public class ReloadCommand extends BaseCommand {
 		}
 
 		try {
-			File lootYML = plugin.getLootYML();
-			if (!lootYML.exists()) {
-				plugin.saveResource("loot.yml", false);
-			}
-
-			YamlConfiguration lootFile = new YamlConfiguration();
-			lootFile.load(lootYML);
+			plugin.getFileManager().loadLootYML();
+			YamlConfiguration lootFile = (YamlConfiguration) plugin.getFileManager().getLootConfig();
 			plugin.setLootFile(lootFile);
 
 			LootManager lootManager = new LootManager(plugin, lootFile);
@@ -61,9 +56,8 @@ public class ReloadCommand extends BaseCommand {
 		}
 
 		try {
-			File saveYML = plugin.getSaveYML();
-			YamlConfiguration saveFile = new YamlConfiguration();
-			saveFile.load(saveYML);
+			plugin.getFileManager().loadSaveYML();
+			YamlConfiguration saveFile = (YamlConfiguration) plugin.getFileManager().getSaveConfig();
 			plugin.setSaveFile(saveFile);
 
 			plugin.getLogger().info("save.yml reloaded successfully.");
